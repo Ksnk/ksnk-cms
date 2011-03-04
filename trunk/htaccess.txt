@@ -1,0 +1,73 @@
+<% if(isset($target_host) && in_array($target_host,array('xln','gi-endo.ru','peterhost'))) { 
+//
+// специальная настройка для любимого хостера Петерхост
+//
+%>
+CharsetRecodeMultipartForms off
+<% }
+// 
+// комплект настроек PHP для более комфортного екзекутирования 
+// 
+%>
+
+php_value allow_call_time_pass_reference on
+php_value register_globals off
+php_value upload_max_filesize 8M
+
+<% if (isset($target_charset)){%>
+AddCharset <%=$target_charset%> .html 
+<%} %>
+
+
+<% if(!empty($error_log)){///home/xilen/www/site22/public_html/error.log %>
+php_value error_log <%=$error_log%>
+<% }%>
+<% if($target=='debug') { 
+// для отладки используется вот такой финт, в обычной жизни он не нужен.
+%>
+### php_value display_errors on
+<% } %>
+
+<IfModule mod_headers.c>
+### 1. Обработка js-файлов
+<FilesMatch "\.js.gz$">
+  ForceType text/javascript  
+  Header set Content-Encoding: gzip
+</FilesMatch>
+<FilesMatch "\.js$">
+  RewriteEngine On
+  RewriteCond %{HTTP_USER_AGENT} !".*Safari.*"
+  RewriteCond %{HTTP:Accept-Encoding} gzip
+  RewriteCond %{REQUEST_FILENAME}.gz -f
+  RewriteRule (.*)\.js$ $1\.js.gz [L]
+  ForceType text/javascript
+</FilesMatch>
+ 
+### 2. Обработка css-файлов
+<FilesMatch "\.css.gz$">
+  ForceType text/css
+  Header set Content-Encoding: gzip
+</FilesMatch>
+<FilesMatch "\.css$">
+  RewriteEngine On
+  RewriteCond %{HTTP_USER_AGENT} !".*Safari.*"
+  RewriteCond %{HTTP:Accept-Encoding} gzip
+  RewriteCond %{REQUEST_FILENAME}.gz -f
+  RewriteRule (.*)\.css$ $1\.css.gz [L]
+  ForceType text/css
+</FilesMatch>
+</IfModule>
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase <%=(empty($target_dir)?"/":$target_dir."/")%>
+    
+    RewriteCond %{REQUEST_FILENAME} !-f
+    RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteCond %{SCRIPT_FILENAME} !/admin
+    RewriteRule ^(.*)$ index.php/$1 [L]
+</IfModule>
+
+<IfModule !mod_rewrite.c>
+    ErrorDocument 404 /index.php
+</IfModule>

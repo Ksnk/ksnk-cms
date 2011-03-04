@@ -1,0 +1,9 @@
+# CharsetRecodeMultipartForms off 
+
+php_value allow_call_time_pass_reference on
+
+php_value register_globals off
+php_value upload_max_filesize 8M
+# debuguiing
+
+php_value display_errors on
