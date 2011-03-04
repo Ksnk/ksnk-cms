@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<files dstdir="$dst">
+		<file>tests/Cache/*.*</file>
+	</files>
+</config>

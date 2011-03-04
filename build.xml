@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="cms-tests" default="init">
+	<property name="dir" value="cms-tests"/>
+	<property file="./${dir}.prop"/>
+
+	<property name="last_ftp" value="06/25/2009 11:06 AM"/>
+	<property name="test_dir" value="/home/${dir}.me/www"/>
+	<property name="test_url" value="http://${dir}.me/tests/Cache/test_cache.php"/> 
+	<property name="browser" location="C:/Program Files/Mozilla Firefox/firefox.exe"/>
+	<property name="xln" value="admin"/>
+ 
+	<property description="Common Folder" name="common_dir" location="Z:/xilen/common"/>
+		
+	<import file="${common_dir}/extend.xml"/>
+ 
+	<target name="init" depends="build_debug"/>
+	
+</project>

@@ -1,0 +1,8 @@
+<%
+$ID='Xilen CMS. Written by Ksnk (sergekoriakin@gmail.com)';
+$VERSION='2.0';
+
+$SVN_Revision = "$WCREV$";
+$SVN_Modified = "$WCMODS?Modified:Not modified$";
+$SVN_Date     = "$WCDATE$";
+%>
