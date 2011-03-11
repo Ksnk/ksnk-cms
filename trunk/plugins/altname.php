@@ -1,23 +1,23 @@
 <?php
 /*
-<%  
-// * необходимая часть шаблона модуля 
+<%
+// * необходимая часть шаблона модуля
 
 // включение плагина в список автоматических плагинов
 $auto_plugins[]='altname';
-	
+
 // участок шаблона админки статьи с дополнительным полем ввода адреса
 	point_start('plugin_control0');
 %>
-<input type="text" class="tahoma fills size11" style="width:100px;" title="Название раздела в адресной строке" 
+<input type="text" class="tahoma fills size11" style="width:100px;" title="Название раздела в адресной строке"
 	alt="Название раздела в адресной строке" onchange="need_Save()" placeholder="адрес" name="alt_name_{id}">
-<% point_start('plugin_control1') 
+<% point_start('plugin_control1')
 // обработка дополнительного поля ввода в форме администрирования статьи
 %>
 if(!!$element->article && $form->var['alt_name_'.$element->article->v['id']]){
    $this->export('altname','update_page',$form->var['alt_name_'.$element->article->v['id']],$element->article->v['id'],$item->v['id']);
 }
-<% point_start('plugin_control2') 
+<% point_start('plugin_control2')
 // обработка дополнительного поля ввода в форме администрирования статьи
 %>
   $x=$this->export('altname','getrealaddr',$item->v['id']);
@@ -26,7 +26,7 @@ if(!!$element->article && $form->var['alt_name_'.$element->article->v['id']]){
   }
   $form->var['alt_name_'.$element->article->v['id']]=$x;
 <% point_start('plugin_body') %>
-		
+
 /**
  * плагин для реализации альтернативных имен страниц
  * -- создается таблица
@@ -59,18 +59,18 @@ class altname extends ml_plugin {
 		}
 		$GLOBALS['altname']=&$this;
 	}
-	
+
 	/**
 	 * получить адрес по меню. null, если нету
 	 * @param $menu
 	 */
 	function getrealaddr($menu){
-		$sel_sql='select * from ?'.$this->base.' where `realadr`=?';
-		$res=@$this->database->query($sel_sql,'?do=menu&id='.$menu);
+		$sel_sql='select * from '.TAB_PREF.$this->base.' where `realadr`=?';
+		$res=@$this->database->selectRow($sel_sql,'?do=menu&id='.$menu);
 		if(empty($res))
 			return null;
 		else
-			return $res[0]['altaddr'];	
+			return $res['altaddr'];
 	}
 
 	/**
@@ -81,7 +81,7 @@ class altname extends ml_plugin {
 		static $cache;
 		if(empty($cache)){
 			$cache=array();
-			$result=mysql_query('select * from '.TAB_PREF.'_altnames;');
+			$result=mysql_query('select * from '.TAB_PREF.$this->base);
 			while($row=mysql_fetch_assoc($result)){
 				$cache[$row['realadr']]=$row['altaddr'];
 			}
@@ -91,27 +91,27 @@ class altname extends ml_plugin {
 		$addr=htmlspecialchars_decode($addr);
 		if(isset($cache[$addr]))
 			return '/'.$cache[$addr];
-		else	
+		else
 			return $addr;
 	}
-	
+
 	/**
-	 * получить реальный адрес 
+	 * получить реальный адрес
 	 * @param $menu
 	 */
 	function getaddr($addr){
-		$sel_sql='select * from ?'.$this->base.' where `altaddr`=?';
-		$res=$this->database->query($sel_sql,$addr);
+		$sel_sql='select * from '.TAB_PREF.$this->base.' where `altaddr`=?';
+		$res=$this->database->selectRow($sel_sql,$addr);
 		if(empty($res))
 			return null;
 		else {
-			if (preg_match('/do=(.+)\&id=(\w+)/',$res[0]['realadr'],$m)){
+			if (preg_match('/do=(.+)\&id=(\w+)/',$res['realadr'],$m)){
 				return array('do'=>$m[1],'id'=>$m[2]);
 			}
 			return false;
-		}	
+		}
 	}
-	
+
 	/**
 	 * update both system addresses do=page & do=menu with different ID's
 	 * @param $page
@@ -119,11 +119,11 @@ class altname extends ml_plugin {
 	 */
 	function update_page($addr,$page,$menu){
 		// try to found new record
-		$sel_sql='select * from ?'.$this->base.' where `realadr`=?';
-		$ins_sql='INSERT INTO ?'.$this->base.' (?#) VALUES(?a);';
-		$upd_sql='update ?'.$this->base.' set ?a where `realadr`=?;';
-		
-		// select & update 
+		$sel_sql='select * from '.TAB_PREF.$this->base.' where `realadr`=?';
+		$ins_sql='INSERT INTO '.TAB_PREF.$this->base.' (?#) VALUES(?a);';
+		$upd_sql='update '.TAB_PREF.$this->base.' set ?a where `realadr`=?;';
+
+		// select & update
 		$data=array('altaddr'=>$addr,'realadr'=>'?do=menu&id='.$menu);
 		$res=$this->database->query($sel_sql,$data['realadr']);
 		if(empty($res)){
@@ -144,15 +144,15 @@ class altname extends ml_plugin {
 		if(!$this->parent->has_rights(right_WRITE))
 			return $this->parent->ffirst('_loginform');
 		if($killall){
-			$this->database->query('DROP TABLE IF EXISTS ?_altnames;');
+			$this->database->query('DROP TABLE IF EXISTS '.TAB_PREF.$this->base.';');
 		}
-		$this->database->query("CREATE TABLE ?_altnames (
-				`id` INT NOT NULL AUTO_INCREMENT ,
-				`realadr` VARCHAR( 255 ) NOT NULL ,
+		$this->database->query('CREATE TABLE '.TAB_PREF.$this->base.' (
 				`altaddr` VARCHAR( 255 ) NOT NULL ,
+				`realadr` VARCHAR( 255 ) NOT NULL ,
 				`order` int,
-				PRIMARY KEY ( `id` )
-				);");
+				PRIMARY KEY ( `altaddr` ),
+				INDEX (`realadr`)
+				);');
 	}
 }
 //<% point_finish('plugin_body') %>
