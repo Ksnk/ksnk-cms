@@ -33,6 +33,11 @@ class CParameters extends CModel
     private $store;
 
     /**
+     * @var string - идентификатор для операции кэширования
+     */
+    private $cache_id;
+
+    /**
      * @var Array - весь комплект параметров приложения.
      */
     private $all;
@@ -52,11 +57,11 @@ class CParameters extends CModel
      */
     static function instance($tablename='{flesh}',$root='SysPar'){
         static $cache=array();
-        if(!isset($cache[$tablename.'#'.$root])){
-             $cache[$tablename.'#'.$root]=
-                    new CParameters($tablename,$root);
+        $x=$tablename.'#'.$root;
+        if(!isset($cache[$x])){
+            $cache[$x]= new CParameters($tablename,$root,$x);
         }
-        return $cache[$tablename.'#'.$root];
+        return $cache[$x];
     }
 
     /**
@@ -64,9 +69,13 @@ class CParameters extends CModel
      * @param  $tablename
      * @param  $root
      */
-    function __construct($tablename,$root){
+    function __construct($tablename,$root,$cache_id){
         $this->store=new CMultyData(array('table'=>$tablename));
-        $this->all=$this->store->readRecord($root);
+        $this->cache_id=$cache_id;
+        $this->all=Yii::app()->cache->get($cache_id);
+        if (empty($this->all)){
+            $this->all=$this->store->readRecord($root);
+        }
     }
 
     /**
@@ -78,6 +87,7 @@ class CParameters extends CModel
         if($this->changed){
             $this->store->writeRecord($this->all);
         }
+        $cache[$this->cache_id]=Yii::app()->cache->set($this->cache_id,$this->all);
     }
 
     /**
@@ -86,8 +96,8 @@ class CParameters extends CModel
      * @return string
      */
         function get($name,$def=null){
-            if(array_key_exists($name,$this->parameters))
-                return $this->parameters[$name];
+            if(array_key_exists($name,$this->all))
+                return $this->all[$name];
             else
                 return $def;
         }

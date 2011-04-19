@@ -1,5 +1,12 @@
 <?php
 /**
+ *
+ * класс для работы с записями произвольной наполненности
+ * запись - одномерный ассоциативный массив
+ *
+ * некоторые имена свойств имеют специальное значение
+ * id - идентификатор записи в таблице.
+ * record, name, - имена полей, которые обязательно нужно размещать в индесированном поле.
  * Created by JetBrains PhpStorm.
  * User: ksnk
  * Date: 12.04.11
@@ -36,14 +43,29 @@ class CMultyData extends CModel
      * приватные методы
      */
 
-    private function createDatabase(){
+    /**
+     * создание таблицы, если очень нужно.
+     * функция вызывается в аварийном обработчике
+     * @return void
+     */
 
+    private function createDatabase(){
+        self::$db->createCommand(
+"CREATE TABLE ".$this->table_name." (
+  `id` int(11) NOT NULL auto_increment,
+  `name` varchar(60) NOT NULL,
+  `ival` int(11) default NULL,
+  `sval` varchar(255) NOT NULL,
+  `tval` text,
+  PRIMARY KEY  (`id`,`name`),
+  KEY `sval` (`sval`)"
+        )->execute();
     }
 
     /**
      *  прочитать одну (первую) запись
      */
-    private function readRecord($param){
+    public function readRecord($param){
         $res=$this->readRecords($param,2,6000);
         if(!empty($res) && count($res)>0)
             return current($res);
@@ -71,13 +93,16 @@ class CMultyData extends CModel
         }
     }
     /**
-     *  найти и elfkbnm
+     *  найти и удалить
      *
      */
     private function delRecord($param){
-        $param=$this->readRecord($param);
+        if (!isset($param['id']))
+            $param=$this->readRecord($param);
         if(!empty($param['id'])){
-            $this->db->select('delete from ?_flesh where `id`=?d',$param['id']);
+            self::$db->createCommand('delete from '.$this->table_name
+                                     .' where `id`=?d',$param['id']
+            )->execute();
             return true;
         } else
             return false;
