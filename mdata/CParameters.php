@@ -1,22 +1,27 @@
 <?php
 /**
+ * 
  * модель для работы с параметрами в приложении.
+ * НЕ СИНГЛТОН!!!
  *
  * Предположения :
  * - количество параметров невелико и вполне влезает в память.
  * - глюк с сохраннением в деструкторе решен
  *
+ * Не нужно вызывать конструктор напрямую.
+ *
  * Параметры - ассоциативный массив
  * Хранение параметров - MultyData
- * User: Сергей
  * Date: 16.04.11
  * Time: 15:44
- * класс для работы с параметрами из любого места
+ *
  * @usage
- * $param = new CParameters(array(table=>'{flesh}','root'=>'Syspar'))
- * $param = newCParameters('Syspar')
- * $param->get()
- * $param->set()
+ * $param = CParameters::instance(array(table=>'{flesh}','root'=>'Syspar'));
+ * $param = CParameters::instance('Syspar');
+ * $param = CParameters::instance();
+ * $param->get();
+ * $param->set();
+ * 
  */
 
 class CParameters extends CModel
@@ -25,7 +30,7 @@ class CParameters extends CModel
     /**
      * @var CMultyData
      */
-    public static $store;
+    private $store;
 
     /**
      * @var Array - весь комплект параметров приложения.
@@ -36,6 +41,23 @@ class CParameters extends CModel
      * @var bool - флаг - было или нет изменение полей массива
      */
     private $changed = false;
+
+    /**
+     * внешний красивый герттер класса параметров
+     *
+     * @static
+     * @param string $tablename - имя mf,kbws базы данных
+     * @param string $root - имя корневого элемента
+     * @return
+     */
+    static function instance($tablename='{flesh}',$root='SysPar'){
+        static $cache=array();
+        if(!isset($cache[$tablename.'#'.$root])){
+             $cache[$tablename.'#'.$root]=
+                    new CParameters($tablename,$root);
+        }
+        return $cache[$tablename.'#'.$root];
+    }
 
     /**
      * конструктор класса
@@ -52,28 +74,11 @@ class CParameters extends CModel
      * @param  $tablename
      * @param  $root
      */
-    function __construct($tablename,$root){
+    function __destruct(){
         if($this->changed){
             $this->store->writeRecord($this->all);
         }
     }
-
-    /**
-     * @static
-     * @param string $tablename - имя таблицы для хранения параметров
-     * @param string $root - корневой элемент 
-     * @return void
-     */
-    static function getStore($tablename='{flesh}',$root='SysPar'){
-
-    }
-
-    /**
-     *  функции работы с системными параметрами
-     */
-        function read(){
-            CParameters::$all=$this->readRecord('SysPar');
-        }
 
     /**
      * @param  string $name - имя параметра
@@ -81,12 +86,6 @@ class CParameters extends CModel
      * @return string
      */
         function get($name,$def=null){
-            if(empty(CParameters::$all)){
-                $this->read_Parameters();
-            }
-            if(empty($this->parameters))
-                return $def;
-            //*--*/print_r($this->parameters);
             if(array_key_exists($name,$this->parameters))
                 return $this->parameters[$name];
             else
@@ -94,20 +93,23 @@ class CParameters extends CModel
         }
 
     /**
-     * @param  string $name - имя параметра для установки
+     * @param  $name - имя параметра для установки либо массив параметров
      * @param  $val
      * @param  $type
      * @return void
      */
-        function set($name,$val,$type=-1){
-            if(empty($this->parameters)){
-                $this->read_Parameters();
+        function set($name,$val,$forcewrite=false){
+            if(is_array($name)) {
+                foreach($name as $k=>$v)
+                    $this->set($k,$v);
+                return ;
             }
-            if(pps($this->parameters[$name])!=$val){
-                $this->parameters[$name]=$val;
-                $this->writeRecord($this->parameters);
-                if(!isset($this->parameters['id']))
-                    $this->read_Parameters();
+
+            if($this->all[$name]!=$val){
+                $this->all[$name]=$val;
+                $this->changed=true;
+                if($forcewrite)
+                    $this->store->writeRecord($this->all);
             }
         }
 
@@ -115,9 +117,11 @@ class CParameters extends CModel
      * @param  string $name - имя параметра для удаления
      * @return void
      */
-        function del($name){
-            unset($this->parameters[$name]);
-            $this->writeRecord($this->parameters);
+        function delete($name,$forcewrite=false){
+            unset($this->all[$name]);
+            $this->changed=true;
+            if($forcewrite)
+                $this->store->writeRecord($this->all);
         }
 
 
