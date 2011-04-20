@@ -100,9 +100,8 @@ class CMultyData extends CModel
         if (!isset($param['id']))
             $param=$this->readRecord($param);
         if(!empty($param['id'])){
-            self::$db->createCommand('delete from '.$this->table_name
-                                     .' where `id`=?d',$param['id']
-            )->execute();
+            self::$db->createCommand()
+                ->delete($this->table_name,'id=:id',array(':id'=>$param['id']))
             return true;
         } else
             return false;

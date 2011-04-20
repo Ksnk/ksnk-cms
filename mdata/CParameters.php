@@ -24,7 +24,7 @@
  * 
  */
 
-class CParameters extends CModel
+class CParameters extends CComponent
 {
 
     /**
