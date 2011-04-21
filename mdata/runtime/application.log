@@ -1,0 +1,90 @@
+2011/04/21 19:02:09 [error] [php] mysql_real_escape_string() [<a href='function.mysql-real-escape-string'>function.mysql-real-escape-string</a>]: Access denied for user 'ODBC'@'localhost' (using password: NO) (D:\projects\mdata\CMultyData.php:156)
+Stack trace:
+#0 Z:\home\localhost\www\mdata\index.php(27): CMultyData->readRecord()
+REQUEST_URI=/mdata/
+in D:\projects\mdata\CMultyData.php (156)
+in D:\projects\mdata\CMultyData.php (73)
+in Z:\home\localhost\www\mdata\index.php (27)
+2011/04/21 19:03:18 [error] [php] mysql_real_escape_string() [<a href='function.mysql-real-escape-string'>function.mysql-real-escape-string</a>]: Access denied for user 'ODBC'@'localhost' (using password: NO) (D:\projects\mdata\CMultyData.php:156)
+Stack trace:
+#0 Z:\home\localhost\www\mdata\index.php(27): CMultyData->readRecord()
+REQUEST_URI=/mdata/
+in D:\projects\mdata\CMultyData.php (156)
+in D:\projects\mdata\CMultyData.php (73)
+in Z:\home\localhost\www\mdata\index.php (27)
+2011/04/21 19:06:49 [error] [php] mysql_real_escape_string() [<a href='function.mysql-real-escape-string'>function.mysql-real-escape-string</a>]: Access denied for user 'ODBC'@'localhost' (using password: NO) (D:\projects\mdata\CMultyData.php:156)
+Stack trace:
+#0 Z:\home\localhost\www\mdata\index.php(27): CMultyData->readRecord()
+REQUEST_URI=/mdata/
+in D:\projects\mdata\CMultyData.php (156)
+in D:\projects\mdata\CMultyData.php (73)
+in Z:\home\localhost\www\mdata\index.php (27)
+2011/04/21 19:06:52 [error] [php] mysql_real_escape_string() [<a href='function.mysql-real-escape-string'>function.mysql-real-escape-string</a>]: Access denied for user 'ODBC'@'localhost' (using password: NO) (D:\projects\mdata\CMultyData.php:156)
+Stack trace:
+#0 Z:\home\localhost\www\mdata\index.php(27): CMultyData->readRecord()
+REQUEST_URI=/mdata/
+in D:\projects\mdata\CMultyData.php (156)
+in D:\projects\mdata\CMultyData.php (73)
+in Z:\home\localhost\www\mdata\index.php (27)
+2011/04/21 19:06:53 [error] [php] mysql_real_escape_string() [<a href='function.mysql-real-escape-string'>function.mysql-real-escape-string</a>]: Access denied for user 'ODBC'@'localhost' (using password: NO) (D:\projects\mdata\CMultyData.php:156)
+Stack trace:
+#0 Z:\home\localhost\www\mdata\index.php(27): CMultyData->readRecord()
+REQUEST_URI=/mdata/
+in D:\projects\mdata\CMultyData.php (156)
+in D:\projects\mdata\CMultyData.php (73)
+in Z:\home\localhost\www\mdata\index.php (27)
+2011/04/21 19:07:16 [error] [exception.CHttpException.404] exception 'CHttpException' with message 'Unable to resolve the request "site".' in D:\WebServers\home\localhost\www\yii\framework\web\CWebApplication.php:332
+Stack trace:
+#0 D:\WebServers\home\localhost\www\yii\framework\web\CWebApplication.php(121): CWebApplication->runController('')
+#1 D:\WebServers\home\localhost\www\yii\framework\base\CApplication.php(155): CWebApplication->processRequest()
+#2 Z:\home\localhost\www\mdata\index.php(24): CApplication->run()
+#3 {main} REQUEST_URI=/mdata/
+2011/04/21 19:07:42 [error] [php] mysql_real_escape_string() [<a href='function.mysql-real-escape-string'>function.mysql-real-escape-string</a>]: Access denied for user 'ODBC'@'localhost' (using password: NO) (D:\projects\mdata\CMultyData.php:156)
+Stack trace:
+#0 Z:\home\localhost\www\mdata\index.php(27): CMultyData->readRecord()
+REQUEST_URI=/mdata/
+in D:\projects\mdata\CMultyData.php (156)
+in D:\projects\mdata\CMultyData.php (73)
+in Z:\home\localhost\www\mdata\index.php (27)
+2011/04/21 19:09:03 [error] [php] mysql_real_escape_string() [<a href='function.mysql-real-escape-string'>function.mysql-real-escape-string</a>]: Access denied for user 'ODBC'@'localhost' (using password: NO) (D:\projects\mdata\CMultyData.php:156)
+Stack trace:
+#0 Z:\home\localhost\www\mdata\index.php(27): CMultyData->readRecord()
+REQUEST_URI=/mdata/
+in D:\projects\mdata\CMultyData.php (156)
+in D:\projects\mdata\CMultyData.php (73)
+in Z:\home\localhost\www\mdata\index.php (27)
+2011/04/21 19:09:04 [error] [php] mysql_real_escape_string() [<a href='function.mysql-real-escape-string'>function.mysql-real-escape-string</a>]: Access denied for user 'ODBC'@'localhost' (using password: NO) (D:\projects\mdata\CMultyData.php:156)
+Stack trace:
+#0 Z:\home\localhost\www\mdata\index.php(27): CMultyData->readRecord()
+REQUEST_URI=/mdata/
+in D:\projects\mdata\CMultyData.php (156)
+in D:\projects\mdata\CMultyData.php (73)
+in Z:\home\localhost\www\mdata\index.php (27)
+2011/04/21 19:09:05 [error] [php] mysql_real_escape_string() [<a href='function.mysql-real-escape-string'>function.mysql-real-escape-string</a>]: Access denied for user 'ODBC'@'localhost' (using password: NO) (D:\projects\mdata\CMultyData.php:156)
+Stack trace:
+#0 Z:\home\localhost\www\mdata\index.php(27): CMultyData->readRecord()
+REQUEST_URI=/mdata/
+in D:\projects\mdata\CMultyData.php (156)
+in D:\projects\mdata\CMultyData.php (73)
+in Z:\home\localhost\www\mdata\index.php (27)
+2011/04/21 19:20:03 [error] [exception.CException] exception 'CException' with message 'The command path "Z:\home\localhost\www\mdata\commands" is not a valid directory.' in Z:\home\localhost\www\yii\framework\console\CConsoleApplication.php:160
+Stack trace:
+#0 Z:\home\localhost\www\yii\framework\console\CConsoleApplication.php(149): CConsoleApplication->setCommandPath('Z:\home\localho...')
+#1 Z:\home\localhost\www\yii\framework\console\CConsoleApplication.php(79): CConsoleApplication->getCommandPath()
+#2 Z:\home\localhost\www\yii\framework\base\CApplication.php(141): CConsoleApplication->init()
+#3 Z:\home\localhost\www\yii\framework\YiiBase.php(118): CApplication->__construct('config.php')
+#4 Z:\home\localhost\www\yii\framework\YiiBase.php(105): YiiBase::createApplication('CConsoleApplica...', 'config.php')
+#5 Z:\home\localhost\www\mdata\tests\index.php(24): YiiBase::createConsoleApplication('config.php')
+#6 {main}
+2011/04/21 19:20:56 [error] [php] mysql_real_escape_string(): Access denied for user 'ODBC'@'localhost' (using password: NO) (Z:\home\localhost\www\mdata\CMultyData.php:156)
+Stack trace:
+#0 Z:\home\localhost\www\mdata\tests\index.php(27): CMultyData->readRecord()
+
+in Z:\home\localhost\www\mdata\CMultyData.php (156)
+in Z:\home\localhost\www\mdata\CMultyData.php (73)
+in Z:\home\localhost\www\mdata\tests\index.php (27)
+2011/04/21 19:36:45 [error] [php] include(CMultyData.php): failed to open stream: No such file or directory (Z:\home\localhost\www\yii\framework\YiiBase.php:396)
+Stack trace:
+#0 Z:\home\localhost\www\mdata\tests\index.php(27): spl_autoload_call()
+
+in Z:\home\localhost\www\mdata\tests\index.php (27)
