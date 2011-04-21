@@ -12,9 +12,9 @@ return array(
 	// preloading 'log' component
 	'preload'=>array('log'),
 
-	// autoloading model and component classes
+	// autoloading models and component classes
 	'import'=>array(
-        '..*',
+        'webroot.models.*',
         'application.models.*',
 		'application.components.*',
 	),
@@ -48,11 +48,13 @@ return array(
 			),
 		),
 		*/
-/*		'db'=>array(
-			'connectionString' => 'sqlite:'.dirname(__FILE__).'/../data/testdrive.db',
-		),//*/
+		/*
+        'db'=>array(
+			'connectionString' => 'sqlite:/home/localhost/www/mdata/data/testdrive.db',
+		),
+		//*/
 		// uncomment the following to use a MySQL database
-		//*
+
 		'db'=>array(
 			'connectionString' => 'mysql:host=localhost;dbname=test',
 			'emulatePrepare' => true,

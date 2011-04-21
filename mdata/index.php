@@ -10,7 +10,7 @@
   * индексный файл для проверки и отладки объекта доступа к данным
   */
 $yii="/home/localhost/www/yii/framework/yii.php";
-$config='config.php';
+$config='tests/config.php';
 
 // remove the following lines when in production mode
 defined('YII_DEBUG') or define('YII_DEBUG',true);
@@ -22,7 +22,4 @@ require_once($yii);
 /** @define "null" "VALUE" */
 //include '../CMultyData.php';
 
-Yii::createConsoleApplication($config);
-
-$data= new CMultyData();
-echo($data->readRecord('version'));
+Yii::createConsoleApplication($config)->run();
