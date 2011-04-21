@@ -39,6 +39,12 @@ class CMultyData extends CModel
      * @var array options - массив параметров для установки
      */
     function __construct ($options=null){
+        if(is_array($options) && !empty($options))
+        foreach($options as $k=>$v){
+            if(isset($this->$k)){
+                $this->$k=$v;
+            }
+        }
         $this->getDbConnection();
     }
 
@@ -166,19 +172,26 @@ class CMultyData extends CModel
         
         // проверка на дорогах
         $rcnt = 2;
-        while ($rcnt-- > 0) {
-            if (!($_qresult = @mysql_query($sql . pps($options['limit'], ' LIMIT ')))) {
+
+         while ($rcnt-- > 0) {
+             echo $sql;
+            if (!($_qresult = @mysql_query($sql . pp($options['limit'], ' LIMIT ')))) {
+                echo 'yy ';
                 // попытка залечить проблему, если ошибка исправима
                 if (mysql_errno() == 1146) { // Table '' doesn't exist
                     $this->createTable();
                     continue;
+                } else {
+                    echo mysql_errno().' '.mysql_error();
                 }
             }
+             echo 'xx ';
             $rcnt = 0; // не нужно повторять!
         }
-
+        echo'1';
+       
         if (!$_qresult) {
-            debug('Invalid query: ' . __FILE__ . ':' . __LINE__ . ' ' . mysql_error() . "\n" . 'Whole query: ' . $sql . pps($options['limit'], ' LIMIT '));
+            echo('Invalid query: ' . __FILE__ . ':' . __LINE__ . ' ' . mysql_error() . "\n" . 'Whole query: ' . $sql . pps($options['limit'], ' LIMIT '));
         } else {
             $_result = array();
             $result = null;

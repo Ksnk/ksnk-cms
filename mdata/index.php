@@ -12,6 +12,11 @@
 $yii="/home/localhost/www/yii/framework/yii.php";
 $config='tests/config.php';
 
+function pp(&$x,$pre=' ',$post='',$def='') { return (!empty($x))?$pre.$x.$post:$def;}
+function pps(&$x,$def='') { return (!empty($x))?$x:$def;}
+function ppi(&$x,$def=0) { return (!empty($x))?intval($x):$def;}
+function ppx($x,$def='') { return (!empty($x))?$x:$def;}
+
 // remove the following lines when in production mode
 defined('YII_DEBUG') or define('YII_DEBUG',true);
 // specify how many levels of call stack should be shown in each log message

@@ -8,11 +8,9 @@
  */
 class TestCommand extends CConsoleCommand
 {
-    public function actionIndex($type, $limit=5) {
-
-     }
     public function actionInit() {
-        $data= new CMultyData();
-         echo($data->readRecord('version'));
+        $data= new CMultyData(array('table_name'=>'test'));
+        echo 'hello!';
+        echo($data->readRecord('version'));
     }
 }
