@@ -38,8 +38,8 @@ class CMultyData extends CModel
      * конструктор
      * @var array options - массив параметров для установки
      */
-    function __construct ($options){
-        
+    function __construct ($options=null){
+        $this->getDbConnection();
     }
 
     /**
@@ -96,6 +96,7 @@ class CMultyData extends CModel
                 throw new CDbException(Yii::t('yii','Active Record requires a "db" CDbConnection application component.'));
         }
     }
+
     /**
      *  найти и удалить
      *
@@ -141,7 +142,6 @@ class CMultyData extends CModel
             $options = array('cnt' => $options);
         if (empty($options['cnt']))
             $options['cnt'] = 6000;
-
         // строим запрос, если нам не дали строку заранее
         if (empty($options['sql'])) {
             //0:id,1:name,2:val, !!! 3:node,4:level,5:childs
@@ -163,7 +163,7 @@ class CMultyData extends CModel
         } else {
             $sql = $options['sql'];
         }
-
+        
         // проверка на дорогах
         $rcnt = 2;
         while ($rcnt-- > 0) {
