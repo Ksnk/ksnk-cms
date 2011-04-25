@@ -58,6 +58,7 @@ return array(
 		'db'=>array(
 			'connectionString' => 'mysql:host=localhost;dbname=ODBC',
 			'emulatePrepare' => true,
+            'enableProfiling'=>true,
             'tablePrefix'=>'test_',
 			'username' => 'root',
 			'password' => '',

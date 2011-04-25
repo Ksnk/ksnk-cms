@@ -112,9 +112,10 @@ class CMultyData extends CModel
          if (!isset($param['id']))
              $param=$this->readRecord($param);
          if(!empty($param['id'])){
+             $sql_par=array(':id'=>$param['id']);
              $res=self::$db->createCommand('select ival from '.$this->table_name
                                       .' where id=:id and not isNull(ival) and sval="link"')
-                     ->queryColumn();
+                     ->queryColumn($sql_par);
              if(!empty($res)){
                 foreach($res as $v){
                     $this->delRecord(array('id'=>$v));
@@ -122,7 +123,7 @@ class CMultyData extends CModel
              }
 
              self::$db->createCommand()
-                 ->delete($this->table_name,'id=:id',array(':id'=>$param['id']));
+                 ->delete($this->table_name,'id=:id',$sql_par);
              return true;
          } else
              return false;
@@ -147,12 +148,23 @@ class CMultyData extends CModel
             $options['cnt'] = 6000;
         // строим запрос, если нам не дали строку заранее
         $sql_par=array();
+        if (!empty($options['param']))
+            $sql_par=$options['param'];
+
         if (empty($options['sql'])) {
             //0:id,1:name,2:val, !!! 3:node,4:level,5:childs
             $sql = 'SELECT u0.id,u0.name, '. $this->_cellname('',0).' as `value`, u0.sval as type from ' . $this->table_name . ' as u0 ';
             $where = array();
+           // if (!empty($options['where']) && !is_array($options['where']))
+           //     $options['where']=array($options['where']);
             $ind = 1;
             if (empty($param['id'])) {
+                if(!empty($options['where'])){
+                     $sql .= sprintf('LEFT JOIN ' . $this->table_name . ' AS u%1$s ON u0.id = u%1$s.id ',
+                                    $ind, $ind);
+                     $where[] = sprintf($options['where'],$ind);
+                     $ind++;
+                }
                 foreach ($param as $k => $v) {
                     $sql .= sprintf('LEFT JOIN ' . $this->table_name . ' AS u%1$s ON u0.id = u%1$s.id ',
                                     $ind, $ind);
@@ -162,7 +174,7 @@ class CMultyData extends CModel
                     $sql_par['v'.$ind]=$v;
                     $ind++;
                 }
-                $sql .= 'where ' . implode(' and ', $where) . ' ORDER BY u0.id';
+                $sql .= 'where ' . implode(' and ', $where) .' ORDER BY '.(empty($options['order'])?'u0.id':$options['order']);
             } else {
                 $sql .= 'where u0.id=:id';
                 $sql_par['id']=$param['id'];
@@ -170,7 +182,7 @@ class CMultyData extends CModel
         } else {
             $sql = $options['sql'];
         }
-        //print_r($sql_par);
+       // print_r($sql);
         // проверка на дорогах
         $_qresult=null;
         try {
@@ -286,13 +298,14 @@ class CMultyData extends CModel
         if(!empty($id))
             $sql_par['id']=$id;
         if(is_array($val))
-            if($key{0}!='_')
+            if($key{0}=='_')
             {
                 $sql_par['val']=serialize($val);
                 $sql_par['type']='serialize';
             } else {
                 if(!empty($id)) $val['_parent']=$id;
                 $sql_par['val']=$this->writeRecord($val);
+                $val=$sql_par['val'];
                 $sql_par['type']='link';
             }
         else
