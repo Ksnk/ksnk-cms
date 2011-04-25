@@ -17,11 +17,10 @@
  * id,name,val
  * 1023, x,1
  * 1023, y,hello
- * 1023, z,
- *
- *
- *
- *
+ * 1023, z,1024,link
+ * 1024,_parent,1024
+ * 1024, x,2
+ * 1024, y,world!!
  *
  */
  
@@ -30,12 +29,12 @@ class CMultyData extends CModel
     /**
      * @var CDbConnection установлено явно после инициализации или взято из yii::app{}->getDb()
      */
-    public static $db;
+    private static $db;
 
     /**
-     * @var string - дефолтное имя созхраняемой таблицы
+     * @var string - дефолтное имя сохраняемой таблицы
      */
-    public $table_name='{{flesh}}';
+    private $table_name='{{flesh}}';
 
     /**
      * @var array - массив полей, по которым будет вестить поиски в дальнейшем
@@ -98,39 +97,35 @@ class CMultyData extends CModel
     /**
      *  прочитать одну (первую) запись
      */
-    public function readRecord($param){
-        $res=$this->readRecords($param,2,6000);
-        if(!empty($res) && count($res)>0)
-            return current($res);
-        else
-            return null;
-    }
+     public function readRecord($param){
+         $res=$this->readRecords($param,2,6000);
+         if(!empty($res) && count($res)>0)
+             return current($res);
+         else
+             return null;
+     }
     
     /**
-     *  найти и удалить
-     *
+     *  найти и обезвредить, вместе с линками
      */
      function delRecord($param){
-        if (!isset($param['id']))
-            $param=$this->readRecord($param);
-        if(!empty($param['id'])){
-            self::$db->createCommand()
-                ->delete($this->table_name,'id=:id',array(':id'=>$param['id']));
-            return true;
-        } else
-            return false;
-     }
+         if (!isset($param['id']))
+             $param=$this->readRecord($param);
+         if(!empty($param['id'])){
+             $res=self::$db->createCommand('select ival from '.$this->table_name
+                                      .' where id=:id and not isNull(ival) and sval="link"')
+                     ->queryColumn();
+             if(!empty($res)){
+                foreach($res as $v){
+                    $this->delRecord(array('id'=>$v));
+                }
+             }
 
-      private function _cellname($k,$i){
-        if(in_array($k,$this->special_words))
-            return sprintf('u%1$s.sval',$i);
-        return sprintf('if(isNull(u%1$s.ival),if(isNull(u%1$s.tval),u%1$s.sval,u%1$s.tval),u%1$s.ival)',$i);
-     }
-
-     private function _name(&$val,&$name){
-        if(in_array($name,$this->special_words)) return 'sval';
-        if(is_int($val) || (strlen($val)<10 && ctype_digit($val))) return 'ival';
-        return 'tval';
+             self::$db->createCommand()
+                 ->delete($this->table_name,'id=:id',array(':id'=>$param['id']));
+             return true;
+         } else
+             return false;
      }
 
     /**
@@ -154,7 +149,7 @@ class CMultyData extends CModel
         $sql_par=array();
         if (empty($options['sql'])) {
             //0:id,1:name,2:val, !!! 3:node,4:level,5:childs
-            $sql = 'SELECT u0.id,u0.name, '. $this->_cellname('',0).' as `value` from ' . $this->table_name . ' as u0 ';
+            $sql = 'SELECT u0.id,u0.name, '. $this->_cellname('',0).' as `value`, u0.sval as type from ' . $this->table_name . ' as u0 ';
             $where = array();
             $ind = 1;
             if (empty($param['id'])) {
@@ -169,32 +164,22 @@ class CMultyData extends CModel
                 }
                 $sql .= 'where ' . implode(' and ', $where) . ' ORDER BY u0.id';
             } else {
-                $sql .= 'where `u0.id`=:id' . $param['id'];
+                $sql .= 'where u0.id=:id';
                 $sql_par['id']=$param['id'];
             }
         } else {
             $sql = $options['sql'];
         }
-        print_r($sql_par);
+        //print_r($sql_par);
         // проверка на дорогах
-         try {
-             $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
-         } catch(Exception $e) {
-             $this->createTable();
-             $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
-         }
-
-        while ($rcnt-- > 0) {
-           // echo $sql;
-            try{
-                $_qresult = self::$db->createCommand($sql)->query($sql_par);
-            } catch (Exception $e) {
-                if($e->errorInfo[1]==1146){
-                    $this->createTable();
-                    continue;
-                }
+        $_qresult=null;
+        try {
+            $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
+        } catch (Exception $e) {
+            if($e->errorInfo[1]==1146){
+                $this->createTable();
+                $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
             }
-            $rcnt = 0; // не нужно повторять!
         }
 
         $_result = array();
@@ -221,10 +206,12 @@ class CMultyData extends CModel
                         $result['childs'] = $row[5];
                 } */
             }
-             if (!empty($row['value']) && $row['value']{0} == 'a' && $row['value']{1} == ':') {
+            if ($row['type']=='serialize') {
                 $result[$row['name']] = unserialize($row['value']);
+            } else if ($row['type']=='link') {
+                $result[$row['name']] = $this->readRecord(array('id'=>$row['value']));
             } else {
-                $result[$row['name']] = $row['value'];
+                $result[$row['name']] =$row['value'];
             }
         }
         //debug($result);
@@ -236,11 +223,7 @@ class CMultyData extends CModel
     }
 
     /**
-     *  записать полную запись параметр с категорией
-     *	в ведущий параметр входят
-     *  - name:category, name- sval
-     *  все остальные записываются как дополнительные параметры записи
-     * поля с именем, начинающиеся с символа подчеркивания, не записываются в базу.
+     *  сохранить полную запись
      */
     function writeRecord($param){
         // вставляем новую запись
@@ -255,21 +238,19 @@ class CMultyData extends CModel
             unset($param['id']);
             if(!empty($res)){
                 $id=$res[0]['id'];
-                $past=array();
                 foreach($res as $v){
                     $name=&$v['name'];
                     if(isset($param[$name])){
-                        if(is_array($param[$name]))
-                            $param[$name]=serialize($param[$name]);
+                        $sql_par=$this->build_par($name,$param[$name],$id);
                         // параметр есть!
                         $tname=$this->_name($param[$v['name']],$name);
                         if($v[$tname]!=$param[$name]){
                             // update
-                            $key=array('ival'=>null,'sval'=>null,'tval'=>null);
-                            $key[$tname]=$param[$name];
-                            self::$db->createCommand('update ' . $this->table_name . '
-                                set '.$this->_name($v,$k).'=:val where `id`=:id and `name`=:name;')
-                                    ->execute(array('id'=>$id,'val'=>$param[$name],'name'=>$name));
+                            self::$db->createCommand('update ' . $this->table_name . ' set '
+                                                     .$this->_name($val,$key).'=:val '
+                                                     .(empty($sql_par['type'])?'':', sval=:type')
+                                                     .' where `id`=:id and `name`=:name;')
+                                    ->execute($sql_par);
                         }
                         unset($param[$name]);
                     } else {
@@ -280,11 +261,7 @@ class CMultyData extends CModel
                 };
             // вставляем оставшиеся.
                 foreach($param as $key=>$val) {
-                    if(is_array($val))
-                        $val=serialize($val);
-                    self::$db->createCommand('insert into ' . $this->table_name . ' set '.
-                                   'id= :id , name= :name ,'.$this->_name($val,$key).'=:val ')
-                            ->execute(array('id'=>$id,'name'=>$key,'val'=>$val));
+                    $this->insert_internal($key,$val,$id);
                 };
                 return $id;
             }
@@ -292,22 +269,57 @@ class CMultyData extends CModel
         
         // вставляем оставшиеся записи, не вставленные в прошлой жизни
         reset($param);
+        $id=false;
         if(list($key, $val) = each($param)){
-            self::$db->createCommand('insert into ' . $this->table_name . ' set '.
-                'name= :name ,'.$this->_name($val,$key).'=:val ')->execute(array('name'=>$key,'val'=>$val));
+            $this->insert_internal($key, $val);
             $id=self::$db->getLastInsertID();
-            $sql='insert into ' . $this->table_name . ' (id,name,ival,sval,tval) values ';
-            $sqlp=array();
             while (list($key, $val) = each($param)) {
-                if(is_array($val))
-                    $val=serialize($val);
-                self::$db->createCommand('insert into ' . $this->table_name . ' set '.
-                               'id= :id , name= :name ,'.$this->_name($val,$key).'=:val ')
-                        ->execute(array('id'=>$id,'name'=>$key,'val'=>$val));
+                $this->insert_internal($key, $val,$id);
             }
         }
 
         return $id;
     }
+
+    private function build_par($key,&$val,$id=0){
+        $sql_par=array('name'=>$key);
+        if(!empty($id))
+            $sql_par['id']=$id;
+        if(is_array($val))
+            if($key{0}!='_')
+            {
+                $sql_par['val']=serialize($val);
+                $sql_par['type']='serialize';
+            } else {
+                if(!empty($id)) $val['_parent']=$id;
+                $sql_par['val']=$this->writeRecord($val);
+                $sql_par['type']='link';
+            }
+        else
+            $sql_par['val']=$val;
+        return $sql_par;
+    }
+
+    private function insert_internal($key,&$val,$id=0){
+        $sql_par=$this->build_par($key,$val,$id);
+        self::$db->createCommand('insert into ' . $this->table_name . ' set '
+                                 .(empty($sql_par['id'])?'':'id= :id ,')
+                                 .' name= :name ,'.$this->_name($val,$key).'=:val '
+                                 .(empty($sql_par['type'])?'':', sval=:type'))
+                ->execute($sql_par);
+    }
+
+
+    private function _cellname($k,$i){
+      if(!empty($k) && in_array($k,$this->special_words))
+          return sprintf('u%1$s.sval',$i);
+      return sprintf('if(isNull(u%1$s.ival),if(isNull(u%1$s.tval),u%1$s.sval,u%1$s.tval),u%1$s.ival)',$i);
+   }
+
+   private function _name(&$val,&$name){
+      if(in_array($name,$this->special_words)) return 'sval';
+      if(is_int($val) || (strlen($val)<10 && ctype_digit($val))) return 'ival';
+      return 'tval';
+   }
 
 }

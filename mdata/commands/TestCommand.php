@@ -16,13 +16,22 @@ class TestCommand extends CConsoleCommand
      */
     public function actionInit() {
          $data= new CMultyData();
-         print_r($data->delRecord(array('id'=>3)));
-     }
+         print_r($data->readRecord(array('id'=>7)));
+    }
+    public function actionInit4() {
+         $data= new CMultyData();
+         print_r($data->writeRecord(array('record'=>'version','version'=>'34','_xx'=>array(1,2,3,4,5),
+                                    'yy'=>array('a'=>2,'b'=>3))));
+    }
+    public function actionInit3() {
+         $data= new CMultyData();
+         print_r($data->delRecord(array('record'=>'version','version'=>'34')));
+    }
     public function actionInit2() {
          $data= new CMultyData();
          print_r($data->delRecord(array('id'=>3)));
-     }
-     public function actionInit1() {
+    }
+    public function actionInit1() {
         $data= new CMultyData();
         print_r($data->readRecord('version'));
         print_r($data->writeRecord(array('record'=>'version','version'=>'12345')));
