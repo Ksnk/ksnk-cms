@@ -6,13 +6,23 @@
  *
  * некоторые имена свойств имеют специальное значение
  * id - идентификатор записи в таблице.
+ * _parent - идентификатор ссылки на поле -предок
  * record - тип поля. param|user
  * name - имена полей, которые обязательно нужно размещать в индесированном поле.
- * Created by JetBrains PhpStorm.
- * User: ksnk
- * Date: 12.04.11
- * Time: 20:57
- * To change this template use File | Settings | File Templates.
+ *
+ * array(x=>1,y=>'hello',z=>array(
+       x=>2,y=>'world!'
+    ))
+ * преобразуется в
+ * id,name,val
+ * 1023, x,1
+ * 1023, y,hello
+ * 1023, z,
+ *
+ *
+ *
+ *
+ *
  */
  
 class CMultyData extends CModel
@@ -26,6 +36,10 @@ class CMultyData extends CModel
     
     public $table_name='{flesh}';
 
+/**
+ * @var array - массив полей, по которым будет вестить поиски в дальнейшем
+ * Обязаны быть небольшими.
+ */
     private $special_words=array('root','record','name','password','url');
 
     public function attributeNames()
@@ -38,14 +52,17 @@ class CMultyData extends CModel
      * конструктор
      * @var array options - массив параметров для установки
      */
-    function __construct ($options=null){
+    function __construct ($options=null,$db=null){
         if(is_array($options) && !empty($options))
         foreach($options as $k=>$v){
             if(isset($this->$k)){
                 $this->$k=$v;
             }
         }
-        $this->getDbConnection();
+        if(!empty($db))
+            self::$db=$db;
+        else
+            self::$db=Yii::app()->getDb();
     }
 
     /**
@@ -118,8 +135,7 @@ class CMultyData extends CModel
             return false;
      }
 
-     //todo: переделать на более Yii-шный вид
-     private function _cellname(&$k,$i){
+      private function _cellname($k,$i){
         if(in_array($k,$this->special_words))
             return sprintf('u%1$s.sval',$i);
         return sprintf('if(isNull(u%1$s.ival),if(isNull(u%1$s.tval),u%1$s.sval,u%1$s.tval),u%1$s.ival)',$i);
@@ -141,7 +157,7 @@ class CMultyData extends CModel
      */
     function readRecords($param, $options)
     { //$cnt=6000,$xcnt=10000,$sql=''){
-        // изготовление записи из переданных параметров
+        // изготовление записи из переданых параметров
         if (!is_array($param))
             $param = array('record' => $param);
         if (!is_array($options))
@@ -149,77 +165,76 @@ class CMultyData extends CModel
         if (empty($options['cnt']))
             $options['cnt'] = 6000;
         // строим запрос, если нам не дали строку заранее
+        $sql_par=array();
         if (empty($options['sql'])) {
             //0:id,1:name,2:val, !!! 3:node,4:level,5:childs
-            $sql = 'SELECT u.id,u.name, if(isNull(u.ival),if(isNull(u.tval),u.sval,u.tval),u.ival) as `value` from ' . $this->table_name . ' as u ';
+            $sql = 'SELECT u.id,u.name, '. $this->_cellname('',0).' as `value` from ' . $this->table_name . ' as u0 ';
             $where = array();
             $ind = 1;
             if (empty($param['id'])) {
                 foreach ($param as $k => $v) {
-                    $sql .= sprintf('LEFT JOIN ' . $this->table_name . ' AS u%s ON u.id = u%s.id ',
+                    $sql .= sprintf('LEFT JOIN ' . $this->table_name . ' AS u%1$s ON u0.id = u%1$s.id ',
                                     $ind, $ind);
-                    $where[] = sprintf('u%1$s.name="%2$s" and ' . $this->_cellname($k, $ind) . '="%3$s" ',
-                                       $ind, mysql_real_escape_string($k), mysql_real_escape_string($v));
+                    $where[] = sprintf('u%1$s.name = :k%1$s and ' . $this->_cellname($k, $ind) . '= :v%1$s ',
+                                       $ind);
+                    $sql_par['k'.$ind]=$k;
+                    $sql_par['v'.$ind]=$v;
                     $ind++;
                 }
-                $sql .= 'where ' . implode(' and ', $where) . ' ORDER BY u.id';
+                $sql .= 'where ' . implode(' and ', $where) . ' ORDER BY u0.id';
             } else {
-                $sql .= 'where `id`=' . $param['id'];
+                $sql .= 'where `id`=:id' . $param['id'];
+                $sql_par['id']=$param['id'];
             }
         } else {
             $sql = $options['sql'];
         }
-        
+        print_r($sql_par);
         // проверка на дорогах
         $rcnt = 2;
 
-         while ($rcnt-- > 0) {
-             echo $sql;
-            if (!($_qresult = @mysql_query($sql . pp($options['limit'], ' LIMIT ')))) {
-                echo 'yy ';
-                // попытка залечить проблему, если ошибка исправима
-                if (mysql_errno() == 1146) { // Table '' doesn't exist
+        while ($rcnt-- > 0) {
+           // echo $sql;
+            try{
+                $_qresult = self::$db->createCommand($sql)->query($sql_par);
+            } catch (Exception $e) {
+                if($e->errorInfo[1]==1146){
                     $this->createTable();
                     continue;
-                } else {
-                    echo mysql_errno().' '.mysql_error();
                 }
             }
-             echo 'xx ';
             $rcnt = 0; // не нужно повторять!
         }
-        echo'1';
-       
-        if (!$_qresult) {
-            echo('Invalid query: ' . __FILE__ . ':' . __LINE__ . ' ' . mysql_error() . "\n" . 'Whole query: ' . $sql . pps($options['limit'], ' LIMIT '));
-        } else {
-            $_result = array();
-            $result = null;
-            $id = 0;
-            while (($row = mysql_fetch_array($_qresult, MYSQL_NUM))) {
-                //debug($row);
-                if ($row[0] != $id) {
-                    if ($options['cnt']-- <= 0)
-                        break;
-                    if (!empty($id)) {
-                        $_result[] = $result;
-                    }
-                    $id = $row[0];
-                    $result = array('id' => $id);
-                    if (isset($row[3])) {
-                        $result['node'] = $row[3];
-                        $result['level'] = $row[4];
-                        if (isset($row[5]))
-                            $result['childs'] = $row[5];
-                    }
+
+        $_result = array();
+        $result = null;
+        $id = 0;
+       // print_r($_qresult);
+        if(!empty($_qresult))
+        foreach($_qresult->readAll() as $row) {
+            //debug($row);
+            if ($row['id'] != $id) {
+                if ($options['cnt']-- <= 0)
+                    break;
+                if (!empty($id)) {
+                    $_result[] = $result;
                 }
-                if (!empty($row[2]) && $row[2]{0} == 'a' && $row[2]{1} == ':') {
-                    $result[$row[1]] = unserialize($row[2]);
-                } else {
-                    $result[$row[1]] = $row[2];
-                }
+                $id = $row['id'];
+                $result = array('id' => $id);
+                /**
+                 * truly special mode!!!
+                if (isset($row[3])) {
+                    $result['node'] = $row[3];
+                    $result['level'] = $row[4];
+                    if (isset($row[5]))
+                        $result['childs'] = $row[5];
+                } */
             }
-            mysql_free_result($_qresult);
+             if (!empty($row['value']) && $row['value']{0} == 'a' && $row['value']{1} == ':') {
+                $result[$row['name']] = unserialize($row['value']);
+            } else {
+                $result[$row['name']] = $row['value'];
+            }
         }
         //debug($result);
         if (!empty($id)) {
@@ -239,10 +254,13 @@ class CMultyData extends CModel
     function writeRecord($param){
         // вставляем новую запись
         unset($param['current'],$param['node'],$param['level'],$param['childs']);
+        
         if(isset($param['id'])){
             // заказывается обновление существующей записи
             // проверяем наличие веточек, изменившихся от прошлого запуска
-            $res=$this->database->select('select * from ' . $this->table_name . ' where `id`=?d',$param['id']);
+            $res=self::$db->createCommand('select * from ' . $this->table_name . ' where `id`= :id')
+                    ->query(array('id'=>$param['id']));
+            print_r($res);
             unset($param['id']);
             if(!empty($res)){
                 $id=$res[0]['id'];
@@ -258,26 +276,24 @@ class CMultyData extends CModel
                             // update
                             $key=array('ival'=>null,'sval'=>null,'tval'=>null);
                             $key[$tname]=$param[$name];
-                            $this->database->select('update ' . $this->table_name . '
-                                set ?a where `id`=?d and `name`=?;',$key,$id,$name);
+                            self::$db->createCommand('update ' . $this->table_name . '
+                                set '.$this->_name($v,$k).'=:val where `id`=:id and `name`=:name;')
+                                    ->execute(array('id'=>$id,'val'=>$param[$name],'name'=>$name));
                         }
                         unset($param[$name]);
                     } else {
                         // удаляем отсутствующие
-                        mysql_query('delete from ' . $this->table_name . '
-                            where `id`=?d and `name`=?;',$id,$name);
+                        self::$db->createCommand()->delete($this->table_name, '`id`=:id and `name`=:name'
+                            ,array('id'=>$id,'name'=>$name));
                     }
                 };
             // вставляем оставшиеся.
-                foreach($param as $k=>$v) {
-                    if(is_array($v))
-                        $v=serialize($v);
-                    if(!empty($v)){
-                        mysql_query(
-                        'insert into ' . $this->table_name . ' (id,name,'.$this->_name($v,$k).') values (
-                            ?d,?,?
-                        )',$id,$k,$v);
-                    }
+                foreach($param as $key=>$val) {
+                    if(is_array($val))
+                        $val=serialize($val);
+                    self::$db->createCommand('insert into ' . $this->table_name . ' set '.
+                                   'id= :id , name= :name ,'.$this->_name($val,$key).'=:val ')
+                            ->execute(array('id'=>$id,'name'=>$key,'val'=>$val));
                 };
                 return $id;
             }
@@ -286,35 +302,21 @@ class CMultyData extends CModel
         // вставляем оставшиеся записи, не вставленные в прошлой жизни
         reset($param);
         if(list($key, $val) = each($param)){
-            $result=mysql_query('insert into ' . $this->table_name . ' (name,ival,sval,tval) values '.
-                '("'.mysql_real_escape_string($key).'",'.$this->_db_insert($val,$key).')'
-            );
-            $this->req_cnt++;
-            if (!$result) {
-                   debug('Invalid query: '.mysql_error()
-                       ."\nWhole query: ".$sql);
-            };
-            $id=mysql_insert_id($this->database->link);
+            self::$db->createCommand('insert into ' . $this->table_name . ' set '.
+                'name= :name ,'.$this->_name($val,$key).'=:val ')->execute(array('name'=>$key,'val'=>$val));
+            $id=self::$db->getLastInsertID();
             $sql='insert into ' . $this->table_name . ' (id,name,ival,sval,tval) values ';
             $sqlp=array();
             while (list($key, $val) = each($param)) {
                 if(is_array($val))
                     $val=serialize($val);
-                $sqlp[]='('.$id.',"'
-                    .mysql_real_escape_string($key).'",'.$this->_db_insert($val,$key).')';
-
+                self::$db->createCommand('insert into ' . $this->table_name . ' set '.
+                               'id= :id , name= :name ,'.$this->_name($val,$key).'=:val ')
+                        ->execute(array('id'=>$id,'name'=>$key,'val'=>$val));
             }
-            if(!empty($sqlp)){
-                $result=mysql_query($sql.implode(',',$sqlp),$this->database->link);$this->req_cnt++;
-                if (!$result) {
-                   debug('Invalid query: '.mysql_error()
-                       ."\nWhole query: ".$sql);
-                };
-            }
-
         }
 
-           return $id;
+        return $id;
     }
 
 }

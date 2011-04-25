@@ -8,9 +8,18 @@
  */
 class TestCommand extends CConsoleCommand
 {
+    function __construct(){
+    }
+
+    /**
+     * @return void - просто тестировать что под руку подвернулось.
+     */
     public function actionInit() {
         $data= new CMultyData(array('table_name'=>'test'));
-        echo 'hello!';
-        echo($data->readRecord('version'));
+        print_r($data->writeRecord(array('record'=>'version','version'=>'12345')));
+        print_r($data->writeRecord(array('record'=>'version','version'=>'34')));
+        print_r($data->writeRecord(array('record'=>'Syspar','xx'=>'12345','yy'=>'opps')));
+        print_r($data->writeRecord(array('type'=>23,'version'=>'12345')));
+        print_r($data->readRecord('version'));
     }
 }
