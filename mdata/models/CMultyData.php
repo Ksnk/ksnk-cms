@@ -28,20 +28,24 @@
 class CMultyData extends CModel
 {
     /**
-     * @var CDbConnection the default database connection for all active record classes.
-     * By default, this is the 'db' application component.
-     * @see getDbConnection
+     * @var CDbConnection установлено явно после инициализации или взято из yii::app{}->getDb()
      */
     public static $db;
-    
-    public $table_name='{flesh}';
 
-/**
- * @var array - массив полей, по которым будет вестить поиски в дальнейшем
- * Обязаны быть небольшими.
- */
+    /**
+     * @var string - дефолтное имя созхраняемой таблицы
+     */
+    public $table_name='{{flesh}}';
+
+    /**
+     * @var array - массив полей, по которым будет вестить поиски в дальнейшем
+     * Обязаны быть небольшими.
+     */
     private $special_words=array('root','record','name','password','url');
 
+    /**
+     * @return array - dont know a while why i need this method...
+     */
     public function attributeNames()
     {
         return array(
@@ -53,12 +57,14 @@ class CMultyData extends CModel
      * @var array options - массив параметров для установки
      */
     function __construct ($options=null,$db=null){
+        // flood up all parameters at once!
         if(is_array($options) && !empty($options))
-        foreach($options as $k=>$v){
-            if(isset($this->$k)){
-                $this->$k=$v;
+            foreach($options as $k=>$v){
+                if(isset($this->$k)){
+                    $this->$k=$v;
+                }
             }
-        }
+        // snatch a database somethere.
         if(!empty($db))
             self::$db=$db;
         else
@@ -79,9 +85,9 @@ class CMultyData extends CModel
         self::$db->createCommand()->createTable($this->table_name,
                 array(
                     'id'=>'int(11) NOT NULL auto_increment',
-                    'name'=>'varchar(60) NOT NULL',
-                    'ival'=>'int(11) default NULL',
-                    'sval'=>'varchar(255) NOT NULL',
+                    'name'=>'string',
+                    'ival'=>'integer',
+                    'sval'=>'string',
                     'tval'=>'text',
                     'PRIMARY KEY  (`id`,`name`)',
                     'KEY `sval` (`sval`)'
@@ -100,26 +106,6 @@ class CMultyData extends CModel
             return null;
     }
     
-    /**
-     * Returns the database connection used by active record.
-     * By default, the "db" application component is used as the database connection.
-     * You may override this method if you want to use a different database connection.
-     * @return CDbConnection the database connection used by active record.
-     */
-    public function getDbConnection()
-    {
-        if(self::$db!==null)
-            return self::$db;
-        else
-        {
-            self::$db=Yii::app()->getDb();
-            if(self::$db instanceof CDbConnection)
-                return self::$db;
-            else
-                throw new CDbException(Yii::t('yii','Active Record requires a "db" CDbConnection application component.'));
-        }
-    }
-
     /**
      *  найти и удалить
      *
@@ -168,7 +154,7 @@ class CMultyData extends CModel
         $sql_par=array();
         if (empty($options['sql'])) {
             //0:id,1:name,2:val, !!! 3:node,4:level,5:childs
-            $sql = 'SELECT u.id,u.name, '. $this->_cellname('',0).' as `value` from ' . $this->table_name . ' as u0 ';
+            $sql = 'SELECT u0.id,u0.name, '. $this->_cellname('',0).' as `value` from ' . $this->table_name . ' as u0 ';
             $where = array();
             $ind = 1;
             if (empty($param['id'])) {
@@ -183,7 +169,7 @@ class CMultyData extends CModel
                 }
                 $sql .= 'where ' . implode(' and ', $where) . ' ORDER BY u0.id';
             } else {
-                $sql .= 'where `id`=:id' . $param['id'];
+                $sql .= 'where `u0.id`=:id' . $param['id'];
                 $sql_par['id']=$param['id'];
             }
         } else {
@@ -191,7 +177,12 @@ class CMultyData extends CModel
         }
         print_r($sql_par);
         // проверка на дорогах
-        $rcnt = 2;
+         try {
+             $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
+         } catch(Exception $e) {
+             $this->createTable();
+             $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
+         }
 
         while ($rcnt-- > 0) {
            // echo $sql;

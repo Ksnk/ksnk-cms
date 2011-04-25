@@ -58,6 +58,7 @@ return array(
 		'db'=>array(
 			'connectionString' => 'mysql:host=localhost;dbname=ODBC',
 			'emulatePrepare' => true,
+            'tablePrefix'=>'test_',
 			'username' => 'root',
 			'password' => '',
 			'charset' => 'utf8',
@@ -72,7 +73,7 @@ return array(
 			'routes'=>array(
 				array(
 					'class'=>'CFileLogRoute',
-					'levels'=>'error, warning',
+					'levels'=>'info,error, warning',
 				),
 				// uncomment the following to show log messages on web pages
 				/*

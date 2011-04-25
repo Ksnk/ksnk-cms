@@ -12,10 +12,19 @@ class TestCommand extends CConsoleCommand
     }
 
     /**
-     * @return void - просто тестировать что под руку подвернулось.
+     * @return void - РїСЂРѕСЃС‚Рѕ С‚РµСЃС‚РёСЂРѕРІР°С‚СЊ С‡С‚Рѕ РїРѕРґ СЂСѓРєСѓ РїРѕРґРІРµСЂРЅСѓР»РѕСЃСЊ.
      */
     public function actionInit() {
-        $data= new CMultyData(array('table_name'=>'test'));
+         $data= new CMultyData();
+         print_r($data->delRecord(array('id'=>3)));
+     }
+    public function actionInit2() {
+         $data= new CMultyData();
+         print_r($data->delRecord(array('id'=>3)));
+     }
+     public function actionInit1() {
+        $data= new CMultyData();
+        print_r($data->readRecord('version'));
         print_r($data->writeRecord(array('record'=>'version','version'=>'12345')));
         print_r($data->writeRecord(array('record'=>'version','version'=>'34')));
         print_r($data->writeRecord(array('record'=>'Syspar','xx'=>'12345','yy'=>'opps')));
