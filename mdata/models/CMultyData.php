@@ -37,7 +37,7 @@ class CMultyData extends CModel
     public $table_name='{{flesh}}';
 
     /**
-     * @var array - массив полей, по которым будет вестить поиски в дальнейшем
+     * @var array - массив полей, по которым будет вестиcь поиски в дальнейшем
      * Обязаны быть небольшими.
      */
     private $special_words=array('root','record','name','password','url');
@@ -63,7 +63,7 @@ class CMultyData extends CModel
                     $this->$k=$v;
                 }
             }
-        // snatch a database somethere.
+        // snatch a database somewhere.
         if(!empty($db))
             self::$db=$db;
         else
@@ -152,7 +152,7 @@ class CMultyData extends CModel
             $sql_par=$options['param'];
 
         if (empty($options['sql'])) {
-            //0:id,1:name,2:val, !!! 3:node,4:level,5:childs
+            //0:id,1:name,2:val, !!! 3:node,4:level,5:childes
             $sql = 'SELECT u0.id,u0.name, '. $this->_cellname('',0).' as `value`, u0.sval as type '
                    .(empty($options['from'])?'from '.$this->table_name . ' as u0 ':$options['from'])
                   ;
@@ -288,7 +288,7 @@ class CMultyData extends CModel
             }
         }
         
-        // вставляем оставшиеся записи, не вставленные в прошлой жизни
+        // вставляем оставшиеся записи, не вставленые в прошлой жизни
         reset($param);
         $id=false;
         if(list($key, $val) = each($param)){
