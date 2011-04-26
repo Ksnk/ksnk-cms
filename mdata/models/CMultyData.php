@@ -34,7 +34,7 @@ class CMultyData extends CModel
     /**
      * @var string - дефолтное имя сохраняемой таблицы
      */
-    private $table_name='{{flesh}}';
+    public $table_name='{{flesh}}';
 
     /**
      * @var array - массив полей, по которым будет вестить поиски в дальнейшем
@@ -153,17 +153,22 @@ class CMultyData extends CModel
 
         if (empty($options['sql'])) {
             //0:id,1:name,2:val, !!! 3:node,4:level,5:childs
-            $sql = 'SELECT u0.id,u0.name, '. $this->_cellname('',0).' as `value`, u0.sval as type from ' . $this->table_name . ' as u0 ';
+            $sql = 'SELECT u0.id,u0.name, '. $this->_cellname('',0).' as `value`, u0.sval as type '
+                   .(empty($options['from'])?'from '.$this->table_name . ' as u0 ':$options['from'])
+                  ;
             $where = array();
            // if (!empty($options['where']) && !is_array($options['where']))
            //     $options['where']=array($options['where']);
             $ind = 1;
             if (empty($param['id'])) {
+                if(!empty($options['where_last'])){
+                    $where[] = $options['where_last'];
+                }
                 if(!empty($options['where'])){
-                     $sql .= sprintf('LEFT JOIN ' . $this->table_name . ' AS u%1$s ON u0.id = u%1$s.id ',
-                                    $ind, $ind);
-                     $where[] = sprintf($options['where'],$ind);
-                     $ind++;
+                    $sql .= sprintf('LEFT JOIN ' . $this->table_name . ' AS u%1$s ON u0.id = u%1$s.id ',
+                                   $ind, $ind);
+                    $where[] = sprintf($options['where'],$ind);
+                    $ind++;
                 }
                 foreach ($param as $k => $v) {
                     $sql .= sprintf('LEFT JOIN ' . $this->table_name . ' AS u%1$s ON u0.id = u%1$s.id ',
@@ -174,7 +179,10 @@ class CMultyData extends CModel
                     $sql_par['v'.$ind]=$v;
                     $ind++;
                 }
-                $sql .= 'where ' . implode(' and ', $where) .' ORDER BY '.(empty($options['order'])?'u0.id':$options['order']);
+                if(!empty($where))
+                    $sql .= 'where ' . implode(' and ', $where);
+                $options['order'][]='u0.id';
+                $sql .= ' ORDER BY '.implode(', ', $options['order']);
             } else {
                 $sql .= 'where u0.id=:id';
                 $sql_par['id']=$param['id'];
@@ -189,6 +197,7 @@ class CMultyData extends CModel
             $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
         } catch (Exception $e) {
             if($e->errorInfo[1]==1146){
+                echo $sql;
                 $this->createTable();
                 $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
             }
@@ -209,14 +218,12 @@ class CMultyData extends CModel
                 }
                 $id = $row['id'];
                 $result = array('id' => $id);
-                /**
-                 * truly special mode!!!
-                if (isset($row[3])) {
-                    $result['node'] = $row[3];
-                    $result['level'] = $row[4];
-                    if (isset($row[5]))
-                        $result['childs'] = $row[5];
-                } */
+                if(!empty($options['fields']))
+                foreach($options['fields'] as $v){
+                    if (isset($row[$v])) {
+                        $result[$v] = $row[$v];
+                    }
+                }
             }
             if ($row['type']=='serialize') {
                 $result[$row['name']] = unserialize($row['value']);
@@ -246,11 +253,12 @@ class CMultyData extends CModel
             // проверяем наличие веточек, изменившихся от прошлого запуска
             $res=self::$db->createCommand('select * from ' . $this->table_name . ' where `id`= :id')
                     ->query(array('id'=>$param['id']));
-            print_r($res);
-            unset($param['id']);
+            //print_r($res);
+            $id=$param['id'];
+           // unset($param['id']);
             if(!empty($res)){
-                $id=$res[0]['id'];
-                foreach($res as $v){
+                foreach($res->readAll() as $v){
+                    $id=$v['id'];
                     $name=&$v['name'];
                     if(isset($param[$name])){
                         $sql_par=$this->build_par($name,$param[$name],$id);
@@ -273,7 +281,8 @@ class CMultyData extends CModel
                 };
             // вставляем оставшиеся.
                 foreach($param as $key=>$val) {
-                    $this->insert_internal($key,$val,$id);
+                    if($key!='id')
+                        $this->insert_internal($key,$val,$id);
                 };
                 return $id;
             }

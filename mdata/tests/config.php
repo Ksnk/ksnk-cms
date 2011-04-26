@@ -57,8 +57,7 @@ return array(
 
 		'db'=>array(
 			'connectionString' => 'mysql:host=localhost;dbname=ODBC',
-			'emulatePrepare' => true,
-            'enableProfiling'=>true,
+			'enableProfiling'=>true,
             'tablePrefix'=>'test_',
 			'username' => 'root',
 			'password' => '',
@@ -76,7 +75,10 @@ return array(
 					'class'=>'CFileLogRoute',
 					'levels'=>'info,error, warning',
 				),
-				// uncomment the following to show log messages on web pages
+                array(
+                        'class'=> 'CFileLogRoute',
+                        'categories' => 'profiler',
+                )// uncomment the following to show log messages on web pages
 				/*
 				array(
 					'class'=>'CWebLogRoute',

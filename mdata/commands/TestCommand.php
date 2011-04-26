@@ -20,10 +20,20 @@ class TestCommand extends CConsoleCommand
     function __construct(){
     }
 
+    function actionNewsGetLast(){
+        // выдать несколько ньюсов
+        $news=new CNews();
+        echo count($news->getLastNews()).'
+';
+        print_r(Yii::app()->db->getStats() );
+    }
+
     function actionNewsGet(){
         // выдать несколько ньюсов
         $news=new CNews();
-         echo count($news->getNews(mktime(20, 00, 0, 3, 24, 2011),mktime(20, 49, 0, 4, 25, 2011)));
+        echo count($news->getNews(mktime(20, 00, 0, 3, 24, 2000),mktime(20, 49, 0, 4, 25, 2011)));
+        for($i=0;$i<100;$i++)
+            $news->getNews(mktime(20, 00, 0, 3, 24, 2000),mktime(20, 49, 0, 4, 25, 2011));
         print_r(Yii::app()->db->getStats() );
     }
 
@@ -31,10 +41,11 @@ class TestCommand extends CConsoleCommand
         // создание множества ньюсов
         $news=new CNews();
         for($i=0;$i<4000;$i++){
+            $date=time()-rand(0,5* 365)* 24 * 60 * 60;
             $newsbody=array(
-                'title'=>random_string(5+rand(0,10)),
-                'text'=>random_string(100+rand(0,1024)),
-                'date'=>time()-rand(0,5* 365)* 24 * 60 * 60
+                'title'=>$date.' '.random_string(5+rand(0,10)),
+                'text'=>$date.' '.random_string(100+rand(0,1024)),
+                'date'=>$date
             );
             $news->addNews($newsbody);
         }

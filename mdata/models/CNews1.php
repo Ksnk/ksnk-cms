@@ -1,7 +1,7 @@
 <?php
 /**
  * Модуль для реализации простой модели списка новостей.
- * Новости с дополнительной таблицей с данными.
+ * Все новости стараемся уложить в CMultyData без дополнительных таблиц
  * потребности
  * -- вывод списка из нескольких новостей, начиная с даты, начиная со станицы,
  * -- за период, начиная со страницы
@@ -11,17 +11,15 @@
  * -- addNews
  */
 
-class CNews extends CModel {
+class CNews1 extends CModel {
 
     /**
      * data provider
      */
     var $ar;
-    static $db;
 
     function __construct($options=null){
         $this->ar=new CMultyData($options);
-        self::$db=Yii::app()->getDb();
     }
 
     public function attributeNames()
@@ -41,43 +39,28 @@ class CNews extends CModel {
     function addNews(&$news){
         if (empty($news['date']))
             $news['date']=time();
-        self::$db->createCommand('insert {{news_date}} set date=:date')->execute(array('date'=>$news['date']));
-        $news['id']=self::$db->getLastInsertID();
-        unset($news['date']);
         $news['record']='news';
         return $this->ar->writeRecord($news);
     }
 
     /**
      * вывести список новостей за диапазон дат, отсортированный по дате
-     */
-    function getNews($from,$to){
-        return $this->ar->readRecords(
-            array(),
-            array(//'where'=>'u1.name="date" and u1.ival BETWEEN :from AND :to'
-                'order'=>array('z.date DESC')
-                ,'fields'=> array('date')
-                ,'from'=>', z.date from (select id,date from {{news_date}} where `date` BETWEEN :from AND :to order by `date` limit 50) as z left join '.$this->ar->table_name . ' as u0 on z.id=u0.id '
-                ,'param'=>array('from'=>$from,'to'=>$to)
-            ));
-    }
-
-    /**
-     * вывести список последних
      * @param  array $news
      * @return array - идентификатор новости в терминах таблицы новостей.
      * добавить новость в базу
      *
      */
-    function getLastNews(){
+    function getNews($from,$to){
         return $this->ar->readRecords(
-            array(),
-            array(
-                'order'=>array('z.date DESC')
-                ,'fields'=> array('date')
-                ,'from'=>', z.date from (select id,date from {{news_date}} order by `date` DESC limit :cnt) as z left join '.$this->ar->table_name . ' as u0 on z.id=u0.id '
-                ,'param'=>array('cnt'=>50)
-            ));
+            'news',
+            array('where'=>'u1.name="date" and u1.ival BETWEEN :from AND :to'
+                 ,'order'=>'u1.ival'
+                //'where'=>'u1.date BETWEEN :from AND :to'
+                //,'order'=>'u1.date'//'u1.ival'
+
+                //,'cnt'=>50
+                ,'param'=>array('from'=>$from,'to'=>$to)
+             ));
     }
 
     /**
