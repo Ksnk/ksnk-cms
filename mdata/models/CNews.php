@@ -98,6 +98,24 @@ class CNews extends CModel {
     }
 
     /**
+     * вывести список новостей по шв
+     * @param  array $news
+     * @return array - идентификатор новости в терминах таблицы новостей.
+     * добавить новость в базу
+     *
+     */
+    function getNewsById($id){
+        return $this->ar->readRecord(
+            array(),
+            array(
+                'order'=>''//array('z.date DESC')
+                ,'fields'=> array('date')
+                ,'from'=>', z.date from (select id,date from {{news_date}} where id=:xid) as z left join '.$this->ar->table_name . ' as u0 on z.id=u0.id '
+                ,'param'=>array('xid'=>$id)
+            ));
+    }
+
+    /**
      * @param  array $news
      * @return void
      * удалить новость по индексу

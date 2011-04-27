@@ -44,20 +44,35 @@ query executed: '.$dbStats[0].' (for '.round($dbStats[1], 5).' sec)';
         $this->status();
     }
 
-    function actionNewsGet(){
-        // выдать несколько ньюсов
-        $news=new CNews();
-        echo count($news->getNews(mktime(20, 00, 0, 3, 24, 2000),mktime(20, 49, 0, 4, 25, 2011)));
-        for($i=0;$i<100;$i++)
-            $news->getNews(mktime(20, 00, 0, 3, 24, 2000),mktime(20, 49, 0, 4, 25, 2011));
-        $this->status();
-    }
+    function actionNewsGet($id=10193){
+         // выдать несколько ньюсов
+         $news=new CNews();
+         print_r($news->getNewsById($id));
+         for ($i=0;$i<50;$i++)
+             $news->getNewsById($id);
+         $this->status();
+     }
+
+    function actionReadNews(){
+         // выдать несколько ньюсов
+         $news=new CNews();
+         echo count($news->getNews(mktime(20, 00, 0, 3, 24, 2000),mktime(20, 49, 0, 4, 25, 2011)));
+         for($i=0;$i<100;$i++)
+             $news->getNews(mktime(20, 00, 0, 3, 24, 2000),mktime(20, 49, 0, 4, 25, 2011));
+         $this->status();
+     }
 
     function actionNewsCreate100500(){
+        /**
+         * for($i=0;$i<10000;$i++) // MyIsam
+         * query executed: 298 (for 0.26599 sec)Memory usage: 2.676 Mb
+         *  Time spent: 24.427 s
+         *
+         */
         // создание множества ньюсов
         $news=new CNews();
         //$news->indexes(false);
-        for($i=0;$i<1000;$i++){
+        for($i=0;$i<10000;$i++){
             $date=time()-rand(0,5* 365)* 24 * 60 * 60;
             $newsbody=array(
                 'title'=>$date.' '.random_string(5+rand(0,10)),
@@ -80,11 +95,11 @@ query executed: '.$dbStats[0].' (for '.round($dbStats[1], 5).' sec)';
      */
     public function actionInit() {
          $data= new CMultyData();
-         print_r($data->delRecord(array('id'=>11)));
+         print_r($data->delRecord(array('id'=>16)));
     }
     public function actionInit5() {
          $data= new CMultyData();
-         print_r($data->readRecord(array('id'=>7)));
+         print_r($data->readRecord(array('id'=>10193)));
     }
     public function actionInit4() {
          $data= new CMultyData();

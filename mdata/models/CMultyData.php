@@ -31,6 +31,9 @@ class CMultyData extends CModel
      */
     private static $db;
 
+    private $sql_cache=array();
+    private $sql_lastid=0;
+
     /**
      * @var string - дефолтное имя сохраняемой таблицы
      */
@@ -51,6 +54,16 @@ class CMultyData extends CModel
         );
     }
 
+    private function flush(){
+        if(!empty($this->sql_cache)){
+            $sql='insert into '. $this->table_name . ' (id,name,ival,sval,tval) values '.
+                implode(',',$this->sql_cache);
+            //echo $sql;
+            self::$db->createCommand($sql)->execute();
+            $this->sql_cache=array();
+        }
+    }
+
     /**
      * конструктор
      * @var array options - массив параметров для установки
@@ -68,6 +81,7 @@ class CMultyData extends CModel
             self::$db=$db;
         else
             self::$db=Yii::app()->getDb();
+
     }
     /**
      * конструктор
@@ -75,8 +89,7 @@ class CMultyData extends CModel
      */
     function __destruct (){
         // flood up all parameters at once!
-        $x='';
-        $this->insert_internal('',$x,0,false);
+        $this->flush();
     }
 
     /**
@@ -106,8 +119,10 @@ class CMultyData extends CModel
     /**
      *  прочитать одну (первую) запись
      */
-     public function readRecord($param){
-         $res=$this->readRecords($param,2,6000);
+     public function readRecord($param,$options=null){
+         if(empty($options))
+            $options=array('cnt'=>2);
+         $res=$this->readRecords($param,$options);
          if(!empty($res) && count($res)>0)
              return current($res);
          else
@@ -148,6 +163,9 @@ class CMultyData extends CModel
      */
     function readRecords($param, $options)
     { //$cnt=6000,$xcnt=10000,$sql=''){
+        if(!empty($this->sql_cache)){
+            $this->flush();
+        }
         // изготовление записи из переданых параметров
         if (!is_array($param))
             $param = array('record' => $param);
@@ -190,8 +208,10 @@ class CMultyData extends CModel
                 }
                 if(!empty($where))
                     $sql .= 'where ' . implode(' and ', $where);
-                $options['order'][]='u0.id';
-                $sql .= ' ORDER BY '.implode(', ', $options['order']);
+                if(!isset($options['order']))
+                    $options['order'][]='u0.id';
+                if(!empty($options['order']))
+                    $sql .= ' ORDER BY '.implode(', ', $options['order']);
             } else {
                 $sql .= 'where u0.id=:id';
                 $sql_par['id']=$param['id'];
@@ -199,9 +219,9 @@ class CMultyData extends CModel
         } else {
             $sql = $options['sql'];
         }
-       // print_r($sql);
+        //print_r($sql);
         // проверка на дорогах
-        Yii::beginProfile('query');
+        //Yii::beginProfile('query');
         $_qresult=null;
         try {
             $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
@@ -212,7 +232,7 @@ class CMultyData extends CModel
                 $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
             }
         }
-        Yii::endProfile('query');
+        //Yii::endProfile('query');
 
         $_result = array();
         $result = null;
@@ -255,7 +275,7 @@ class CMultyData extends CModel
     /**
      *  сохранить полную запись
      */
-    function writeRecord($param){
+    function writeRecord($param,$wait=true){
         // вставляем новую запись
         unset($param['current'],$param['node'],$param['level'],$param['childs']);
         
@@ -298,16 +318,20 @@ class CMultyData extends CModel
                 //$this->insert_internal('',$val,$id,false);
                 return $id;
             }
+        } else {
+            if($this->sql_lastid==0){
+                $res=self::$db->createCommand('SHOW TABLE STATUS FROM `ODBC` LIKE "'.$this->table_name.'";')->queryRow();
+                $this->sql_lastid=$res['Auto_increment'];//1+self::$db->createCommand('select max(id) from '.$this->table_name.';')->queryScalar();
+            }
+            $id=$this->sql_lastid++;
         }
         
         // вставляем оставшиеся записи, не вставленые в прошлой жизни
         reset($param);
-        $id=false;
-        if(list($key, $val) = each($param)){
-            $this->insert_internal($key, $val);
-            $id=self::$db->getLastInsertID();
+        if(!empty($param)){
             while (list($key, $val) = each($param)) {
-                $this->insert_internal($key, $val,$id);
+                if($key!='id')
+                    $this->insert_internal($key, $val,$id,true);
             }
         }
 
@@ -318,6 +342,10 @@ class CMultyData extends CModel
         $sql_par=array('name'=>$key);
         if(!empty($id))
             $sql_par['id']=$id;
+        else {
+            Yii::getLogger()->log('empty Id!!!','error');
+            $sql_par['id']='null';
+        }
         if(is_array($val))
             if($key{0}=='_')
             {
@@ -335,14 +363,7 @@ class CMultyData extends CModel
     }
 
     private function insert_internal($key,&$val,$id=0,$wait=false){
-        static $delayed_sql=array();
-        if(!empty($delayed_sql) && !$wait){
-            $sql='insert into '. $this->table_name . ' (id,name,ival,sval,tval) values '.
-                implode(',',$delayed_sql);
-           // echo $sql;
-            self::$db->createCommand($sql)->execute();
-            $delayed_sql=array();
-        }
+
         if(empty($key)) return;
 
         if($wait && !empty($id)){
@@ -351,17 +372,13 @@ class CMultyData extends CModel
             if(in_array($key,$this->special_words)){
                 $vals[]='null';$vals[]=self::$db->quoteValue($val);$vals[]='null';
             } else if(is_int($val) || (strlen($val)<12 && ctype_digit($val))){
-                $vals[]=$val;$vals[]=(empty($sql_par['type'])?"''":$sql_par['type']);$vals[]='null';
+                $vals[]=$val;$vals[]=(empty($sql_par['type'])?"''":self::$db->quoteValue($sql_par['type']));$vals[]='null';
             } else {
-                $vals[]='null';$vals[]=(empty($sql_par['type'])?"''":$sql_par['type']);$vals[]=self::$db->quoteValue($val);
+                $vals[]='null';$vals[]=(empty($sql_par['type'])?"''":self::$db->quoteValue($sql_par['type']));$vals[]=self::$db->quoteValue($sql_par['val']);
             }
-            $delayed_sql[]='('.implode(',',$vals).')';
-            if(count($delayed_sql)>100){
-                $sql='insert into '. $this->table_name . ' (id,name,ival,sval,tval) values '.
-                implode(',',$delayed_sql);
-               // echo $sql;
-                self::$db->createCommand($sql)->execute();
-                $delayed_sql=array();
+            $this->sql_cache[]='('.implode(',',$vals).')';
+            if(count($this->sql_cache)>100){
+                $this->flush();
             }
             return;
         }
@@ -371,6 +388,7 @@ class CMultyData extends CModel
                                  .' name= :name ,'.$this->_name($val,$key).'=:val '
                                  .(empty($sql_par['type'])?'':', sval=:type'))
                 ->execute($sql_par);
+        if(!$wait) $this->flush();
     }
 
 
