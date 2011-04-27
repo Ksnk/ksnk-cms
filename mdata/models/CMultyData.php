@@ -44,6 +44,7 @@ class CMultyData extends CModel
      * Обязаны быть небольшими.
      */
     private $special_words=array('root','record','name','password','url');
+    private $table_locked=false;
 
     /**
      * @return array - dont know a while why i need this method...
@@ -83,6 +84,7 @@ class CMultyData extends CModel
             self::$db=Yii::app()->getDb();
 
     }
+    
     /**
      * конструктор
      * @var array options - массив параметров для установки
@@ -90,6 +92,8 @@ class CMultyData extends CModel
     function __destruct (){
         // flood up all parameters at once!
         $this->flush();
+        if($this->table_locked)
+            self::$db->createCommand('UNLOCK TABLES')->execute();
     }
 
     /**
@@ -101,8 +105,7 @@ class CMultyData extends CModel
      * функция вызывается в аварийном обработчике
      * @return void
      */
-
-    private function createTable(){
+   private function createTable(){
         self::$db->createCommand()->createTable($this->table_name,
                 array(
                     'id'=>'int(11) NOT NULL auto_increment',
@@ -315,11 +318,12 @@ class CMultyData extends CModel
                     if($key!='id')
                         $this->insert_internal($key,$val,$id,true);
                 };
-                //$this->insert_internal('',$val,$id,false);
                 return $id;
             }
         } else {
             if($this->sql_lastid==0){
+                self::$db->createCommand('LOCK TABLE '.$this->table_name.' WRITE;')->execute();
+                $this->table_locked=true;
                 $res=self::$db->createCommand('SHOW TABLE STATUS FROM `ODBC` LIKE "'.$this->table_name.'";')->queryRow();
                 $this->sql_lastid=$res['Auto_increment'];//1+self::$db->createCommand('select max(id) from '.$this->table_name.';')->queryScalar();
             }
