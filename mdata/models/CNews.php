@@ -29,6 +29,23 @@ class CNews extends CModel {
         return array(
         );
     }
+
+    public function indexes($on=true){
+        if(!$on){
+           // self::$db->createCommand('ALTER TABLE {{news_date}} CHANGE `id` `id` INT( 11 ) NOT NULL;')->execute();
+           // self::$db->createCommand('ALTER TABLE {{news_date}} DROP PRIMARY KEY;')->execute();
+           //  self::$db->createCommand('ALTER TABLE {{news_date}} CHANGE `id` `id` INT( 11 ) NOT NULL AUTO_INCREMENT;')->execute();
+           //
+            self::$db->createCommand('ALTER TABLE {{flesh}} DROP INDEX `sval`;')->execute();
+            self::$db->createCommand('ALTER TABLE {{flesh}} CHANGE `id` `id` INT( 11 ) NOT NULL;')->execute();
+            self::$db->createCommand('ALTER TABLE {{flesh}} DROP PRIMARY KEY;')->execute();
+        } else {
+           // self::$db->createCommand('ALTER TABLE {{news_date}} ADD PRIMARY KEY ( `id` );')->execute();
+            self::$db->createCommand('ALTER TABLE {{flesh}} ADD INDEX ( `sval` ) ;')->execute();
+            self::$db->createCommand('ALTER TABLE {{flesh}} ADD PRIMARY KEY ( `id` , `name` );')->execute();
+            self::$db->createCommand('ALTER TABLE {{flesh}} CHANGE `id` `id` INT( 11 ) NOT NULL AUTO_INCREMENT;')->execute();
+        }
+    }
     
     /**
      *

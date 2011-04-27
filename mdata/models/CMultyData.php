@@ -69,6 +69,15 @@ class CMultyData extends CModel
         else
             self::$db=Yii::app()->getDb();
     }
+    /**
+     * конструктор
+     * @var array options - массив параметров для установки
+     */
+    function __destruct (){
+        // flood up all parameters at once!
+        $x='';
+        $this->insert_internal('',$x,0,false);
+    }
 
     /**
      * приватные методы
@@ -192,6 +201,7 @@ class CMultyData extends CModel
         }
        // print_r($sql);
         // проверка на дорогах
+        Yii::beginProfile('query');
         $_qresult=null;
         try {
             $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
@@ -202,6 +212,7 @@ class CMultyData extends CModel
                 $_qresult = self::$db->createCommand($sql . pp($options['limit'], ' LIMIT '))->query($sql_par);
             }
         }
+        Yii::endProfile('query');
 
         $_result = array();
         $result = null;
@@ -268,7 +279,7 @@ class CMultyData extends CModel
                             // update
                             self::$db->createCommand('update ' . $this->table_name . ' set '
                                                      .$this->_name($val,$key).'=:val '
-                                                     .(empty($sql_par['type'])?'':', sval=:type')
+                                                     .(!isset($sql_par['type'])?'':', sval=:type')
                                                      .' where `id`=:id and `name`=:name;')
                                     ->execute($sql_par);
                         }
@@ -282,8 +293,9 @@ class CMultyData extends CModel
             // вставляем оставшиеся.
                 foreach($param as $key=>$val) {
                     if($key!='id')
-                        $this->insert_internal($key,$val,$id);
+                        $this->insert_internal($key,$val,$id,true);
                 };
+                //$this->insert_internal('',$val,$id,false);
                 return $id;
             }
         }
@@ -322,7 +334,37 @@ class CMultyData extends CModel
         return $sql_par;
     }
 
-    private function insert_internal($key,&$val,$id=0){
+    private function insert_internal($key,&$val,$id=0,$wait=false){
+        static $delayed_sql=array();
+        if(!empty($delayed_sql) && !$wait){
+            $sql='insert into '. $this->table_name . ' (id,name,ival,sval,tval) values '.
+                implode(',',$delayed_sql);
+           // echo $sql;
+            self::$db->createCommand($sql)->execute();
+            $delayed_sql=array();
+        }
+        if(empty($key)) return;
+
+        if($wait && !empty($id)){
+            $vals=array($id, self::$db->quoteValue($key));
+            $sql_par=$this->build_par($key,$val,$id);
+            if(in_array($key,$this->special_words)){
+                $vals[]='null';$vals[]=self::$db->quoteValue($val);$vals[]='null';
+            } else if(is_int($val) || (strlen($val)<12 && ctype_digit($val))){
+                $vals[]=$val;$vals[]=(empty($sql_par['type'])?"''":$sql_par['type']);$vals[]='null';
+            } else {
+                $vals[]='null';$vals[]=(empty($sql_par['type'])?"''":$sql_par['type']);$vals[]=self::$db->quoteValue($val);
+            }
+            $delayed_sql[]='('.implode(',',$vals).')';
+            if(count($delayed_sql)>100){
+                $sql='insert into '. $this->table_name . ' (id,name,ival,sval,tval) values '.
+                implode(',',$delayed_sql);
+               // echo $sql;
+                self::$db->createCommand($sql)->execute();
+                $delayed_sql=array();
+            }
+            return;
+        }
         $sql_par=$this->build_par($key,$val,$id);
         self::$db->createCommand('insert into ' . $this->table_name . ' set '
                                  .(empty($sql_par['id'])?'':'id= :id ,')
@@ -333,14 +375,14 @@ class CMultyData extends CModel
 
 
     private function _cellname($k,$i){
-      if(!empty($k) && in_array($k,$this->special_words))
+      if(!empty($k) && in_array($k,&$this->special_words))
           return sprintf('u%1$s.sval',$i);
       return sprintf('if(isNull(u%1$s.ival),if(isNull(u%1$s.tval),u%1$s.sval,u%1$s.tval),u%1$s.ival)',$i);
    }
 
    private function _name(&$val,&$name){
       if(in_array($name,$this->special_words)) return 'sval';
-      if(is_int($val) || (strlen($val)<10 && ctype_digit($val))) return 'ival';
+      if(is_int($val) || (strlen($val)<12 && ctype_digit($val))) return 'ival';
       return 'tval';
    }
 

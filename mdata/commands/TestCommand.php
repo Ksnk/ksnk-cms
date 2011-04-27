@@ -8,16 +8,32 @@
  */
 
 function random_string($l = 10){
-    $s='';
-    $c = " ABCDEFGHIJKLMNOPQRS TUVWXYZabcdefgh ijklmnopqrs tuvwxwz012345 6789";
-    for(;$l > 0;$l--) $s .= $c{rand(0,strlen($c))};
-    return str_shuffle($s);
+    shuffle(TestCommand::$c);
+    return substr(implode (TestCommand::$c),0,$l);
 }
 
 
 class TestCommand extends CConsoleCommand
 {
+
+    public static $c;
+
+    private function status(){
+        $dbStats = Yii::app()->db->getStats();
+        echo '
+query executed: '.$dbStats[0].' (for '.round($dbStats[1], 5).' sec)';
+
+        $memory = round(Yii::getLogger()->memoryUsage/1024/1024, 3);
+        $time = round(Yii::getLogger()->executionTime, 3);
+        echo 'Memory usage: '.$memory.' Mb
+';
+        echo 'Time spent: '.$time.' s
+';
+
+    }
+
     function __construct(){
+        self::$c=str_split(" ABCDEFGHIJKLMNOPQRS TUVWXYZabcdefgh ijklmnopqrs tuvwxwz012345 6789",1);
     }
 
     function actionNewsGetLast(){
@@ -25,7 +41,7 @@ class TestCommand extends CConsoleCommand
         $news=new CNews();
         echo count($news->getLastNews()).'
 ';
-        print_r(Yii::app()->db->getStats() );
+        $this->status();
     }
 
     function actionNewsGet(){
@@ -34,13 +50,14 @@ class TestCommand extends CConsoleCommand
         echo count($news->getNews(mktime(20, 00, 0, 3, 24, 2000),mktime(20, 49, 0, 4, 25, 2011)));
         for($i=0;$i<100;$i++)
             $news->getNews(mktime(20, 00, 0, 3, 24, 2000),mktime(20, 49, 0, 4, 25, 2011));
-        print_r(Yii::app()->db->getStats() );
+        $this->status();
     }
 
     function actionNewsCreate100500(){
         // создание множества ньюсов
         $news=new CNews();
-        for($i=0;$i<4000;$i++){
+        //$news->indexes(false);
+        for($i=0;$i<1000;$i++){
             $date=time()-rand(0,5* 365)* 24 * 60 * 60;
             $newsbody=array(
                 'title'=>$date.' '.random_string(5+rand(0,10)),
@@ -49,6 +66,13 @@ class TestCommand extends CConsoleCommand
             );
             $news->addNews($newsbody);
         }
+        //$news->indexes();
+        $this->status();
+    }
+    function actionNewsIndexes(){
+        // создание множества ньюсов
+        $news=new CNews();
+        $news->indexes();
     }
 
     /**
