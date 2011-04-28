@@ -24,11 +24,12 @@
  *
  */
  
-class CMultyData extends CModel
+class EMultyDataBehavior extends CActiveRecordBehavior
 {
     /**
      * @var CDbConnection установлено явно после инициализации или взято из yii::app{}->getDb()
      */
+    //todo: статическое ли оно должно быть! Есть мнение, что нужно динамическое
     private static $db;
 
     private $sql_cache=array();
@@ -37,7 +38,7 @@ class CMultyData extends CModel
     /**
      * @var string - дефолтное имя сохраняемой таблицы
      */
-    public $table_name='{{flesh}}';
+    public $multyDataName='{{flesh}}';
 
     /**
      * @var array - массив полей, по которым будет вестиcь поиски в дальнейшем
@@ -46,6 +47,11 @@ class CMultyData extends CModel
     private $special_words=array('root','record','name','password','url');
     private $table_locked=false;
 
+    public function attach($owner)
+    {
+        parent::attach($owner);
+        self::$db=$owner->getDbConnection();
+    }
     /**
      * @return array - dont know a while why i need this method...
      */
@@ -57,7 +63,7 @@ class CMultyData extends CModel
 
     private function flush(){
         if(!empty($this->sql_cache)){
-            $sql='insert into '. $this->table_name . ' (id,name,ival,sval,tval) values '.
+            $sql='insert into '. $this->multyDataName . ' (id,name,ival,sval,tval) values '.
                 implode(',',$this->sql_cache);
             //echo $sql;
             self::$db->createCommand($sql)->execute();
@@ -106,7 +112,7 @@ class CMultyData extends CModel
      * @return void
      */
    private function createTable(){
-        self::$db->createCommand()->createTable($this->table_name,
+        self::$db->createCommand()->createTable($this->multyDataName,
                 array(
                     'id'=>'int(11) NOT NULL auto_increment',
                     'name'=>'string',
@@ -140,7 +146,7 @@ class CMultyData extends CModel
              $param=$this->readRecord($param);
          if(!empty($param['id'])){
              $sql_par=array(':id'=>$param['id']);
-             $res=self::$db->createCommand('select ival from '.$this->table_name
+             $res=self::$db->createCommand('select ival from '.$this->multyDataName
                                       .' where id=:id and not isNull(ival) and sval="link"')
                      ->queryColumn($sql_par);
              if(!empty($res)){
@@ -150,7 +156,7 @@ class CMultyData extends CModel
              }
 
              self::$db->createCommand()
-                 ->delete($this->table_name,'id=:id',$sql_par);
+                 ->delete($this->multyDataName,'id=:id',$sql_par);
              return true;
          } else
              return false;
@@ -184,7 +190,7 @@ class CMultyData extends CModel
         if (empty($options['sql'])) {
             //0:id,1:name,2:val, !!! 3:node,4:level,5:childes
             $sql = 'SELECT u0.id,u0.name, '. $this->_cellname('',0).' as `value`, u0.sval as type '
-                   .(empty($options['from'])?'from '.$this->table_name . ' as u0 ':$options['from'])
+                   .(empty($options['from'])?'from '.$this->multyDataName . ' as u0 ':$options['from'])
                   ;
             $where = array();
            // if (!empty($options['where']) && !is_array($options['where']))
@@ -195,13 +201,13 @@ class CMultyData extends CModel
                     $where[] = $options['where_last'];
                 }
                 if(!empty($options['where'])){
-                    $sql .= sprintf('LEFT JOIN ' . $this->table_name . ' AS u%1$s ON u0.id = u%1$s.id ',
+                    $sql .= sprintf('LEFT JOIN ' . $this->multyDataName . ' AS u%1$s ON u0.id = u%1$s.id ',
                                    $ind, $ind);
                     $where[] = sprintf($options['where'],$ind);
                     $ind++;
                 }
                 foreach ($param as $k => $v) {
-                    $sql .= sprintf('LEFT JOIN ' . $this->table_name . ' AS u%1$s ON u0.id = u%1$s.id ',
+                    $sql .= sprintf('LEFT JOIN ' . $this->multyDataName . ' AS u%1$s ON u0.id = u%1$s.id ',
                                     $ind, $ind);
                     $where[] = sprintf('u%1$s.name = :k%1$s and ' . $this->_cellname($k, $ind) . '= :v%1$s ',
                                        $ind);
@@ -285,7 +291,7 @@ class CMultyData extends CModel
         if(isset($param['id'])){
             // заказывается обновление существующей записи
             // проверяем наличие веточек, изменившихся от прошлого запуска
-            $res=self::$db->createCommand('select * from ' . $this->table_name . ' where `id`= :id')
+            $res=self::$db->createCommand('select * from ' . $this->multyDataName . ' where `id`= :id')
                     ->query(array('id'=>$param['id']));
             //print_r($res);
             $id=$param['id'];
@@ -300,7 +306,7 @@ class CMultyData extends CModel
                         $tname=$this->_name($param[$v['name']],$name);
                         if($v[$tname]!=$param[$name]){
                             // update
-                            self::$db->createCommand('update ' . $this->table_name . ' set '
+                            self::$db->createCommand('update ' . $this->multyDataName . ' set '
                                                      .$this->_name($val,$key).'=:val '
                                                      .(!isset($sql_par['type'])?'':', sval=:type')
                                                      .' where `id`=:id and `name`=:name;')
@@ -309,7 +315,7 @@ class CMultyData extends CModel
                         unset($param[$name]);
                     } else {
                         // удаляем отсутствующие
-                        self::$db->createCommand()->delete($this->table_name, '`id`=:id and `name`=:name'
+                        self::$db->createCommand()->delete($this->multyDataName, '`id`=:id and `name`=:name'
                             ,array('id'=>$id,'name'=>$name));
                     }
                 };
@@ -322,10 +328,10 @@ class CMultyData extends CModel
             }
         } else {
             if($this->sql_lastid==0){
-                self::$db->createCommand('LOCK TABLE '.$this->table_name.' WRITE;')->execute();
+                self::$db->createCommand('LOCK TABLE '.$this->multyDataName.' WRITE;')->execute();
                 $this->table_locked=true;
-                $res=self::$db->createCommand('SHOW TABLE STATUS FROM `ODBC` LIKE "'.$this->table_name.'";')->queryRow();
-                $this->sql_lastid=$res['Auto_increment'];//1+self::$db->createCommand('select max(id) from '.$this->table_name.';')->queryScalar();
+                $res=self::$db->createCommand('SHOW TABLE STATUS FROM `ODBC` LIKE "'.$this->multyDataName.'";')->queryRow();
+                $this->sql_lastid=$res['Auto_increment'];//1+self::$db->createCommand('select max(id) from '.$this->multyDataName.';')->queryScalar();
             }
             $id=$this->sql_lastid++;
         }
@@ -387,7 +393,7 @@ class CMultyData extends CModel
             return;
         }
         $sql_par=$this->build_par($key,$val,$id);
-        self::$db->createCommand('insert into ' . $this->table_name . ' set '
+        self::$db->createCommand('insert into ' . $this->multyDataName . ' set '
                                  .(empty($sql_par['id'])?'':'id= :id ,')
                                  .' name= :name ,'.$this->_name($val,$key).'=:val '
                                  .(empty($sql_par['type'])?'':', sval=:type'))

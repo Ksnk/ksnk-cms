@@ -25,6 +25,6 @@ defined('YII_TRACE_LEVEL') or define('YII_TRACE_LEVEL',3);
 require_once($yii);
 
 /** @define "null" "VALUE" */
-//include '../CMultyData.php';
+//include '../EMultyDataBehavior.php';
 
 Yii::createConsoleApplication($config)->run();

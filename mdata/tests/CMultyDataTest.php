@@ -1,5 +1,5 @@
 <?php
-require_once dirname(dirname(__FILE__)).'/CMultyData.php';
+require_once dirname(dirname(__FILE__)).'/EMultyDataBehavior.php';
 
 class CMultyDataTest extends CTestCase
 {
