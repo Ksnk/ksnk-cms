@@ -1,23 +1,35 @@
 <?php
 /**
- * Модуль для реализации простой модели списка новостей.
- * Новости с дополнительной таблицей с данными.
- * потребности
- * -- вывод списка из нескольких новостей, начиная с даты, начиная со станицы,
+ * Пример использования EMultyData для реализации моделти NEWS
+ *
+ * - потенциальные возможности
+ * -- "расширяемость" формата новостей позволяет свободно изменять
+ *    структуру новости без изменения таблицы данных.
+ *
+ * - реализованные потребности
+ * -- вывод списка из нескольких новостей, начиная с даты, начиная со страницы,
  * -- за период, начиная со страницы
  * -- количество новостей за период
- * admin
+ * -- удаление новости
+ * - для панели администрирования
  * -- delNews
  * -- addNews
+ *
+ * - подход к реализации:
+ * -- используется CactiveRecorв, однако пользоваться обычными для него save нельзя!
+ * -- для работы с SQL используется CDBCriteria
+ *
  */
 
-class CNews extends CActiveRecord {
+class CNews extends CModel {
 
     /**
      * data provider
      */
     static $db;
-    private $base_name='{{news}}';
+    
+    private $md=null;
+    private $base_name='{{news_date}}';
 
     public function tableName()
     {
@@ -26,16 +38,8 @@ class CNews extends CActiveRecord {
 
     function __construct($options=null){
         self::$db=Yii::app()->getDb();
-    }
-
-    public function behaviors(){
-        return array(
-            'tree' => array(
-                'class' => 'EMultyDataBehavior',
-                // имя дополнительной таблицы
-                'multyDataName' => '{{news_data}}',
-            ),
-        );
+        $this->md= new EMultyDataBehavior(array('multyDataName'=>$this->base),self::$db);
+        $this->attachBehavior('data',$this->md);
     }
 
     public function attributeNames()
@@ -55,23 +59,23 @@ class CNews extends CActiveRecord {
     function addNews(&$news){
         if (empty($news['date']))
             $news['date']=time();
-        self::$db->createCommand('insert {{news_date}} set date=:date')->execute(array('date'=>$news['date']));
+        self::$db->createCommand('insert '.self::$db->quoteTableName($this->base).' set date=:date')->execute(array('date'=>$news['date']));
         $news['id']=self::$db->getLastInsertID();
         unset($news['date']);
         $news['record']='news';
-        return $this->writeRecord($news);
+        return $this->md->writeRecord($news);
     }
 
     /**
      * вывести список новостей за диапазон дат, отсортированный по дате
      */
     function getNews($from,$to){
-        return self::model(__CLASS__)->readRecords(
+        return $this->readRecords(
             array(),
             array(//'where'=>'u1.name="date" and u1.ival BETWEEN :from AND :to'
                 'order'=>array('z.date DESC')
                 ,'fields'=> array('date')
-                ,'from'=>', z.date from (select id,date from {{news_date}} where `date` BETWEEN :from AND :to order by `date` limit 50) as z left join '.self::model(__CLASS__)->multyDataName . ' as u0 on z.id=u0.id '
+                ,'from'=>', z.date from (select id,date from '.self::$db->quoteTableName($this->base).' where `date` BETWEEN :from AND :to order by `date` limit 50) as z left join '.$this->multyDataName . ' as u0 on z.id=u0.id '
                 ,'param'=>array('from'=>$from,'to'=>$to)
             ));
     }
@@ -84,12 +88,13 @@ class CNews extends CActiveRecord {
      *
      */
     function getLastNews(){
-        return self::model(__CLASS__)->readRecords(
+        //print_r($this);
+        return $this->readRecords(
             array(),
             array(
                 'order'=>array('z.date DESC')
                 ,'fields'=> array('date')
-                ,'from'=>', z.date from (select id,date from {{news_date}} order by `date` DESC limit :cnt) as z left join '.self::model(__CLASS__)->multyDataName . ' as u0 on z.id=u0.id '
+                ,'from'=>', z.date from (select id,date from '.self::$db->quoteTableName($this->base).' order by `date` DESC limit :cnt) as z left join '.$this->multyDataName . ' as u0 on z.id=u0.id '
                 ,'param'=>array('cnt'=>50)
             ));
     }
@@ -102,12 +107,12 @@ class CNews extends CActiveRecord {
      *
      */
     function getNewsById($id){
-        return self::model(__CLASS__)->readRecord(
+        return $this->readRecord(
             array(),
             array(
                 'order'=>''//array('z.date DESC')
                 ,'fields'=> array('date')
-                ,'from'=>', z.date from (select id,date from {{news_date}} where id=:xid) as z left join '.self::model(__CLASS__)->multyDataName . ' as u0 on z.id=u0.id '
+                ,'from'=>', z.date from (select id,date from '.self::$db->quoteTableName($this->base).' where id=:xid) as z left join '.$this->multyDataName . ' as u0 on z.id=u0.id '
                 ,'param'=>array('xid'=>$id)
             ));
     }
@@ -118,7 +123,9 @@ class CNews extends CActiveRecord {
      * удалить новость по индексу
      */
     function delNews($id){
-        self::model(__CLASS__)->delRecord(array('id'=>$id));
+        if(!is_array($id))
+            $id=array('id'=>$id);
+        $this->delRecord($id);
     }
 
  }

@@ -24,7 +24,7 @@
  *
  */
  
-class EMultyDataBehavior extends CActiveRecordBehavior
+class EMultyDataBehavior extends CBehavior
 {
     /**
      * @var CDbConnection установлено явно после инициализации или взято из yii::app{}->getDb()
@@ -50,7 +50,6 @@ class EMultyDataBehavior extends CActiveRecordBehavior
     public function attach($owner)
     {
         parent::attach($owner);
-        self::$db=$owner->getDbConnection();
     }
     /**
      * @return array - dont know a while why i need this method...
@@ -128,39 +127,48 @@ class EMultyDataBehavior extends CActiveRecordBehavior
     /**
      *  прочитать одну (первую) запись
      */
-     public function readRecord($param,$options=null){
-         if(empty($options))
-            $options=array('cnt'=>2);
-         $res=$this->readRecords($param,$options);
-         if(!empty($res) && count($res)>0)
-             return current($res);
-         else
-             return null;
-     }
-    
+    public function readRecord($param, $options = null)
+    {
+        if (empty($options))
+            $options = array('cnt' => 2);
+        $res = $this->readRecords($param, $options);
+        if (!empty($res) && count($res) > 0)
+            return current($res);
+        else
+            return null;
+    }
+
     /**
      *  найти и обезвредить, вместе с линками
      */
-     function delRecord($param){
-         if (!isset($param['id']))
-             $param=$this->readRecord($param);
-         if(!empty($param['id'])){
-             $sql_par=array(':id'=>$param['id']);
-             $res=self::$db->createCommand('select ival from '.$this->multyDataName
-                                      .' where id=:id and not isNull(ival) and sval="link"')
-                     ->queryColumn($sql_par);
-             if(!empty($res)){
-                foreach($res as $v){
-                    $this->delRecord(array('id'=>$v));
-                }
-             }
+    function delRecord($param)
+    {
+        if (!isset($param['id']))
+            $param = $this->readRecords($param);
+        if (isset($param[0])) {
+            foreach ($param as &$v)
+                $this->delRecord($v);
 
-             self::$db->createCommand()
-                 ->delete($this->multyDataName,'id=:id',$sql_par);
-             return true;
-         } else
-             return false;
-     }
+            return true;
+        }
+        if (!empty($param['id'])) {
+            $sql_par = array(':id' => $param['id']);
+            $res = self::$db->createCommand('select ival from ' . $this->multyDataName
+                                            . ' where id=:id and not isNull(ival) and sval="link"')
+                    ->queryColumn($sql_par);
+            if (!empty($res)) {
+                foreach ($res as $v)
+                {
+                    $this->delRecord(array('id' => $v));
+                }
+            }
+
+            self::$db->createCommand()
+                    ->delete($this->multyDataName, 'id=:id', $sql_par);
+            return true;
+        } else
+            return false;
+    }
 
     /**
      * @param  $param

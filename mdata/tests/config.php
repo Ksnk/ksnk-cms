@@ -15,7 +15,7 @@ return array(
 	// autoloading models and component classes
 	'import'=>array(
         'webroot.models.*',
-        'Yii.extensions.nestedsets.*',
+        //'Yii.extensions.nestedsets.*',
         'application.models.*',
 		'application.components.*',
 	),

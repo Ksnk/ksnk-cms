@@ -52,7 +52,21 @@ query executed: '.$dbStats[0].' (for '.round($dbStats[1], 5).' sec)';
              $news->getNewsById($id);
          $this->status();
      }
+/**
+ * @return void
+ * Первый!!!!!!!!! 50
+query executed: 103 (for 0.95028 sec)Memory usage: 3.039 Mb
+Time spent: 1.258 s
+ * Последующие 50
+query executed: 103 (for 0.47209 sec)Memory usage: 3.039 Mb
+Time spent: 0.78 s
+ *
+ * После замены self::model(__CLASS__) на $this->readRecord 50
+query executed: 103 (for 0.46413 sec)Memory usage: 3.039 Mb
+Time spent: 0.763 s
 
+
+ */
     function actionReadNews(){
          // выдать несколько ньюсов
          $news=new CNews();
@@ -67,6 +81,12 @@ query executed: '.$dbStats[0].' (for '.round($dbStats[1], 5).' sec)';
          * for($i=0;$i<10000;$i++) // MyIsam
          * query executed: 298 (for 0.26599 sec)Memory usage: 2.676 Mb
          *  Time spent: 24.427 s
+         *
+         * query executed: 300 (for 0.29056 sec)Memory usage: 3.499 Mb
+         * Time spent: 27.21 s
+         *
+        query executed: 298 (for 0.28719 sec)Memory usage: 2.698 Mb
+        Time spent: 25.569 s
          *
          */
         // создание множества ньюсов
