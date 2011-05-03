@@ -110,7 +110,7 @@ class EMultyDataBehavior extends CBehavior
      * функция вызывается в аварийном обработчике
      * @return void
      */
-   private function createTable(){
+    private function createTable(){
         self::$db->createCommand()->createTable($this->multyDataName,
                 array(
                     'id'=>'int(11) NOT NULL auto_increment',
@@ -178,7 +178,7 @@ class EMultyDataBehavior extends CBehavior
      *      $options.limit - максимальное количество просматриваемых строчек таблицы
      * @return array
      */
-    function readRecords($param, $options)
+    function readRecords($param, $options=null)
     { //$cnt=6000,$xcnt=10000,$sql=''){
         if(!empty($this->sql_cache)){
             $this->flush();
@@ -410,7 +410,7 @@ class EMultyDataBehavior extends CBehavior
     }
 
 
-    private function _cellname($k,$i){
+   private function _cellname($k,$i){
       if(!empty($k) && in_array($k,&$this->special_words))
           return sprintf('u%1$s.sval',$i);
       return sprintf('if(isNull(u%1$s.ival),if(isNull(u%1$s.tval),u%1$s.sval,u%1$s.tval),u%1$s.ival)',$i);
