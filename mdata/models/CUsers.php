@@ -12,7 +12,7 @@
  * -- поиск пользователя по имени
  * -- вывод списка пользователей постранично
  * - для панели администрирования
- * -- Доьавить пользователя
+ * -- Добавить пользователя
  * -- удалить пользователя
  *
  */
@@ -83,12 +83,15 @@ class CUsers extends CModel {
     /**
      * найти пользователя
      * @param mixed &$user - информация о пользователе.
-     * @return bool - true - пользователь найден. false - больше одного пользователя найдено, null - не найден
+     * @return bool - true - пользователь найден.
+     *      false - больше одного пользователя найдено,
+     *      null - не найден
      *
      * пример проверки на имя-пароль
-     * $user=array('name'=>'Ivan IV', 'password'=>md5('the mad'));
-     * if($this->get($user)){
+     * $user=array('name'=>$_POST['username'], 'password'=>md5($_POST['password']));
+     * if($this->get($user)===true){
  ... user found and valid
+     * user['id'] - идентификатор юзера в таблице юзеров
      * }
      */
     function get(&$user){
