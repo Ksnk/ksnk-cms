@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<var name="SVN_Revision">$WCREV$</var>
+	<var name="SVN_Modified">$WCMODS?Modified:Not modified$</var>
+	<var name="SVN_Date">$WCDATE$</var>
+
+<!-- 
+	complete set of source files
+-->
+	<files dstdir="$dst/src">
+		<copy>build.xml</copy>
+		<copy>config.xml</copy>
+		<copy>readme.txt</copy>
+		<copy>*.php</copy>
+	</files>
+
+<!-- 
+	preprocesor files ready to distribute
+-->
+	<files dstdir="$dst">
+		<file>readme.txt</file>
+		<echo name="history.txt"><![CDATA[
+preprocessor project history
+--------------------------------
+<%=point('history');%>]]></echo>
+		<file>*.php</file>
+	</files>
+
+</config>
