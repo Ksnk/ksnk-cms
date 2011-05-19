@@ -1,0 +1,93 @@
+<html>
+<head>
+<style>
+#scene div {
+	float:left; width:10px; height:10px; background:blue;overflow:hidden;
+	border:1px solid white;
+}
+</style>
+<script type="text/javascript" src="chain.js" ></script>
+<script type="text/javascript" >
+
+var animate=(function (){
+
+function fly(e,dir,callback){
+	var cnt=Math.round(100+Math.random()*200), // count animation
+		start={x:e.offsetLeft,y:e.offsetTop}; // start position
+	e.style.position='absolute';
+	e.float=e.style.float;
+	e.style.float='none';
+	return setInterval(function(){
+		e.style.top=(start.y+=dir.y)+'px';
+		e.style.left=(start.x+=dir.x)+'px';
+		if (cnt-- < 0) callback();
+	},20)
+}
+// function to roll back animated object
+function fin(e,b,callback){
+	var s=e.style
+	e.style.position='static';
+	e.style.left='';
+	e.style.top='';
+	e.style.float=e.float;
+	callback();
+}
+// function itself
+return function(e){
+	if(!e.chain)e.chain=chain(); // setup first chain if needed
+	e.chain.clear() // clear past animation
+	.chain(fly,e,{x:Math.random()*2,y:Math.random()*2}) // fly
+	.chain(fly,e,{x:Math.random()*2-1,y:Math.random()*2-1}) // fly
+	.chain(fly,e,{x:Math.random()*2-2,y:Math.random()*2-2}) // fly
+	.chain(fin,e,'important') // finish
+	.run()
+}})()
+
+</script>
+
+</head>
+
+
+<body>
+
+<div id='scene'>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+<div onmouseover="animate(this)"></div>
+</div>
+
+</body>
+</html>
