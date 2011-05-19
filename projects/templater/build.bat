@@ -1,2 +1,3 @@
-d:\WebServers\usr\local\php5\php.exe -q  ../preprocessor/preprocessor.php config.xml
+call ..\env.bat
+%php_exe% -q  ../preprocessor/preprocessor.php config.xml
 pause
