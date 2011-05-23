@@ -1,0 +1,130 @@
+##################################################################
+##
+##	модуль - форум
+##
+##################################################################
+
+##################################################################
+##
+##  вывод списка постов форума
+##
+{% macro forum_posts (pages,list,all_topics,user) %}
+
+<div class="tahoma size11" style="padding-top:49px;">
+{{pages}}
+<table style="width:75%;margin-top:30px;">
+
+    {% for post in list %}
+
+<tr style="color:#9eafc3;">
+<td style="border-bottom:solid 1px #d7dee9;padding-bottom:2px;">{{post.date}} {{post.year}}</td><td style="border-bottom:solid 1px #d7dee9;width:110px;">
+{% if user.id %}<a href="#" onClick="return komment(this,{{post.id}});">Комментировать</a>{% endif %}
+</td><td style="border-bottom:solid 1px #eb8017;width:100px;">сообщение #{{post.id}}</td>
+</tr>
+    {% if post.quote %}
+
+<tr>
+<td style="height:16px;"></td><td></td><td></td>
+</tr>
+<tr>
+<td colspan="2" style="padding: 10px 0px 12px 25px;background-color:#d7dee9;">{{post.quote}}</td><td style="background:url(img/strelka.gif) no-repeat center 8px"></td>
+</tr>
+
+    {% endif %}
+
+<tr>
+<td class="question" colspan="2" style="padding: 20px 0px 12px 25px;">{{post.question}}</td>
+    <td{% if post.quote %} style="background:url(img/strelka.gif) no-repeat center 24px;"{% endif %}></td>
+</tr>
+<tr>
+<td colspan="2" style="padding: 0px 0px 33px 25px;color:#225f9a;">
+<span onmouseover="showInfo(this)">{{post.sval}}
+<div style="display:none;">{{post.info}}</div>
+</span></td><td></td>
+</tr>
+
+    {% endfor %}
+
+</table>
+{{pages}}
+<table style="width:75%;margin-top:42px;">
+<tr>
+<td>
+
+    {% if user.id %}
+
+<table class="tahoma">
+<tr><td style="background-color:#09304d;color:#FFFFFF;height:28px;width:215px;text-align:center;vertical-align:middle;font-weight:bold;font-family:Arial;font-size:11px;">ОСТАВИТЬ КОММЕНТАРИЙ</tr></td>
+<tr><td style="height:10px;background:url(img/ugol_t.gif) left top no-repeat;"></tr></td>
+</table>
+
+    {% endif %}
+    
+</td>
+<td style="font-size:12px;"><a href="{{all_topics}}">Показать все темы</a></td>
+<td></td>
+</tr>
+</table>
+
+<a name="komment"></a>
+
+    {% if user.id %}
+
+<div class="quote_div"></div>
+<form method="post">
+<input type="hidden" name="action" value="newpost"/>
+<textarea name="newpost" style="margin:10px 0px 10px 25px;height:145px;width:425px;border:solid 1px #d7dee9;">
+</textarea><br/>
+<input type="hidden"  name="quote_id" value=""/>
+<input type="hidden" name="quote" value=""/>
+<input type="submit" value="Отправить" style="background:url(img/button2.gif) no-repeat center right #FFFFFF;border:none;width:100px;color:#225f9a;margin-left:20px;"/>
+</form>
+
+    {% endif %}
+
+</div>
+{% endmacro %}
+
+##################################################################
+##
+##  вывод списка постов форума
+##
+{% macro forum_topics (list,user=0) %}
+
+<div class="tahoma size12">
+<table style="width:70%;margin-top:31px;">
+
+    {% for theme in list %}
+<TBODY>
+<tr>
+<td style="border-bottom:solid 1px #d7dee9;font-size:11px;color:#9eafc3;">{{theme.date}} {{theme.year}}</td><td style="border-bottom:solid 1px #eb8017;width:80px;"></td>
+</tr>
+<tr>
+<td style="padding-top:5px;padding-bottom:16px;"><a href="javascript:show_sub({{theme.id}})">{{theme.topic}}</a></td><td id="cnt_otv_{{theme.id}}" style="font-size:11px;color:#eb8017;"><span>{{theme.cnt}} ответов</span></td>
+</tr>
+</TBODY>
+<TBODY id="subtopic_{{theme.id}}" style="display:none;">
+<tr>
+<td colspan="2" style="height:17px;"></td>
+</tr>
+{{theme.topic_p}}
+<tr>
+<td style="padding-left:40px;padding-bottom:52px;font-size:14px;">
+
+    {% if user.id %}
+
+    <a href="{{theme.href_new}}" style="color:#000000;">Создать тему</a></td><td></td>
+
+    {% endif %}
+    
+</tr>
+</TBODY>
+
+    {% endfor %}
+
+</table>
+</div>
+
+    {% endmacro %}
+
+
