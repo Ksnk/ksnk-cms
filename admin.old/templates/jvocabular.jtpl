@@ -1,0 +1,231 @@
+#################################################################
+##
+## общая форма вывода плагина-таблицы
+##
+#################################################################
+
+{% macro admin_vocabular (plus=0,additional2=0,head=0,list=0,name=0,error=0,root=0,additional=0) %}
+<form name="admin{{name}}" action="" method="POST">
+{% if error -%}
+<span style="color:red;font-size:16px;">{{error}}</span>
+{%- endif %}
+<input type='hidden' class="del" name="del">
+{{additional}}
+
+<table class="table long ctext size11">
+<tr>
+<th class="bblue" style="width:20px;padding: 0 2px;">№</th>
+{% for h in head %}
+<th class="bblue{%if h.class %} {{h.class}}{%endif%}">{{h.title}}</th>
+{% endfor %}
+<th class="bblue"></th>
+</tr>
+{% for l in list %}
+<tr class="{{loop.cycle('odd','even')}}" id="{{l.prefix|default('rl')}}_{{l.id}}"><th class="nopage" style="width:20px;">{{loop.index}}</th>
+{% for r in l.row %}
+<t{{r.d|default('d')}} {% if r.style %}style="{{r.style}}" {% endif -%} 
+class="{{r.class|default('text_edit')}}" id="{{r.name}}_{{r.id}}">{{r.value}}</t{{r.d|default('d')}}>
+{% endfor %}
+{% if l.sort %}
+<th class="nopage align_center" style="padding:0 2px;" nowrap>
+{{callex('MAIN','tpl','admin','order_elm_start')}}
+<input type="text" class="order size11" onkeydown="need_Save()" style="width:15px;" name="item_order_{id}">
+{{callex('MAIN','tpl','admin','order_elm_fin')}}
+</th>
+{% endif %}
+<th style="width:20px;padding: 0 2px;">{{callex('MAIN','tpl','admin','delrec_elm')}}</th>
+{% endfor %}
+</tr>
+<tr class="odd" id="newrow" style="display:none;">
+<th>&raquo;</th>
+{% for r in plus %}
+<td  class="{{r.class|default('text_edit')}}" id="{{r.name}}"></td>
+{% endfor %}
+<th ></th>
+</tr>
+
+</table>
+{% if additional2 %} {{additional2}}{% else %}
+<table class="table long ctext size11">
+<tr>
+<th class="bblue align_center" STYLE="padding:2px;">
+<input class="button savebutton" type="submit"  disabled="disabled" value=" Сохранить ">
+<input type="button" class="button" onclick="element.$('newrow').style.display='';this.disabled='disabled';" name="newRecord" value="Добавить">
+</th>
+</tr></table>
+{% endif %}
+{% if pages %}
+<table class="table long ctext size11">
+<tr><th style="background:white;">
+{{pages}}
+</th></tr></table>
+{% endif %}
+
+<script type="text/javascript">
+element.add_event(element.$('aaa'),'click',function(){
+	var e = this;
+	element.allClass(this.form,'select',function(el){
+		el.checked = e.checked;
+	})
+	e=null;
+})
+</script>
+</form>
+{% endmacro %}
+
+#################################################################
+##
+## общая форма вывода плагина-таблицы (новый вариант с прибамбасами)
+##
+#################################################################
+
+{% macro admin_form (pages,data,root,options,fields,error,additional,name,additional2) %}
+<form name="admin{{name}}" action="" method="POST">
+{% if error -%}
+<span style="color:red;font-size:16px;">{{error}}</span>
+{%- endif %}
+<input type='hidden' class="del" name="del">
+{{additional}}
+<table class="table long ctext size11">
+<tr>
+<th class="bblue" style="width:20px;padding: 0 2px;">№</th>
+{% set colnum =0 %}
+{% for h in fields %}{% if not h.dontshow %}
+    {% set colnum=colnum+1 %}
+	<th class="bblue{%if h.class %} {{h.class}}{%endif%}">{{h[0]}}</th>
+{% endif %}{% endfor %}
+<th class="bblue"></th>
+</tr>
+{% set oldgroup = ''%}
+{% for d in data %}
+    {% if options.group and (d[options.group]!=oldgroup) %}
+    <tr class="bblue"><th></th><th colspan="{{colnum}}">{{d[options.group]}}</th><th></th></tr>
+    {% set oldgroup=d[options.group]%}
+    {% endif %} 
+	<tr class="{{loop.cycle('odd','even')}}" id="{{l.prefix|default('rl')}}_{{d['id']}}"><th class="nopage" style="width:20px;">{{loop.index}}</th>
+	{% for r in fields %}
+		{% if r.dontshow -%}
+		{% elif r.dontedit %} #### просто нередактируемое поле
+			<td {% if r.style %}style="{{r.style}}" {% endif -%}>{{d[r[1]]}}</td>
+		{% elif (r[2]=='check01') %}
+			<td class="check01 align_center nopage" id="{{r.name}}_{{d[id]}}"> 
+			<input name="{{r[1]}}_{{d['id']}}" type="text" value="1" class="win_check"> </td> 
+		{% elif (r[2]=='text_edit') or not(r[2]) %}
+			<td class="text_edit" id="{{r[1]}}_{{d['id']}}">{{d[r[1]]}}</td>
+		{% endif %}
+	{% endfor %}
+	{% if l.sort %}
+	<th class="nopage align_center" style="padding:0 2px;" nowrap>
+	{{callex('MAIN','tpl','admin','order_elm_start')}}
+	<input type="text" class="order size11" onkeydown="need_Save()" style="width:15px;" name="item_order_{id}">
+	{{callex('MAIN','tpl','admin','order_elm_fin')}}
+	</th>
+	{% endif %}
+	<th style="width:20px;padding: 0 2px;">{{callex('MAIN','tpl','admin','delrec_elm')}}</th>
+	</tr>
+{% endfor %}
+{% if not options.noadd %}
+<tr class="odd" id="newrow" style="display:none;">
+<th>&raquo;</th>
+{% for r in plus %}
+<td  class="{{r.class|default('text_edit')}}" id="{{r.name}}"></td>
+{% endfor %}
+<th ></th>
+</tr>
+{% endif %}
+</table>
+{% if additional2 %} {{additional2}}{% else %}
+<table class="table long ctext size11">
+<tr>
+<th class="bblue align_center" STYLE="padding:2px;">
+<input class="button savebutton" type="submit"  disabled="disabled" value=" Сохранить ">
+{% if not options.noadd %}
+<input type="button" class="button" onclick="element.$('newrow').style.display='';this.disabled='disabled';" name="newRecord" value="Добавить">
+{% endif %}
+</th>
+</tr></table>
+{% endif %}
+{% if pages %}
+<table class="table long ctext size11">
+<tr><th style="background:white;">
+{{pages}}
+</th></tr></table>
+{% endif %}
+
+<script type="text/javascript">
+element.add_event(element.$('aaa'),'click',function(){
+	var e = this;
+	element.allClass(this.form,'select',function(el){
+		el.checked = e.checked;
+	})
+	e=null;
+})
+</script>
+</form>
+{% endmacro %}
+
+##################################################################
+##
+##  Komment_edit - пункт редактироания комментария в странице 
+##
+{% macro komment_edit (data,trclass,id,name,item_columns) %}
+<tr class="context {{trclass|default('odd')}}" id="pg_{{id}}" ><td class="bwhite"  style="padding:0;">
+<table class="tahoma ctext size11 long fixed">
+<col width="23px">
+<col width="90px"><col width="auto"><col width="150px">
+##<col width="25px">
+<col width="50px">
+<col width="23px">
+<tr>
+<th class="nopage align_center" style="padding:0 2px;"><div class="win_max closed  open_close">&nbsp;</div></th>
+<td class="text_edit" id="item_name_{{id}}" title="тип:Комментарий">{{name|default('комментарий')}}</td>
+<td class="text_edit" id="item_columns_{{id}}" title="">{{item_columns|default('')}}</td>
+<td>
+ <input type="submit" onmousedown="window.el_open(this); return false;" title="" class="button green" 
+ name="new_row_com_{{id}}" value="Доб.Коммент."> 
+</td>
+##<td class="align_center" style="padding:0 2px;">
+##<input type="text" name="item_align_{{id}}" class="align hidden"></td>
+<th class="nopage align_center" style="padding:0 2px;" nowrap>
+{{callex('MAIN','tpl','admin','order_elm_start')}}
+<input type="text" class="order size11" onkeydown="need_Save()" style="width:15px;" name="item_order_{{id}}">
+{{callex('MAIN','tpl','admin','order_elm_fin')}}
+</th>
+<th class="align_center" style="padding:0 2px;">
+{{callex('MAIN','tpl','admin','delrec_elm')}}
+</th>
+</tr>
+
+<tr class="bwhite"  style="display:none;">
+<td class="bwhite" colspan=2></td>
+<td colspan="4"><div style="height:100%;width:100%;overflow-y:visible; overflow-x:auto;">
+##
+##  генерируем таблицу по данным из коментариев
+##
+<table class="tahoma ctext size11 long">
+<col width="40">
+<col width="80">
+<col width="60">
+<col width="auto">
+<col width="auto">
+<col width="25">
+
+<tr><th>Пров.</th><th>Дата</th><th>имя</th><th>Текст</th><th>Цитата</th><th></th></tr>
+{% for d in data %}
+<tr class="{{loop.cycle('even','odd')}}" id="del{{id}}[{{d['id']}}]">
+<td class="check01 align_center nopage" > 
+	<input name="new{{d['id']}}_{{id}}" type="text" value="1" class="win_check"></td>
+<td  class="text_edit" id="date{{d['id']}}_{{id}}">{{d.date}}</td>
+<td  class="text_edit" id="username{{d['id']}}_{{id}}">{{d.username}}</td>
+<td  class="text_edit" id="text{{d['id']}}_{{id}}">{{d.text}}</td>
+<td  class="text_edit" id="quote{{d['id']}}_{{id}}">{{d.quote}}</td>
+<td >{{callex('MAIN','tpl','admin','delrec_elm')}}</td>
+</tr>
+{% endfor %}
+</table>
+##
+</div>
+</td></tr></table>
+</td>
+</tr>
+{% endmacro %}

@@ -1,0 +1,1172 @@
+###############################################################
+##
+##  файл Jijna-шаблонов для админки cms
+##
+
+###############################################################
+##
+##  menuedit-шаблон вывода основной панели редактирования статьи
+##
+{% macro menuedit(error,has_menu,has_content) %}
+<form action="" method="POST" name="menuedit" style="width:100%;">
+<table style="width:100%;"><tr><td height="140">
+<div class="stick" style="width:730px;"></div>
+{%if error %}<div class="red">{{error}}</div>{% endif %}
+
+##
+## перемещающийся бар с элементами 
+##
+<div style="zoom:1;margin: 34px 36px 0 35px;position:relative;">
+<div class="move_left"></div>
+<div class="move_right"></div>
+<div id="katalog" class="scroll_gal2 wideable" style="zoom:1;width:500px;">
+<table class="align_center"><tr>
+<td id="xx_16" title="Элемент Текст+Фото">
+<div class="stateX3" >
+<a href="#"><img alt="text" src="img/text_4s.gif"></a>
+</div>
+<a href="#" class="title">Текст</a></td>
+<td id="xx_27" title="Элемент Гориз. полоса">
+<div class="stateX3" >
+<a href="#"><img alt="text" src="img/line_4s.gif"></a>
+</div>
+<a href="#" class="title">Линия</a></td>
+<td id="xx_3" title="Элемент Cсылки и файлы">
+<div class="stateX3" >
+<a href="#"><img alt="text" src="img/link_4s.gif"></a>
+</div>
+<a href="#" class="title">Cсылки</a></td>
+<td id="xx_7" title="Элемент Галерея">
+<div class="stateX3" >
+<a href="#"><img alt="text" src="img/galery_4s.gif"></a>
+</div>
+<a href="#" class="title">Галерея</a></td>
+<td id="xx_28" title="Элемент Комментарий">
+<div class="stateX3" >
+<a href="#"><img alt="text" src="img/comment_4s.gif"></a>
+</div>
+<a href="#" class="title">Коммент</a></td>
+<td id="xx_20" title="Элемент Заголовок">
+<div class="stateX3" >
+<a href="#"><img alt="text" src="img/a_4s.gif"></a>
+</div>
+<a href="#" class="title">Заголовок</a></td>
+<td id="xx_19" title="Элемент Колонки">
+<div class="stateX3" >
+<a href="#"><img alt="text" src="img/columns_4s.gif"></a>
+</div>
+<a href="#" class="title">Колонки</a></td>
+<td id="xx_6" title="Элемент Таблица">
+<div class="stateX3" >
+<a href="#"><img alt="text" src="img/table_4s.gif"></a>
+</div>
+<a href="#" class="title">Таблица</a></td>
+<td id="xx_9" title="Элемент Каталог">
+<div class="stateX3" >
+<a href="#"><img alt="text" src="img/katalog_4s.gif"></a>
+</div>
+<a href="#" class="title">Каталог</a></td>
+</tr></table>
+<input type="hidden" name="new_item_type">
+<input type="hidden" name="insert_after">
+<input type="hidden" name="new_item_add" disabled="disabled">
+</div> </div>
+{% if has_menu%}
+ 
+<div id="drop_0" class="droppable graypane">
+<table class="grayline long"><tr>
+<td style="line-height:22px;font-weight:bold; color:green;" class="text_edit align_center" id="name_{{has_menu.id}}">{{has_menu.name}}</td>
+<td style="width:150px;"><input type="button" class="savebutton">
+</td>
+</tr></table>
+##
+## выпадающая панель со свойствами статьи
+##
+<div  class="dd_graypane" >
+<table class="tahoma long ctext size11 fixed align_middle align_center">
+	<col width="90px">
+	<col width="auto">
+	<col width="90px">
+	<tr>
+		<td class="bgray" style="background-position:100% -1px;">
+		Настройки описания</td>
+		<td class="align_center bgdray" style="color:white;background-position:100% -1px;">
+		<table style="width:90%;margin:5px auto;">
+		<tr id="id_{{has_menu.aid}}">
+	<td >
+##>>
+## кусок от плагина altnames - передрано без привязки к тексту плагина
+##
+	<input type="text" class="input" title="Название раздела в адресной строке" 
+	alt="Название раздела в адресной строке" onchange="need_Save()" placeholder="адрес" name="alt_name_{{has_menu.aid}}">
+##<<	
+	</td><td>&nbsp;</td><td >
+	<input class="longinput" placeholder="Ссылка на другой сайт">
+	</td><td>&nbsp;</td><td>
+	<input class="input" placeholder="Код раздела">
+	</td>
+	</tr>
+	</table>
+	Открытие большого окна - Ctrl + левая кнопка мыши
+	<table style="width:90%;margin:5px auto;">
+	<tr id="id_{{has_menu.aid}}">
+	<td width="30%" style="padding:2px;height:20px;overflow:hidden;" class="edited text_edit" title="TITLE (заголовок на синей полосе)"
+		 id="article_title_{{has_menu.aid}}">{{truncate(has_menu.article_title,40)}}</td>
+	<td width="5%">&nbsp;</td><td width="30%" style="padding:2px;height:20px;overflow:hidden;" title="Поле DESCRIPTION (описание раздела)" class="edited text_edit" id="article_descr_{{has_menu.aid}}">{{truncate(has_menu.article_descr,40)}}</td>
+	<td width="5%">&nbsp;</td><td width="30%" style="padding:2px;height:20px;overflow:hidden;" class="edited text_edit" title="Значения KEYWORDS (слово, слово, слово, ...)" id="article_keywords_{{has_menu.aid}}">{{truncate(has_menu.article_keywords,40)}}</td>
+</tr>
+</table>
+		</td>
+<td class="bgdray align_center"  style="background-position:100% -1px;">
+<div class="picture_upload" style="height:50px;width:50px;display:inline-block;">
+<input type="text" style="display:none;" name="pic_small_{{has_menu.aid}}">
+<img src="{{has_menu.pic_small}}" height="30" alt="" data-size="80,60">
+</div>
+</td>	</tr>
+</table>
+
+</div></div>
+{% endif %}
+</td></tr><tr><td>
+<div class="lofty long" ><div style="margin-right:5px;">
+{% if has_content %}
+{{has_content.data}}
+{% endif %}
+</div></div></td></tr></table>
+<input type="hidden" class="del" name="del">
+<script type="text/javascript">
+
+$(function(){
+	var change_func=[];
+
+	change_func[16]=function (){
+	var o=change_func[16].option,options={
+		width:parseInt(o.sizex) || 90	
+		,height:parseInt(o.sizey) || 90
+//		,borderWidth:'2px'
+//		,borderColor:'red'
+	};
+	if (o.border!='0' && o.border!='') {
+		options['border-style']='solid';
+		options['border-top-width']=(o.by||'2')+'px';
+		options['border-bottom-width']=(o.by||'2')+'px';
+		options['border-left-width']=(o.bx||'2')+'px';
+		options['border-right-width']=(o.bx||'2')+'px';
+		options['border-color']=o.color||'red';
+	} else {
+		options['border']='0';
+	}
+	var texto={
+			color:o.tcolor||'rgb(87,101,115)',
+			'font-family':o.tfont||'Tahoma',
+			'font-size':o.tsize||'11px',
+			'font-weight':o.tpb==1?'bold':'normal',
+			'font-style':o.tpi==1?'italic':'normal',
+			'text-decoration':o.tpu==1?'underline':'none'
+	};
+	
+	if(change_func[16].to){
+		clearTimeout(change_func[16].to);
+	}
+	change_func[16].to=setTimeout(function(){
+		change_func[16].to=false;
+		$('#xTP_defpicture').css(options);
+		$('#xTP_deftext').css(texto);
+	},10);
+};
+change_func[27]=function (){
+	var o=change_func[27].option,options={
+		overflow:'hidden'
+		,height:parseInt(o.height) || 2
+		,backgroundColor:o.color||'red'	
+	};
+	if(o.width && o.width.match(/\%$/))
+		options.width=o.width;
+	else
+		parseInt(o.width) || '100%';
+	switch(parseInt(o.align)||0){
+	case 1: // center
+		options.margin='0 auto';
+		break;
+	case 2: // right
+		options.margin='0 0 0 auto';
+		break;
+	default: // left
+		options.margin='0 auto 0 0';
+		break;
+	}
+	var brdsize=Math.round((options.height+2)/3);
+	switch(parseInt(o.btype)||0){
+	case 1:// solid
+	case 2:// doted	
+		options.border='0';
+		break;
+	case 3:// inset	
+		options.border=brdsize+'px inset';
+		break;
+	case 4:// outset	
+		options.border=brdsize+'px outset';
+		break;
+}
+	
+	if(change_func[27].to){
+		clearTimeout(change_func[27].to);
+	}
+	change_func[27].to=setTimeout(function(){
+		change_func[27].to=false;
+		$('#TP_x_LINE').css(options);
+	},10);
+};
+change_func[3]=function (){
+	var o=change_func[3].option;
+	var texto={
+			color:o.color||'rgb(87,101,115)',
+			'font-family':o.font||'Tahoma',
+			'font-size':o.size||'11px',
+			'font-weight':o.tpb==1?'bold':'normal',
+			'font-style':o.tpi==1?'italic':'normal',
+			'text-decoration':o.tpu==1?'underline':'none'
+	};
+	if(o.pic_small){
+		texto['padding-left']='30px';
+		texto['background']='url('+o.pic_small+') 0 60% no-repeat';
+	} else {
+		texto['background']="none";
+		texto['padding-left']='0px';
+	}
+	
+	if(!change_func[3].to){
+		clearTimeout(change_func[3].to);
+	}
+	change_func[3].to=setTimeout(function(){
+		change_func[3].to=false;
+		$('#xLINKS_def').css(texto);
+	},10);
+};
+change_func[20]=function (){
+	var o=change_func[20].option;
+	var texto={
+			color:o.color||'rgb(87,101,115)',
+			'font-family':o.font||'Tahoma',
+			'font-size':o.size||'11px',
+			'font-weight':o.tpb==1?'bold':'normal',
+			'font-style':o.tpi==1?'italic':'normal',
+			'text-decoration':o.tpu==1?'underline':'none'
+	};
+	if(o.pic_small){
+		texto['padding-left']='30px';
+		texto['background']='url('+o.pic_small+') 0 60% no-repeat';
+	} else {
+		texto['background']="none";
+		texto['padding-left']='0px';
+	}
+	
+	if(!change_func[20].to){
+		clearTimeout(change_func[20].to);
+	}
+	change_func[20].to=setTimeout(function(){
+		change_func[20].to=false;
+		$('#xANCHOR_def').css(texto);
+	},10);
+};
+//
+change_func[6]=function (){
+	var o=change_func[6].option,options={
+		table:{
+			border:'none',
+			'border-collapse':'collapse'
+		},
+		td_th:{
+			border:0,
+			borderSpacing:0,
+			padding:'3px 5px'
+		},
+		th:{
+			backgroundColor:o.hcolor||'rgb(168,190,204)'	
+		},
+		even:{
+			backgroundColor:o.lrcolor||'rgb(224,235,241)'	
+		},
+		odd:{
+			backgroundColor:o.drcolor||'rgb(209,223,232)'	
+		}
+	}
+	,size='2px'
+	,style=' outset ';
+	o.brcolor=(o.brcolor||'white')
+	if(o.border==1){
+		options.td_th.border=size+style+o.brcolor;
+		//options.table['border-collapse']='separate';
+		options.table.border=size+' inset '+o.brcolor;
+		//options.table.backgroundColor=o.brcolor||'black';
+	} else if(o.border==2){
+		//options.td_th.borderSpacing='2px';
+		//options.table['border-collapse']='separate';
+		options.table.border=size+' inset '+o.brcolor;
+		//options.table.backgroundColor=o.brcolor||'black';
+	} else if(o.border==3){
+		options.td_th.border=size+style+o.brcolor;
+		options.td_th['border-left-width']='0';
+		options.td_th['border-right-width']='0';
+		
+		//options.td_th.borderSpacing='2px';
+		//options.table['border-collapse']='separate';
+		options.table.border=size+' inset '+o.brcolor;
+		//options.table.backgroundColor=o.brcolor||'black';
+	}
+	
+	if(change_func[6].to){
+		clearTimeout(change_func[6].to);
+	}
+	change_func[6].to=setTimeout(function(){
+		change_func[6].to=false;
+		$('#xTABLE_def').css(options.table);
+		$('#xTABLE_def th').css(options.th);
+		$('#xTABLE_def th,#xTABLE_def td').css(options.td_th);
+		$('#xTABLE_def tr.even td').css(options.even);
+		$('#xTABLE_def tr.odd td').css(options.odd);
+	},10);
+};
+	$('form[name=menuedit]').find('input, radio').each(function(){
+		$(this).data('pastval',$(this).val());
+	})
+	.change(function(){
+		if($(this).attr('name').match(/(\w+)_(\d+)/)){
+			if($(this).val!=$(this).data('pastval'))
+				need_Save();
+		}
+	}).trigger('change');
+	need_Save(false);
+})
+</script></form>
+{% endmacro %}
+
+###############################################################
+##
+##  шаблон плагина - "значения по умолчанию" - части элементов 
+##
+{% block def_x_LINE %}
+<div  class="greenpane">
+<div class="arrow "></div>
+<table class="pane long align_center align_middle">
+<col width="90">
+<col>
+<col>
+<col>
+<col width="160">
+<col>
+<tr>
+<td style="height:67px;" class="bgxx" ><img src="img/def_line.gif"></td><td class="bgxx">Толщина, px<br><input class="digit6"  name="height_{{id}}" value="{{height|e}}" type="text"></td><td class="bgxx">Длина, px, %<br><input class="digit6"  name="width_{{id}}" value="{{width|e}}" type="text"></td><td class="bgxx">Цвет линии<br><input class="box colorbox" value="{{color|e}}" value="{{color|e}}" name="color_{{id}}"></td><td class="bgxx">доп описание.<br><div style="display:inline-block;text-align:left;"><select class="select" name="btype_{{id}}" value="{{btype|e}}"><option  value="0" {% if btype==0%} selected {% endif%}></option><option  value="1" {% if btype==1%} selected {% endif%}>cпошная</option><option  value="2" {% if btype==2%} selected {% endif%}>точками</option><option  value="3" {% if btype==3%} selected {% endif%}>inset</option><option  value="4" {% if btype==4%} selected {% endif%}>outset</option></select></div></td><td class="bgxx" title="выравнивание текста"
+			style="padding: 0 2px;"><input name="align_{{id}}" type="text"
+			 value="{{align|e}}" class="align hidden"></td>
+</tr>
+</table>
+<table class="tahoma long ctext size11 fixed align_middle" style="margin-bottom:4px;">
+	<col width="90px">
+	<col width="auto">
+	<tr>
+		<td style="height:84px" class="align_center align_middle bgray" >
+		Пример линии</td>
+		<td class="align_center bgdray" >
+		<div id="TP_x_LINE"></div>
+		</td>
+	</tr>
+</table>
+</div>
+{% endblock %}
+{% block x_LINE %}
+<div  id="pg_{{id}}" class="droppable greenpane collapsed">
+<div class="arrow "></div>
+<table class="pane fixed long ">
+<col width="{% if level%}90{% else%}66{%endif%}">
+<col>
+<col>
+<col>
+<col width="160">
+<col width="30">
+<col width="50"><tr>
+<td class="bgxx align_center align_middle" style="height:67px;" title="">
+				<img class="id_picture"	src="img/el_line.gif"></td><td class="bgxx noborder align_center align_middle">Толщина, px<br><input class="digit6"  name="height_{{id}}" placeholder="{{alt_height}}" value="{{height|e}}" type="text"></td><td class="bgxx noborder align_center align_middle">Длина, px, %<br><input class="digit6"  name="width_{{id}}" placeholder="{{alt_width}}" value="{{width|e}}" type="text"></td><td class="bgxx noborder align_center align_middle">Цвет линии<br><input class="box colorbox" placeholder="{{alt_color}}" value="{{color|e}}" name="color_{{id}}"></td><td class="bgxx noborder align_center align_middle">Вид линии<br><div style="display:inline-block;text-align:left;"><select class="select" name="btype_{{id}}" placeholder="{{alt_type}}" value="{{btype|e}}"><option  value="0"{% if btype==0%}selected{%endif%}></option><option  value="1"{% if btype==1%}selected{%endif%}>cпошная</option><option  value="2"{% if btype==2%}selected{%endif%}>точками</option><option  value="3"{% if btype==3%}selected{%endif%}>inset</option><option  value="4"{% if btype==4%}selected{%endif%}>outset</option></select></div></td><td class="bgxx align_center align_middle" style="vertical-align: bottom;" title="выравнивание текста"
+			style="padding: 0 2px;"><input name="align_{{id}}" type="text" class="align hidden"></td>
+		<th class="bgxx noborder align_center"
+			style="padding: 0 2px;"><input
+			type="text" name="hidden_{{id}}" class="checkbox" title="скрыть элемент"></th>
+	</tr>
+</table>
+</div>
+{% endblock %}
+{% block def_xANCHOR %}
+<div  class="greenpane">
+<div class="arrow "></div>
+<table class="pane long align_center align_middle">
+<col width="90">
+<col width="160">
+<col>
+<col>
+<col>
+<col width="80">
+<tr>
+<td style="height:67px;" class="bgxx" ><img src="img/def_header.gif"></td><td class="bgxx">
+			<input type="text"  name="tpb_{{id}}"class="_bold" value="{{tpb|e}}">
+			<input type="text"  name="tpu_{{id}}"class="_underline" value="{{tpu}}">
+			<input type="text"  name="tpi_{{id}}"class="_italic" value="{{tpi}}">
+			</td><td class="bgxx"><input class="box fontbox" value="{{font|e}}" name="font_{{id}}"></td><td class="bgxx"><input class="box colorbox" value="{{color|e}}" value="{{color|e}}" name="color_{{id}}"></td><td class="bgxx"><input class="box sizebox" value="{{size|e}}" name="size_{{id}}"></td><td class="bgxx"><div class="picture_upload" alt="small" style="vertical-align:middle;display:inline-block;min-height:30px; min-width:30px; max-height:50px;overflow:hidden;margin-right:30px;">
+			<img src="{{pic_small|default('img/folderb.gif')}}">
+			<input  name="pic_small_{{id}}" value="{{pic_small|e}}" type="text" style="vertical-align:middle;display:none;"></div>
+			</td></tr>
+</table>
+
+<table class="tahoma long ctext size11 fixed align_middle"  style="margin-bottom:4px;">
+	<col width="90px">
+	<col width="auto">
+	<tr>
+		<td style="height:84px" class="align_center align_middle bgray" >
+		Пример заголовка</td>
+		<td class="align_center bgdray" >
+		<span id="xANCHOR_def" href='#' onclick="return false;">так будет выглядеть заголовок по умолчанию</span>
+		</td>
+	</tr>
+</table>
+</div>
+{% endblock %}
+{% block xANCHOR %}
+<div  id="pg_{{id}}" class="droppable greenpane collapsed">
+<div class="arrow "></div>
+<table class="pane fixed long ">
+<col width="{% if level%}90{% else%}66{%endif%}">
+<col width="auto">
+<col width="260">
+<col width="30">
+<col width="50"><tr>
+<td class="bgxx align_center align_middle" style="height:67px;" title="">
+				<img class="id_picture"	src="img/el_head.gif"></td><td class="bgxx noborder" title="текст">
+			<div id="item_text_{{id}}" class="html_edit">{{text_x}}</div>
+			</td>
+<td id="loadpic_{{id}}" class="bgxx noborder align_center align_middle" title="">
+			<div class="picture_upload" title="Добавить значек" alt="small" style="vertical-align:middle;display:inline-block;min-height:30px; min-width:30px; max-height:50px;overflow:hidden;margin-right:30px;">
+			<img src="{{pic_small|default('img/folderb.gif')}}"></div>
+			<input name="pic_small_{{id}}" type="text" style="vertical-align:middle;display:none;">Значок</td><td class="bgxx align_center align_middle" style="vertical-align: bottom;" title="выравнивание текста"
+			style="padding: 0 2px;"><input name="item_align_{{id}}" type="text" class="align hidden"></td>
+		<th class="bgxx noborder align_center"
+			style="padding: 0 2px;"><input
+			type="text" name="hidden_{{id}}" class="checkbox" title="скрыть элемент"></th>
+	</tr>
+</table>
+</div>
+{% endblock %}
+{% block def_xTable %}
+<div  class="greenpane">
+<div class="arrow "></div>
+<table class="pane long align_center align_middle">
+<col width="90">
+<col width="160">
+<col>
+<col>
+<col>
+<col>
+<col>
+<tr>
+<td style="height:67px;" class="bgxx" ><img src="img/def_table.gif"></td><td class="bgxx"><div style="display:inline-block;text-align:left;"><input type="radio" name="border_{{id}}" value="1"{% if border==1%} checked{% endif %}>Рамка<br><input type="radio" name="border_{{id}}" value="2"{% if border==2%} checked{% endif %}>без линий<br><input type="radio" name="border_{{id}}" value="3"{% if border==3%} checked{% endif %}>без боковых линий</div></td><td class="bgxx">Цвет линий.<br><input class="box colorbox" value="{{brcolor|e}}" value="{{brcolor|e}}" name="brcolor_{{id}}"></td><td class="bgxx">Фон шапки.<br><input class="box colorbox" value="{{hcolor|e}}" value="{{hcolor|e}}" name="hcolor_{{id}}"></td><td class="bgxx">Светлая полоса.<br><input class="box colorbox" value="{{lrcolor|e}}" value="{{lrcolor|e}}" name="lrcolor_{{id}}"></td><td class="bgxx">Темная полоса.<br><input class="box colorbox" value="{{drcolor|e}}" value="{{drcolor|e}}" name="drcolor_{{id}}"></td><td class="bgxx" title="выравнивание текста"
+			style="padding: 0 2px;"><input name="align_{{id}}" type="text"
+			 value="{{align|e}}" class="align hidden"></td>
+</tr>
+</table>
+
+<table class="tahoma long ctext size11  align_middle" style="margin-bottom:4px;">
+	<col width="90px">
+	<col width="auto">
+	<tr>
+		<td class="align_center align_middle bgray" >
+		Пример оформления таблиц</td>
+		<td class="align_center bgdray" style="padding:10px 8px;">
+		<table id="xTABLE_def"><col><col><col><col>
+		<tr>{% for x in ['№','Фон','заголовок1','Заголовок2'] %}
+		<th>{{x}}</th>{% endfor %}</tr>
+		{% for x in [1,2,3,4] %}
+		<tr class="{{loop.cycle('odd','even')}}"><td>{{loop.index}}</td><td>
+		{{ lipsum (1,0,2,4) }}</td><td>{{ lipsum (1,0,2,4) }}</td><td>{{ lipsum (1,0,2,4) }}</td></tr>
+		{% endfor %}
+		</table>
+		</td>
+	</tr>
+</table>
+
+</div>
+{% endblock %}
+{% block xTable %}
+<div  id="pg_{{id}}" class="droppable greenpane collapsed">
+<div class="arrow "></div>
+<table class="pane fixed long ">
+<col width="{% if level%}90{% else%}66{%endif%}">
+<col>
+<col>
+<col width="130">
+<col width="130">
+<col width="30">
+<col width="50"><tr>
+<td class="bgxx align_center align_middle" style="height:67px;" title="">
+				<img class="id_picture"	src="img/el_table.gif"></td><td class="bgxx noborder align_center align_middle">таблица.<br><input class="digit6" name="bx_{{id}}" type="text">x<input  name="by_{{id}}" class="digit6" type="text"></td><td class="bgxx noborder align_middle" style="height:67px;" title=""><iframe class="clipframe" style="width:80%;border:0;height:30px;" src="javascript: true;"></iframe></td><td class="bgxx noborder" style="vertical-align: bottom;"><input type="button" title=""
+			class="panebutton tablepane" value="Таблица"></td>
+<td class="bgxx noborder" style="vertical-align: bottom;"><input type="button" title=""
+			class="panebutton fotopane" value="Доб.Фото{% if picture %}({{picture|length}}){%endif%}"></td>
+<td class="bgxx align_center align_middle" style="vertical-align: bottom;" title="выравнивание текста"
+			style="padding: 0 2px;"><input name="item_align_{{id}}" type="text" class="align hidden"></td>
+		<th class="bgxx noborder align_center"
+			style="padding: 0 2px;"><input
+			type="text" name="hidden_{{id}}" class="checkbox" title="скрыть элемент"></th>
+	</tr>
+</table>
+
+<div style="margin-top: 0px;" class="datapane">
+<div id="newElem_{{id}}" class="tablepane_pane droppable">
+<table class="tahoma long ctext size11 fixed align_center align_middle">
+<col width="90">
+<col width="45">
+{% for r in rows[0] %}<col>{% endfor %}
+<col width="72">
+<col width="44">
+<!-- заголовки -->
+<tr>
+<td style="height:35px;" class="bgray">
+		Настройки таблицы</td>
+		
+<td class="bgdray"></td>
+{% for  r in rows[0] %}
+<td class="bgdray">  
+<input type="button" class="arrowlf"
+><input type="text" class="digit6" placeholder="Шир."
+><input type="button" class="arrowrt"
+><input type="button" class="remrec ajax"
+	data-confirm="Действительно удалить столбец" 
+	data-href="?do=remcells&plugin=xTable&id={{r.id}}" 
+	data-complete="/*window.location.reload()*/;" >
+</td>
+{% endfor %}
+<td class="bgdray" rowspan=2 colspan=2><input type="button" class="button" value="Доб столб"><br>
+<input type="button" class="button" value="Доб строк"></td>
+</tr>
+<tr>
+<td style="height:35px;"></td>
+		
+<th class="bgdgreen" style="border-left:none;">№</th>
+{% for  r in rows[0] %}
+<th class="bgdgreen "><div id="item_text_{{r.id}}" class="text_edit">{{r.text|default('&nbsp;')}}</div> </th>
+{% endfor %}
+</tr>
+{% for  rr in rows %} {% if not loop.first %}
+<tr>
+<td style="height:35px;"></td>
+{% set bg=loop.cycle('bglgreen','bggreen') %}
+{% if loop.last %}{%set last='border-bottom:none;' %}
+{% else %}{%set last='' %}{% endif %}		
+<th class="{{bg}}" style="border-left:none;{{last}}">{{loop.index0}}</th>
+{% for  r in rr %}
+<td class="{{bg}}" {% if last %}style="{{last}}"{%endif%}>
+<div id="item_text_{{r.id}}" class="text_edit">{{r.text|default('&nbsp;')}}</div></td>
+{% endfor %}
+<td class="bgdray">
+<input type="button" class="arrowup"
+><input type="text" class="digit2"
+><input type="button" class="arrowdn"
+></td>
+<td class="bgdray">
+<input type="button" class="remrec ajax"
+	data-confirm="Действительно удалить строку?" 
+	data-href="?do=remrow&plugin=xTable&id={{r.id}}" 
+	data-complete="/*window.location.reload()*/;">
+</td>
+</tr>
+
+{% endif %}
+{% endfor %}
+
+</table>
+</div>
+
+<!-- фото -->
+<div class="fotopane_pane">
+<table class="tahoma long ctext size11 fixed align_center align_middle">
+<col width="90">
+<col width="160">
+<col width="160">
+<col width="80">
+<col width="180">
+<col width="50">
+<tr>
+<td style="height:35px;" class="bgray" >
+		Настройки фото</td><td class="bgdray">Мал:<input class="digit6" name="sizex_{{id}}" placeholder="{{alt_sizex}}" type="text">x<input  name="sizey_{{id}}" placeholder="{{alt_sizey}}" class="digit6" type="text"></td><td class="bgdray">Бол:<input class="digit6" name="bsizex_{{id}}" placeholder="{{alt_bsizex}}" type="text">x<input  name="bsizey_{{id}}" placeholder="{{alt_bsizey}}" class="digit6" type="text"></td><td class="bgdray">Рамка<input class="checkbox" type="text" name="border_{id}" placeholder="{{alt_border}}"></td>
+<td class="bgdray">Показывать одно фото<input class="checkbox" type="text" name="ftpl_{{id}}"></td>
+<td class="bgdray" 
+			title="выравнивание текста"><input name="pic_align_{{id}}" type="text"
+			value="{{pic_align}}" class="align hidden"></td></tr>
+</table>
+
+{% for pic in picture %}
+<table id="picture_{{pic.id}}" class="tahoma long ctext size11 fixed align_center align_middle">
+<col width="90">
+<col>
+<col width="80">
+<col width="30">
+<tr>
+<td></td>		<td class="bgray" >
+		<table style="width: 95%;"
+			class=" tahoma ctext size11 align_middle align_center"">
+			<col width="50px">
+			<col width="10px">
+			<col width="130px">
+			<col width="auto">
+			<col width="auto">
+				<tr><td rowspan=3>
+		<div class="picture_upload" alt="both"><img alt="" data-size="120,100"
+			title="просмотр маленькой картинки"
+			src="{{pic.pic_small}}"></div>
+		</td>
+					<td colspan=2 align="right">мал.</td>
+					<td><input class="upload" type="text" name="pic_small_{{pic.id}}"
+						style="width: 180px;"
+						title="вставьте маленькую картинку"></td>
+					<td  width="100px">{{pic.swidth}}x{{pic.sheight}}</td>
+				</tr>
+				<tr>
+					<td colspan=2 align="right">бол.</td>
+					<td><input class="upload" type="text" name="pic_big_{{pic.id}}" 
+						style="width: 180px;"
+						title="вставьте большую картинку"></td>
+					<td  class="align_center">{{pic.bwidth}}x{{pic.bheight}}</td>
+				</tr>
+				<tr><td></td>
+					<td colspan=3>
+					<table class="fixed long">
+						<col width="60%">
+						<col width="20">
+						<col width="40%">
+						<tr>
+							<td><input class="box"
+								style="border: 1px solid gray; overflow: hidden; padding: 0; width: 100%;"
+								name="pic_comment_{{pic.id}}" type="text" value=""
+								onkeydown="need_Save()" title="название картинки"></td>
+							<td></td>
+							<td><input name="item_url_{{pic.id}}" type="text" placeholder="Ссылка"
+								style="margin-bottom: 5px; border: 1px solid gray; overflow: hidden; padding: 0; width: 100%;"
+								class="box nocontext long link_toolbox" title="Ссылка"></td>
+						</tr>
+					</table>
+					</td>
+				</tr>
+		</table>
+		</td><th class="bgdray nopage align_center" style="padding: 0 2px;"
+			nowrap="">
+		<table class="compact">
+			<tbody>
+				<tr>
+					<td><input type="button" class="arrowdn"
+						onclick="order(this,'+');"></td>
+					<td><input name="item_order_{{id}}" type="text" value=""
+						class="order size11" onkeydown="need_Save()" style="width: 15px;">
+					</td>
+					<td><input type="button" class="arrowup"
+						onclick="order(this,'-');"></td>
+				</tr>
+			</tbody>
+		</table>
+		</th><th class="bgdray align_center" style="padding: 0 2px;"><input
+			type="button" class="delrec"></th></tr>
+</table>
+{% endfor %}
+
+</div>
+</div>
+
+</div>
+{% endblock %}
+{% block def_xKatalog %}
+<div  class="greenpane">
+<div class="arrow "></div>
+<table class="pane long align_center align_middle">
+<col width="90">
+<col>
+<col>
+<col width="80">
+<col width="110">
+<col>
+<col>
+<tr>
+<td style="height:67px;" class="bgxx" ><img src="img/def_katalog.gif"></td><td class="bgxx">Мал. фото.<br>
+			<input class="digit6" name="sizex_{{id}}" value="{{sizex|e}}" type="text">x<input class="digit6" name="sizey_{{id}}" value="{{sizey}}" type="text"></td><td class="bgxx">Бол. фото.<br>
+			<input class="digit6" name="bsizex_{{id}}" value="{{bsizex|e}}" type="text">x<input class="digit6" name="bsizey_{{id}}" value="{{bsizey}}" type="text"></td><td class="bgxx">Рамка.<br><input class="checkbox" value="{{border|e}}" type="text" name="border_{{id}}"></td>
+<td class="bgxx">Цвет рамки.<br><input class="box colorbox" value="{{color|e}}" value="{{color|e}}" name="color_{{id}}"></td><td class="bgxx">толщина рамки.<br>
+			<input class="digit6" name="bx_{{id}}" value="{{bx|e}}" type="text">x<input class="digit6" name="by_{{id}}" value="{{by}}" type="text"></td><td class="bgxx" title="выравнивание текста"
+			style="padding: 0 2px;"><input name="align_{{id}}" type="text"
+			 value="{{align|e}}" class="align hidden"></td>
+</tr>
+</table>
+
+<table id="xKatalog_def" class="bluetab align_center tahoma long ctext size11  align_middle" style="margin-bottom:2px;">
+	<col width="90px">
+	{% set properties=callex('xKatalog','propList') -%}
+	{% set zzz=['№','Характ','файл синх.','доп хар.'
+			,'сел. (сайт)','Скр. (сайт)','Сорт. (админ)','только зарег.','Ширина поля(px)']-%}
+	{% for x in zzz %}<col>{% endfor-%}
+	<col width=50><col width=30>	
+		
+	<tr>
+		<td class="align_middle bgray" >
+		Настройки каталога</td>
+		{% for x in zzz %}
+		<th class="bgdray">{{x}}</th>{% endfor %}
+		<th style="padding:3px;" class="bgray" colspan=2>
+		<input type="button" class="ajax button" value="Доб. характ."
+			data-dialog="#defineharact" 
+			data-href="?do=addprop&plugin=xKatalog" 
+			data-complete="reload();" 
+		></th>
+	</tr>
+{% for x in properties %}
+		{% if loop.first %}<tr class="head">
+		{% else %}
+		<tr class="{{loop.cycle('odd','even')}}">
+		{% endif %}
+		<td></td>
+		<td  class="cell">
+		{{loop.index}}</td><th  class="cell">{{ x }}</th>
+		{% set xxx=loop.index %}
+		{% for y in zzz %}{% if loop.index==7  %}
+		<td class="cell"><input type="button" class="arrowup"><input type="button" class="arrowdn"></td>
+		{% elif loop.index==9 %}
+		<td class="cell"><input type="text" class="digit6" style="margin:0;"></td>
+		{% elif loop.index>2 %}
+		<td class="cell"><input type="text" class="checkbox" 
+		value="{{self['kat_'~xxx~'_'~loop.index]}}" name="kat_{{xxx}}_{{loop.index}}_{{id}}"></td>
+		{% endif %} 
+		{% endfor %}
+		{% if loop.first %}<td class="bgray"></td><td class="bgray"></td>
+		{% else %}
+		<td class="bgray">
+		<input type="button" class="arrowup"
+><input type="text" class="digit2" style="margin:0;"
+><input type="button" class="arrowdn"
+>		</td><td class="bgray">
+		<input type="button" class="ajax remrec"
+			data-confirm="Действительно удалить атрибут?" 
+			data-href="?do=remprop&plugin=xKatalog&prop={{xxx}}" 
+			data-complete="reload();" 
+		>
+	</td>
+{%- endif %}
+	</tr>
+{% endfor %}	
+</table>
+<table class="tahoma long ctext size11  align_middle" style="margin-bottom:2px;">
+	<col width="90px">
+	<col width="auto">
+	<tr>
+		<td class="align_center align_middle bgray" >
+		Отображать на сайте</td>
+		<td class="bgdray" style="padding:10px 8px;">
+		{% set ZZZ=['Табличная форма','Блочная форма','Галерея'] %}
+		<table class="long align_left">{% for x in ZZZ %}<col>{%endfor%}
+		<tr>{% for x in ZZZ %}
+		<td ><input type="radio" name="kat_form_{{id}}" value="{{loop.index}}" {%if kat_form==loop.index%}checked {%endif%}><b> {{x}}</b><br>
+		<input type="text" class="digit2" name="kat_col{{loop.index}}_{{id}}" value="{{self['kat_col'~loop.index]}}"> Кол-во столбцов<br>
+		</td>{% endfor %}
+		</tr>
+		</table>
+		</td>
+	</tr>
+</table>
+<table class="tahoma long ctext size11  align_middle" style="margin-bottom:2px;">
+<col width="90px"><col>
+	<tr>
+		<td class="align_center bgray" >
+		Настройки описания</td>
+		<td class=" bgdray" style="padding:10px 8px;">
+		<table class="long align_left"><col width="200"><col><col>
+		<tr>
+		<td>Наз. ссылки <input type="text" class="digit6" name="kat_link_{{id}}" value="{{kat_link}}"></td>
+		<td><input type="radio" name="kat_link_style_{{id}}" value="1" {%if kat_link_style==1%}checked {%endif%}> Выпадающее</td>
+		<td><input type="radio" name="kat_link_style_{{id}}" value="2" {%if kat_link_style==2%}checked {%endif%}> В новом окне</td>
+		</tr>
+		</table>
+		</td>
+	</tr>
+</table>
+<table class="tahoma long ctext size11  align_middle" style="margin-bottom:4px;">
+<col width="90px"><col>
+	<tr>
+		<td class="align_center align_middle bgray" >
+		Настройки доп хар-ки</td>
+		<td class="bgdray" style="padding:10px 8px;">
+		<table class="long align_left"><col width="200"><col><col><col>
+		<tr>
+		<td>Наз. ссылки <input type="text" class="digit6" name="kat_dop_{{id}}" value="{{kat_dop}}"></td>
+		<td><input type="radio" name="kat_dop_style_{{id}}" value="1" {%if kat_dop_style==1%}checked {%endif%}> Выпадающее</td>
+		<td><input type="radio" name="kat_dop_style_{{id}}" value="2" {%if kat_dop_style==2%}checked {%endif%}> В новом окне</td>
+		<td><input type="radio" name="kat_dop_style_{{id}}" value="3" {%if kat_dop_style==3%}checked {%endif%}> Скрыть</td>
+		</tr>
+		</table>
+		</td>
+	</tr>	
+</table>
+
+</div>
+{% endblock %}
+{% block xKatalog %}
+<div  id="pg_{{id}}" class="droppable greenpane collapsed">
+<div class="arrow "></div>
+<table class="pane fixed long ">
+<col width="{% if level%}90{% else%}66{%endif%}">
+<col width="120">
+<col>
+<col width="130">
+<col width="130">
+<col width="30">
+<col width="50"><tr>
+<td class="bgxx align_center align_middle" style="height:67px;" title="">
+				<img class="id_picture"	src="img/el_katalog.gif"></td><td id="loadpic_{{id}}" class="bgxx noborder align_center align_middle" title="">
+			<div class="picture_upload" title="Иконка" alt="small" style="vertical-align:middle;display:inline-block;min-height:30px; min-width:30px; max-height:50px;overflow:hidden;margin-right:30px;">
+			<img src="{{pic_small|default('img/folderb.gif')}}"></div>
+			<input name="pic_small_{{id}}" type="text" style="vertical-align:middle;display:none;"> </td><td class="bgxx noborder align_center align_middle"><input  name="articulx_{{id}}" placeholder="Артикул" class="input" type="text"><br><input  name="descrx_{{id}}" placeholder="Название" class="input" type="text"></td><td class="bgxx noborder" style="vertical-align: bottom;"><input type="button" title=""
+			class="panebutton haractpane" value="Характер."></td>
+<td class="bgxx noborder" style="vertical-align: bottom;"><input type="button" title=""
+			class="panebutton notepane" value="Доп.Описание {{article_count}}"></td>
+<td class="bgxx align_center align_middle" style="vertical-align: bottom;" title="выравнивание текста"
+			style="padding: 0 2px;"><input name="item_align_{{id}}" type="text" class="align hidden"></td>
+		<th class="bgxx noborder align_center"
+			style="padding: 0 2px;"><input
+			type="text" name="hidden_{{id}}" class="checkbox" title="скрыть элемент"></th>
+	</tr>
+</table>
+
+<div style="margin-top: 0px;" class="datapane">
+<div id="newElem_{{id}}" class="notepane_pane droppable">
+<table class="tahoma long ctext size11 fixed align_center align_middle">
+<col width="90">
+<col width="auto">
+<col width="auto">
+<tr>
+<td style="height:35px;" class="bgray" >
+		Настройки описания</td><td class="bgdray noborder">Название ссылки:<input class="input" name="comment_{{id}}" placeholder="Подробнее..." type="text"></td><td class="radio bgdray noborder"><input type="radio" name="target_{{id}}" value="1">выпадающее<input type="radio" name="target_{{id}}" value="2">в новом окне</td></tr>
+</table>
+<div class="greenpane">{{article}}</div>
+</div>
+<!-- фото -->
+<div class="haractpane_pane">
+{% set properties=callex('xKatalog','propList') %}
+<table class="greentab align_center tahoma long ctext size11  align_middle" style="margin-bottom:2px;">
+	{% for x in properties -%}
+		{% if loop.first %}<col width="90px;">{% endif %}{% endfor -%}
+		<col width=30>	
+<tr><th class="bgray">Фото</th>
+	{% for x in properties %}
+		{% if loop.index>1 %}
+		<th class="bgdray">{{ x }}</th>
+		{% endif %}
+	{% endfor %}
+		<th class="bgdray" ></th>
+</tr>
+<tr class="odd">
+	<td id="loadpic_{{id}}" class="cell align_center align_middle" title="">
+		<div class="picture_upload" alt="small" >
+		<img src="{{pic_small|default('img/folderb.gif')}}"></div>
+		<input name="pic_small_{{id}}" type="text" style="vertical-align:middle;display:none;">
+	</td>	
+	{% set keys=properties|keys %}	
+	{% for x in keys %}
+		{% if loop.index>1 %}
+	<td  class="cell"><input type="text" style="margin:0;" class="digit6" name="{{x}}_{{id}}"></td>
+		{% endif %}
+	{% endfor %}
+	<th class="bgdray" ></th>
+</tr>
+</table>
+<table class="align_center tahoma long ctext size11  align_middle" style="margin-bottom:2px;">
+<tr class="odd">
+	<td class="bgray" style="width:90px;">Настройки доп. хар-ки</td>
+	<td class="bgdray">Название ссылки
+	<input type="text" class="input"></td>
+	<td class="bgdray">
+	<input type="radio" name="har_type" value=1> Выпад
+	<input type="radio" name="har_type" value=1> В новом окне
+	<input type="radio" name="har_type" value=1> Скрыть
+	</td>
+	<th class="bgdray">
+	<input type="button" class="ajax longbutton" value="Доб. доп. xар"
+		data-href="?do=addharact&plugin=xKatalog&prop={{katalog_id}}" 
+		data-complete="reload();" 
+	></td>
+	</th>
+</tr>	
+</table>
+{% if katchilds %}
+<table class="greentab align_center tahoma long ctext size11  align_middle" style="margin-bottom:2px;">
+	{% for x in properties -%}
+		{% if loop.first %}<col width="90px;">{% endif %}{% endfor -%}
+		<col width=30>	
+<tr><th class="bgray">Фото</th>
+	{% for x in properties %}
+		{% if loop.index>1 %}
+		<th class="bgdray">{{ x }}</th>
+		{% endif %}
+	{% endfor %}
+		<th class="bgdray" ></th>
+</tr>
+{% for child in katchilds %}
+<tr class="odd">
+	<td id="loadpic_{{child.id}}" class="cell align_center align_middle" title="">
+		<div class="picture_upload" alt="small" >
+		<img src="{{child.pic_small|default('img/folderb.gif')}}"></div>
+		<input name="pic_small_{{child.id}}_{{id}}" type="text" style="vertical-align:middle;display:none;">
+	</td>	
+	{% set keys=properties|keys %}	
+	{% for x in keys %}
+		{% if loop.index>1 %}
+	<td  class="cell"><input type="text" style="margin:0;" class="digit6" name="{{x}}_{{child.id}}_{{id}}"></td>
+		{% endif %}
+	{% endfor %}
+	<th class="bgdray" >
+		<input type="button" class="remrec"></th>
+</tr>
+{% endfor %}
+</table>{% endif %}
+</div>
+</div>
+
+</div>
+{% endblock %}
+
+## <?php
+/**\/
+###############################################################
+{% block defvalues %}
+##
+##  шаблон плагина - "значения по умолчанию" - основной кусок
+##
+<form name="defvalues" action="" method="post">
+<input type="hidden" value="defaultValues" name="form">
+<div class="stick " style="height:30px;"></div>
+<div class="stick" style="width:740px;"></div>
+<div style="margin-bottom:2px;" class="graypane">
+<table class="grayline long"><tr>
+<td style="line-height:22px;font-weight:bold; color:green;" class="align_center">Параметры по умолчанию</td>
+<td style="width:120px;"><input type="button" class="savebutton">
+</td>
+</tr></table></div>
+<div class='lofty' style="overflow:auto;">
+{% for data in tabs %}
+{{data.data}}
+{% endfor %}
+</div>
+<script type="text/javascript">
+
+$(function(){
+	var change_func=[];
+
+	change_func[16]=function (){
+	var o=change_func[16].option,options={
+		width:parseInt(o.sizex) || 90	
+		,height:parseInt(o.sizey) || 90
+//		,borderWidth:'2px'
+//		,borderColor:'red'
+	};
+	if (o.border!='0' && o.border!='') {
+		options['border-style']='solid';
+		options['border-top-width']=(o.by||'2')+'px';
+		options['border-bottom-width']=(o.by||'2')+'px';
+		options['border-left-width']=(o.bx||'2')+'px';
+		options['border-right-width']=(o.bx||'2')+'px';
+		options['border-color']=o.color||'red';
+	} else {
+		options['border']='0';
+	}
+	var texto={
+			color:o.tcolor||'rgb(87,101,115)',
+			'font-family':o.tfont||'Tahoma',
+			'font-size':o.tsize||'11px',
+			'font-weight':o.tpb==1?'bold':'normal',
+			'font-style':o.tpi==1?'italic':'normal',
+			'text-decoration':o.tpu==1?'underline':'none'
+	};
+	
+	if(change_func[16].to){
+		clearTimeout(change_func[16].to);
+	}
+	change_func[16].to=setTimeout(function(){
+		change_func[16].to=false;
+		$('#xTP_defpicture').css(options);
+		$('#xTP_deftext').css(texto);
+	},10);
+};
+change_func[27]=function (){
+	var o=change_func[27].option,options={
+		overflow:'hidden'
+		,height:parseInt(o.height) || 2
+		,backgroundColor:o.color||'red'	
+	};
+	if(o.width && o.width.match(/\%$/))
+		options.width=o.width;
+	else
+		parseInt(o.width) || '100%';
+	switch(parseInt(o.align)||0){
+	case 1: // center
+		options.margin='0 auto';
+		break;
+	case 2: // right
+		options.margin='0 0 0 auto';
+		break;
+	default: // left
+		options.margin='0 auto 0 0';
+		break;
+	}
+	var brdsize=Math.round((options.height+2)/3);
+	switch(parseInt(o.btype)||0){
+	case 1:// solid
+	case 2:// doted	
+		options.border='0';
+		break;
+	case 3:// inset	
+		options.border=brdsize+'px inset';
+		break;
+	case 4:// outset	
+		options.border=brdsize+'px outset';
+		break;
+}
+	
+	if(change_func[27].to){
+		clearTimeout(change_func[27].to);
+	}
+	change_func[27].to=setTimeout(function(){
+		change_func[27].to=false;
+		$('#TP_x_LINE').css(options);
+	},10);
+};
+change_func[3]=function (){
+	var o=change_func[3].option;
+	var texto={
+			color:o.color||'rgb(87,101,115)',
+			'font-family':o.font||'Tahoma',
+			'font-size':o.size||'11px',
+			'font-weight':o.tpb==1?'bold':'normal',
+			'font-style':o.tpi==1?'italic':'normal',
+			'text-decoration':o.tpu==1?'underline':'none'
+	};
+	if(o.pic_small){
+		texto['padding-left']='30px';
+		texto['background']='url('+o.pic_small+') 0 60% no-repeat';
+	} else {
+		texto['background']="none";
+		texto['padding-left']='0px';
+	}
+	
+	if(!change_func[3].to){
+		clearTimeout(change_func[3].to);
+	}
+	change_func[3].to=setTimeout(function(){
+		change_func[3].to=false;
+		$('#xLINKS_def').css(texto);
+	},10);
+};
+change_func[20]=function (){
+	var o=change_func[20].option;
+	var texto={
+			color:o.color||'rgb(87,101,115)',
+			'font-family':o.font||'Tahoma',
+			'font-size':o.size||'11px',
+			'font-weight':o.tpb==1?'bold':'normal',
+			'font-style':o.tpi==1?'italic':'normal',
+			'text-decoration':o.tpu==1?'underline':'none'
+	};
+	if(o.pic_small){
+		texto['padding-left']='30px';
+		texto['background']='url('+o.pic_small+') 0 60% no-repeat';
+	} else {
+		texto['background']="none";
+		texto['padding-left']='0px';
+	}
+	
+	if(!change_func[20].to){
+		clearTimeout(change_func[20].to);
+	}
+	change_func[20].to=setTimeout(function(){
+		change_func[20].to=false;
+		$('#xANCHOR_def').css(texto);
+	},10);
+};
+//
+change_func[6]=function (){
+	var o=change_func[6].option,options={
+		table:{
+			border:'none',
+			'border-collapse':'collapse'
+		},
+		td_th:{
+			border:0,
+			borderSpacing:0,
+			padding:'3px 5px'
+		},
+		th:{
+			backgroundColor:o.hcolor||'rgb(168,190,204)'	
+		},
+		even:{
+			backgroundColor:o.lrcolor||'rgb(224,235,241)'	
+		},
+		odd:{
+			backgroundColor:o.drcolor||'rgb(209,223,232)'	
+		}
+	}
+	,size='2px'
+	,style=' outset ';
+	o.brcolor=(o.brcolor||'white')
+	if(o.border==1){
+		options.td_th.border=size+style+o.brcolor;
+		//options.table['border-collapse']='separate';
+		options.table.border=size+' inset '+o.brcolor;
+		//options.table.backgroundColor=o.brcolor||'black';
+	} else if(o.border==2){
+		//options.td_th.borderSpacing='2px';
+		//options.table['border-collapse']='separate';
+		options.table.border=size+' inset '+o.brcolor;
+		//options.table.backgroundColor=o.brcolor||'black';
+	} else if(o.border==3){
+		options.td_th.border=size+style+o.brcolor;
+		options.td_th['border-left-width']='0';
+		options.td_th['border-right-width']='0';
+		
+		//options.td_th.borderSpacing='2px';
+		//options.table['border-collapse']='separate';
+		options.table.border=size+' inset '+o.brcolor;
+		//options.table.backgroundColor=o.brcolor||'black';
+	}
+	
+	if(change_func[6].to){
+		clearTimeout(change_func[6].to);
+	}
+	change_func[6].to=setTimeout(function(){
+		change_func[6].to=false;
+		$('#xTABLE_def').css(options.table);
+		$('#xTABLE_def th').css(options.th);
+		$('#xTABLE_def th,#xTABLE_def td').css(options.td_th);
+		$('#xTABLE_def tr.even td').css(options.even);
+		$('#xTABLE_def tr.odd td').css(options.odd);
+	},10);
+};
+	$('input, radio, select')
+	.change(function(){
+		var m,$self=$(this);
+		if( (m=$self.attr('name').match(/(\w+)_(\d+)/))
+			&& ($self.attr('type')!='radio' || $self.attr('checked')))
+		{
+			var ch_func=parseInt(m[2]);
+			if (ch_func && change_func[ch_func]){
+				if(!change_func[ch_func].option) change_func[ch_func].option={};
+				change_func[ch_func].option[m[1]]=$self.val();
+				change_func[ch_func]();
+			}
+			need_Save();
+		}
+	}).trigger('change');
+	need_Save(false);
+})
+</script>
+</form>
+{% endblock %}
+
