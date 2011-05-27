@@ -1,0 +1,88 @@
+#########################################################################
+##
+##  модуль пользователи. шаблоны админки
+##
+#########################################################################
+
+#########################################################################
+##
+##  редактирование свойств пользователя
+##
+{% macro admin_user(root=0,list=0,user=0,error=0) %}
+<form action="" method="POST" name="admin_user"><div style="height:100%;ovrflow:auto;">
+{% if error %}<span style="color:red;font-size:16px;">{{error}}</span>{% endif %}
+<input type='hidden' class="del" name="del">
+<table class="thetable long tahoma size11" >
+<tr>
+<th class="bblue">свойство</th>
+<th class="bblue">значение</th>
+</tr>
+{% for row in list %}
+	<tr class="{{loop.cycle('odd','even')}}"{%if row.prop %} id="us_{{row.prop}}{% endif %}">
+	{% if row.type=='common' %}
+		<td ><b>{{row.the_text}}</b></td>
+		<td class="text_edit" id="{{row.prop}}" >{{row.val}}</td>
+	{% elif row.type=='avatar' %}
+		<td ><div style="float:right;">
+		{% if row.val %}
+		<img src="{{root~row.val}}" height="80" width="80" onload="checkImg(this,80,60)" />
+		{% endif %}
+		</div><b>Фото (аватар)</b>
+		</td>
+		<td ><div class="wide long uploader action_small users_avatar">
+		<input class="long" type="" value="{{row.val}}" name="avatar"><br><br>
+		</div></td>
+	{% elif row.type=='xrights' %}
+		<td ><b>Права пользователя</b></td>
+		<td ><div class="wide long xrights">
+		<input class="long" type="text" name="us_right">
+		</div></td>
+	{% elif row.type=='xuser' %}
+		<td ><b>{the_text}</b></td>
+		<td ><div class="wide long xuser">
+		<input class="long" type="text" name="{prop}">
+		</div></td>
+	{% elif row.type=='xmanager' %}
+		<td ><b>{the_text}</b></td>
+		<td ><div class="wide long xmanager">
+		<input class="long" type="text" name="{{row.prop}}">
+		</div></td>
+	{% endif %}
+		</tr>
+{% endfor %}
+<tr><th class="align_center" colspan=3 >
+	<input type="submit" class="button savebutton" disabled="disabled" value="сохранить">
+	<input type="submit" class="button" name="delete_user" value="Удалить">
+</th></tr>
+</table></div>
+</form>
+{% endmacro %}
+
+#########################################################################
+##
+##  список пользователей
+##
+{% macro user_list(list=1,columns=5) %}
+<div style="height:100%;overflow:hidden;overflow-y:auto;">
+<table class="menu ctext tahoma">
+{% for x in range(columns) %} <col width="{{100/columns}}%">{% endfor %}
+{% set cols=slice(list,1+(length(list)-1)/columns) %} 
+{% for c in cols[0] %}
+{% set col=loop.index0 %}
+<tr>
+{% for xx in range(columns) %}
+{% set u=cols[loop.index0] %}
+{% set user=u[col] %}
+<td>{% if user.id %}
+<a class="arrow{% if not right(user)%} lock_user{% endif %}{%if user.new %} new_user{%endif%}" href="{{ callex('MAIN','curl','user')~'user='~user.id }}">{%if user.new %}*{%endif%}{{user.name|default('-----')}}</a>
+{% endif %}</td>
+{% endfor %}
+</tr>
+{% endfor %}
+<tr><td colspan={{columns}} style="padding-top:30px;"
+>Всего: {{list|length}} пользовател{{list|finnumb('ь','я','ей')}}. 
+<a
+ class="button"
+href="{{callex('MAIN','curl','user')~'user=0'}}">Добавить</a></td></tr>
+</table></div>
+{% endmacro %}
