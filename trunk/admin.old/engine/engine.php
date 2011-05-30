@@ -280,7 +280,7 @@ class prop {
 		else
 			$me=&$this;	
 		if(!$valute)$valute=$me->prep() ;
-		$mm=explode('.',$LL,2);
+        $mm=explode('.',str_replace(',','.',$LL),2);
 		if (empty($mm[1]))$mm[1]=0;
 		else {
 			if (strlen ($mm[1])<2) $mm[1].='00';
