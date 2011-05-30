@@ -182,7 +182,7 @@ class users extends plugin {
 				}
 			} 
 			//Обязательные поля
-			$obz = array(
+	/*		$obz = array(
 				"surname" => "Не указана фамилия",
 				"first_name" => "Не указано имя",
 				"patronymic" => "Не указано отчество",
@@ -191,7 +191,7 @@ class users extends plugin {
 				"cust_ORGANISATION" => "Не указано учреждение",
 				"cust_EMAIL" => "Не указана электронная почта",
 				);
-			
+
 			foreach ($obz as $k => $v) {
 				if (trim($form->var[$k]) == "") {
 					$this->parent->error($v);
@@ -199,7 +199,7 @@ class users extends plugin {
 					break;
 				}	
 			}
-			
+	*/
 			if (!ereg("^[a-zA-Z0-9_\.\-]+@[a-zA-Z0-9_\.\-]+\.[a-zA-Z0-9_\.\-]+$", $form->var["cust_EMAIL"])) {
 				$this->parent->error('Не правильный адрес электронной почты');
 				$this->parent->go($this->parent->curl('do').'do='.$profile);
@@ -223,25 +223,18 @@ class users extends plugin {
 			if(!isset($key['visible']))
 				$key['visible']=array();
 			if(!empty($key['visible']))
-				$key['visible']=array_flip($key['visible'])	;	
-			foreach($this->fields as $v){
-				if($v['name'] && isset($_POST[$v['name']])){
-					$key[$v['name']]=trim(strip_tags($_POST[$v['name']]));
-				}
-				if($v['name'] && empty($v['nocheck'])){
-					if(pps($_POST['show_'.$v['name']])){
-						$key['visible'][$v['name']]=true;
-					} else {
-						unset($key['visible'][$v['name']]);
-					}
+				$key['visible']=array_flip($key['visible'])	;
+ 			foreach($this->fields as $k=>$v){
+ 				if(isset($_POST[$k])){
+					$key[$k]=trim(strip_tags($_POST[$k]));
 				}
 			}
 			$key['visible']=array_keys($key['visible']);
 			if($form->havenewfile) {
 				$key['avatar'] = toUrl_sf(toUrl($form->var['~avatar']));
 			}
-			//debug($this->fields); 	
-			//debug($form->var);	
+			debug($this->fields);
+			debug($form->var);
 			if(!$newuser){
 				$key['id']=$this->parent->user['id'];
 				$key['name']=$this->parent->user['name'];
