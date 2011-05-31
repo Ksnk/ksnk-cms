@@ -1746,9 +1746,11 @@ LIMIT 100;';
 		$form=new form('callback');
         $form->scanHtml($this->_tpl('tpl_jelements','_callback',$res));
 		if($form->handle()){
+
 		// проверка обязательных полей		
 			$error=false;
 			$encoding=false;
+            debug($fields);
 			foreach($fields as $k=>$v){
 				if($encoding || detectUTF8($form->var[$v[0]])){
 					$encoding=true;	
@@ -1760,6 +1762,7 @@ LIMIT 100;';
                     switch ($v['validate']){
                         
                     case 'email':
+                        debug('email');
                         if(!filter_var($form->var[$v[0]], FILTER_VALIDATE_EMAIL)){
                             $error=true;
                             $this->error('поле "'.$k.'" не является email адресом<br>');
@@ -1768,11 +1771,13 @@ LIMIT 100;';
 
                     default:
                         $func=create_function('$var',$v['validate']);
-                        $res=$func($form->var);
-                        if(!empty($res)){
-                            $error=true;
-                            $this->error($res);
-                        };
+                        if($func){
+                            $res=$func($form->var);
+                            if(!empty($res)){
+                                $error=true;
+                                $this->error($res);
+                            };
+                        }
                     }
                 } else	if(!is_int($k) && isset($v['require'])) // типо индекс
 				{
