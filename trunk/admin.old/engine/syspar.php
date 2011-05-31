@@ -1757,12 +1757,23 @@ LIMIT 100;';
                 if(!empty($ruller) && !empty($v['rule']) && !preg_match('/\br'.$form->var[$ruller].'\b/',$v['rule']))
                     continue;
                 if(!empty($v['validate'])){
-                    $func=create_function('$var',$v['validate']);
-                    $res=$func($form->var);
-                    if(!empty($res)){
-                        $error=true;
-                        $this->error($res);
-                    };
+                    switch ($v['validate']){
+                        
+                    case 'email':
+                        if(!filter_var($form->var[$v[0]], FILTER_VALIDATE_EMAIL)){
+                            $error=true;
+                            $this->error('поле "'.$k.'" не является email адресом<br>');
+                        };
+                        break;
+
+                    default:
+                        $func=create_function('$var',$v['validate']);
+                        $res=$func($form->var);
+                        if(!empty($res)){
+                            $error=true;
+                            $this->error($res);
+                        };
+                    }
                 } else	if(!is_int($k) && isset($v['require'])) // типо индекс
 				{
 					if(empty($form->var[$v[0]])){
