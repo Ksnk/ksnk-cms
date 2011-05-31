@@ -1,0 +1,298 @@
+##################################################################
+##################################################################
+##################################################################
+##
+##	модуль комментарий
+##
+##################################################################
+
+##################################################################
+##
+##  комментарий для вывода в обычной странице
+##
+{% macro komment (par=0,data=0,pages=0,user=0,root=0) %}
+
+<div class="tahoma size11" style="margin-top:25px;margin-bottom:10px;padding:10px 20px;background-color:#d7dee9;width:140px;text-align:center;">
+<a href="javascript:show_komment({{par.id}})">
+{% if par.item_columns %} {{par.item_columns}}<br>{% else %}Комментарии{% endif %}
+- {{data|length}} ответ{{data|finnumb('','а','ов')}}</a></div>
+<div id="komment_{{par.id}}" class="tahoma size11" style="padding-top:25px;display:none;">
+{% if pages %}{{pages}}{% endif %} 
+<table style="width:75%;margin-top:30px;">
+{% for comment in data %}
+<tr style="color:#9eafc3;">
+<td style="border-bottom:solid 1px #d7dee9;padding-bottom:2px;">{{comment.date}}</td><td style="border-bottom:solid 1px #d7dee9;width:110px;">
+</td><td style="border-bottom:solid 1px #eb8017;width:100px;">сообщение #{{loop.index}}</td>
+</tr>
+{% if comment.quote %}
+<tr>
+<td style="height:16px;"></td><td></td><td></td>
+</tr>
+<tr>
+<td colspan="2" style="padding: 10px 0px 12px 25px;background-color:#d7dee9;">{{comment.quote}}</td><td style="background:url(img/strelka.gif) no-repeat center 8px"></td>
+</tr>
+{% endif %}
+<tr>
+<td class="question" colspan="2" style="padding: 20px 0px 12px 25px;">{{comment.text}}</td><td style="{style_str}"></td>
+</tr>
+<tr>
+<td colspan="2" style="padding: 0px 0px 33px 25px;color:#225f9a;">
+{% if comment.info %}
+<span onmouseover="showInfo(this)">{{comment.username}}
+<div style="display:none;">{{comment.info}}</div>
+</span>
+{% else %}
+<span >{{comment.username}}</span>
+{% endif %}
+</td><td></td>
+</tr>
+{% endfor %}
+</table>
+{% if pages %}{{pages}}{% endif %} 
+<table style="width:75%;margin-top:42px;">
+<tr>
+<td>
+<table class="tahoma">
+<tr><td style="background-color:#09304d;color:#FFFFFF;height:28px;width:215px;text-align:center;vertical-align:middle;font-weight:bold;font-family:Arial;font-size:11px;">ОСТАВИТЬ КОММЕНТАРИЙ</tr></td>
+<tr><td style="height:10px;background:url(img/ugol_t.gif) left top no-repeat;"></tr></td>
+</table>
+</td>
+<td style="font-size:12px;"><!--<a href="{all_topics}">Показать все темы</a>--></td>
+<td></td>
+</tr>
+</table>
+
+<div class="quote_div"></div>
+<form method="post">
+<input type="hidden" name="action" value="newkomment"/>
+<div style="margin:10px 0px 10px 25px;">Ваше имя
+<input type="hidden" name="user" value="{{user.id}}">
+<input type="text" name="username" value="{{user.name}}" style="margin:0px 0px 0px 15px;border:solid 1px #d7dee9;"/></div>
+<textarea name="newpost" style="margin:10px 0px 10px 25px;height:145px;width:425px;border:solid 1px #d7dee9;">
+</textarea><br/>
+<input type="hidden" name="comment" value="{{par.id}}"/>
+<input type="hidden" name="quote_id" value=""/>
+<input type="hidden" name="quote" value=""/>
+<input type="submit" value="Отправить" style="background:url(img/button2.gif) no-repeat center right #FFFFFF;border:none;width:100px;color:#225f9a;margin-left:20px;"/>
+</form>
+</div>
+{% endmacro %}
+
+##################################################################
+##################################################################
+##################################################################
+##
+##	модуль - каталог
+##
+##################################################################
+
+##################################################################
+##
+##  информация о количестве товаров в корзине
+##
+{% macro basket_top (pos=0,root=0) %}
+        {% if pos %}
+<b>{{pos}}</b> товар{{pos|finnumb('','a','ов')}} в корзине<br>
+        <a class="basket" href="{{root}}basket">Оформить заказ</a>
+        {% else %}
+корзина пуста
+        {% endif %}
+{% endmacro %}
+
+##################################################################
+##
+##  элемент каталог (в корзине и списке товаров)
+##
+{% macro catalogue (button_val=0,_table=0,perpage=40,root=0,user=0,pages) %}
+        {% set data= _table[0] %}
+	<form name="basket" method="POST">
+	<table class="long">
+        {% if pages %}
+		<tr><td>
+			<table class="long">
+				<tr>
+					<td class="align_right" style="vertical-align:middle;padding-right:40px; padding-bottom:10px">
+                    <nobr><u>Кол-во на странице</u>&nbsp;&nbsp;&nbsp;
+						<select name="perpage" style="border:1px solid #424d5b; background:#424d5b; color:#FFFFFF">
+                            {% for item in [10,20,40,60,100,200,500] %}
+							<option value=" {{ item }}"{% if perpage==item %} selected{% endif %}>{{ item }}</option>
+                            {% endfor %}
+                        </select>
+						<input type="submit" style="background:url(img/btn_red.gif); border:0;width:13px; height:21px;" value="&nbsp;" src="{::index}/img/button3.gif">
+					</td></tr>
+					<tr><td style="padding-left:100px;">
+					{pages}
+					</td>
+				</tr>
+			</table>
+		</td></tr>
+        {% endif %}
+        {% set data=_table[0] %}
+{% for table in _table%}
+		<tr><td>
+    <table style="width:100%; border-top:3px solid #e3e6ea; border-bottom:3px solid #e3e6ea; border-left:none; border-right:none; margin-top:0px; margin-bottom:8px;">
+		<tr><td style="padding-top:1px; padding-bottom:1px; padding-left:-1px; overflow:hidden;">
+		    <table class="long size12 table tablex" style="margin-left:-1px;">
+				<tr class="size11">{{table.headers}}</tr>
+
+	{% for row in table.data %}
+		<tr id="xx_{{row.id}}" class="{even??even::odd}">{{row.data}}</tr>
+	{% endfor %}
+
+			</table>
+	    </td></tr>
+    </table>
+
+    </td></tr>
+    {% if table.subtitle %}
+    {% set sub= table.subtitle %}
+	<tr><td class="menu size12" style="text-align:right">
+			<div class="align_right" style="padding-right:10%; float:right">{{sub.title}}, руб:&nbsp;&nbsp;&nbsp;{{sub.value}}</div>
+	</td></tr>
+	{% endif %}
+
+{% endfor %}
+
+	<tr><td  height=20px></td></tr>
+	<tr><td  >
+	<table class="long">
+		<tr><td style="padding-left:100px;">
+	{{pages}}
+	</td>
+	</tr>
+
+	<tr><td class="align_left" style="padding-left:60px; padding-bottom:15px">
+		<table><tr><td style="vertical-align:middle;"><input type="submit"
+		    name="clear_bsk"
+			style="border:0;background-color:#FFFFFF"
+			class="basket_link"
+			value="Очистить"></td>
+		<td style="width:10px;"></td>
+		<td class="white size11" style="vertical-align:middle;"><input type="submit"
+			style="border:0;background-color:#FFFFFF"
+			class="basket_link"
+			value="{{button_val|default('Добавить в корзину')}}">
+        </td></tr></table>
+
+	</td></tr></table>
+	</td></tr>
+		</table>
+	</form>
+{% endmacro %}
+
+##################################################################
+##
+##  кнопка "оформить заказ" для корзинки
+##
+{% macro basket_btn (pos=0,posx=0,cost=0,root=0) %}
+    {% if pos %}
+<div style="padding:10px 60px;" class="size12 menu">
+Сейчас в корзине {% if pos %}{{pos}} товар{{pos|finnumb('','a','ов')}} на сумму {{cost}} р.{% else %} нет товаров. {% endif %}
+</div>
+<div style="padding-left:60px;outline:none;" class="link tahoma menu">##Для оформления выбирайте удобный способ оплаты и переходите по ссылке:
+<ul class="link tahoma menu ">
+    <li><a class="" href="{{root}}order">Оформить заказ</a></li>
+</ul></div>
+    {% else %}
+<div style='font-weight:bold;font-size:16px;padding:60px;' class='align_center red'>Корзина пуста</div>
+    {% endif %}
+
+{% endmacro %}
+##################################################################
+##
+##  форма callback для Simpleform
+##
+{% macro callback (list,hidden,error,root=0) %}
+
+<form style="padding:0; margin:0" action="" method="POST" name="callback">
+<style>
+.table td.pad10 {
+    padding-top:10px;
+    padding-bottom:10px;
+}
+.table .input {
+	border:1px solid rgb(127,157,185);
+	width:310px;
+
+}
+.table textarea.input {
+	height:100px;
+}
+
+.table span.comment {
+	font-size:10px; color:#cccccc;
+}
+
+</style>
+<span class="bold red">{{error}}</span>
+    ## скрытые элементы формы
+{% for el in hidden %}<input class="hidden" ntype="text" name="{{el.text}}">{%endfor%}
+    ## секретный ID формы
+<input  class="hidden" type="text" name="hidden_value" value="secret">
+    ## обычные элементы формы
+<table class="table size12">
+    {% for el in list %}
+
+<tr class="{%if el.even%}even{%else %}odd{%endif%}{% if el.rule %} ruled {{el.rule}}{%endif%}">
+    {% if el.type=='text' %}
+    <td colspan=3 class="pad10 text bold align_center" >{{el.text}}</td>
+    {% endif %}
+    {% if el.type=='password' %}
+    <td class="pad10 text align_right">{{el.tit}}
+        {%- if el.nocol %}{%else%}:{%endif -%}&nbsp;
+        {%- if el.nostar %}&nbsp;{% else %}<sup><b>*</b></sup>{%endif -%}
+    </td>
+    <td colspan=2 class="pad10 text"><input  class="input" type="password" name="{{el.name}}">{{el.comment}}</td>
+    {% endif %}
+    {% if el.type=='scrolltext' %}
+<td colspan=3 class="pad10 text align_right" >
+	{{el.title}}<div style="overflow:auto;">{{el.text}}</div></td>
+    {% endif %}
+    {% if el.type=='input' %}
+<td class="pad10 text align_right">{{el.tit}}
+        {%- if el.nocol %}{%else%}:{%endif -%}&nbsp;
+        {%- if el.nostar %}&nbsp;{% else %}<sup><b>*</b></sup>{%endif -%}
+    </td>
+<td colspan=2 class="pad10 text"><input  class="input" type="text" name="{{el.name}}">{{el.comment}}</td>
+    {% endif %}
+    {% if el.type=='textarea' %}
+<td class="pad10 text align_right">{{el.tit}}
+        {%- if el.nocol %}{%else%}:{%endif -%}&nbsp;
+        {%- if el.nostar %}&nbsp;{% else %}<sup><b>*</b></sup>{%endif -%}
+    </td><td colspan=2 class="pad10 text"><textarea  class="input" name="{{el.name}}"></textarea></td>
+    {% endif %}
+    {% if el.type=='checkbox' %}
+<td class="pad10 text align_right">{{el.tit}}
+        {%- if el.nocol %}{%else%}:{%endif -%}&nbsp;
+        {%- if el.nostar %}&nbsp;{% else %}<sup><b>*</b></sup>{%endif -%}
+    </td>
+<td colspan=2 class="pad10 text">
+	{% for ch in el.check %}
+	<div><input type="checkbox" name="{{ch.name}}" value="{{ch.value}}">{{ch.text}}</div>
+	{% endfor %}
+	</td>
+    {% endif %}
+    {% if el.type=='radio' %}
+<td class="pad10 text align_right">{{el.tit}}
+        {%- if el.nocol %}{%else%}:{%endif -%}&nbsp;
+        {%- if el.nostar %}&nbsp;{% else %}<sup><b>*</b></sup>{%endif -%}
+    </td>
+<td colspan=2 class="pad10 text">
+	{% for ch in el.check %}
+	<div><input type="radio"{%if el.onchange %} onchange="{{el.onchange}}" {%endif%}name="{{ch.name}}" value="{{ch.value}}">{{ch.text}}</div>
+	{% endfor %}
+	</td>
+    {% endif %}
+    {% if el.type=='captcha' %}
+<td class="pad10 text align_right" >Введите номер, изображенный на картинке:<br></td><td class="text" style="vertical-align:middle; padding-left:10px"><input class="input2"  type="text" name="captcha" /></td>
+<td><img src="{{root}}captcha.php" alt="" />
+</td>
+    {% endif %}
+    {% if el.type=='submit' %}
+<td class="text pad10" ></td><td colspan=2 class="pad10 text align_left" ><div style="width:100px;" class="button"><input type="submit" value="Отправить"></div></td>
+    {% endif %}
+</tr>
+{% endfor %}
+</table>
+</form>
+{% endmacro %}

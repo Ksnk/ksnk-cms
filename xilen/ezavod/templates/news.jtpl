@@ -1,0 +1,55 @@
+########################################################################
+##
+##                   плагин Новости
+##
+########################################################################
+########################################################################
+##
+##    news_b - маленький список новостей в углу сайта, 
+##		разбит на 2 колонки
+##
+{%- macro news_b(news,newscnt=3) %}
+## заголовок "новости" размещаем поверх блока новостей, смещаясь вниз
+
+<div style="background:url(img/novosty.gif) 96px 0 no-repeat;height:18px;">
+</div>
+## тело блока с 2-мя новостями
+<table id="news_b"><col style="width:49%"><col style="width:49%"><tr>
+{% for n in news %}{% if loop.index<3 %}
+<td>
+	<table style="margin:30px;table-layout:fixed;" >
+	<col width="16px"><col width="30px"><col>
+	<tr><td style="background:url(img/arrow.gif) 0 9px no-repeat;"></td>
+	<td style="font-size:12px;font-weight:bold;color:white;background-color:rgb(180,20,20);padding:5px;">{{n.news_date|date('d')}}
+	</td><td rowspan=2 style="padding:0 26px 30px 16px;font-size:12px;line-height:1.4em;">
+	<a class="newslink" href="?do=newslist&id={{n.id}}">{{n.the_text|truncate(100)}}</a>
+	</td></tr><tr>
+	<td colspan=2 style="text-align:right;padding-top:9px;color:rgb(87,101,115);font-size:11px;">{{n.news_date|date('m/Y')}}</td>
+	</tr>
+	</table></td>
+{% endif %}{% endfor %}
+</tr></table>
+<div style="clear:both;margin:30px 0 10px 38px;">
+<span class="size12 ">Архив новостей
+{% for y in years %}
+<a href="?do=newslist&year={{y.year}}">11{{y.year}}</a> г. {%if not loop.last %}/{% endif %}
+{% endfor %}</span></div>
+{% endmacro %}
+########################################################################
+
+<!--begin:newslist-->
+
+<div class="tahoma ctext" style="margin-top:15px;">
+<!--begin:news-->
+<div style="clear:both;">
+<b>{date}</b>
+<b>{title}</b><br>
+<!--begin:img-->
+<div class="float_left" style="margin-top:15px;">
+	{pict}
+</div>
+<!--end:img--><p>{text}</p></div>
+<!--end:news-->
+{pages}
+</div>
+<!--end:newslist-->

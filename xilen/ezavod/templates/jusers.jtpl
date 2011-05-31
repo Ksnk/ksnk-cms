@@ -1,0 +1,237 @@
+##################################################################
+##
+##	модуль пользователи
+##
+##################################################################
+
+##################################################################
+##
+##  форма логина для вывода в шапке сайта
+##
+{% macro toplogin (root,user,error) %}
+        <div style="margin-top:17px;">
+{% if user.id %} ## регистрация произошла - можно выводить logout
+<a class="login" href="{{root~'logout'}}" title="Пользователь '{{user.name|e}}'">Выход</a>
+<div class="fills" style="top: 50px; right: 0px; position: absolute; overflow: hidden; height: 80px; ">
+Вы зарегистрированы&nbsp;как&nbsp;<a href="{{root~'onlinereg'}}" title ="Профиль">{{user.name|e}}</a></div>
+{% else %}
+<a class="login" href="{{root~'login'}}" onclick="return showloginbar();">Вход</a>
+{% if error %}<div class="red fills" style="top: 50px; right: 0px; position: absolute; overflow: hidden; height: 80px; ">
+            {{error}}</div>{% endif %}
+<div class="fills" id="loginbar" style="top: 30px; right: 0px; position: absolute; overflow: hidden;  display: none; height: 80px; ">
+    <form method="post" href="">
+    <div style="padding:15px 10px;width:160px;">
+    <div style="float:right;margin-top:15px;"><input class="submit" align="middle" type="image" src="{{root~'img/search1.gif'}}"></div>
+    <input alt="имя пользователя" title="имя пользователя" id='login' name="login_name" type="text"><br>
+    <input alt="пароль" title="пароль" name="login_pass" type="password"><br>
+        <a class="login" href="{{root~'onlinereg'}}">Нет логина?</a>
+    </div></form>
+</div>
+
+<script type="text/javascript">
+    $(function(){
+    menu('#loginbar',{
+        show:function(){$(this).show('hormal',function(){
+            $('#login').focus();
+        })},
+        hide:function(){$(this).hide('hormal')}
+    });
+    })
+window.showloginbar=function (){
+var x=$('#loginbar')[0];
+if(!x.shown)
+    x.show_menu();
+return false;
+};
+</script>
+{% endif %}
+</div>
+{% endmacro %}
+##################################################################
+##
+##  форма логина для вывода на странице в случае доступа к защищенной информации
+##
+{% macro login (error,cansave,names, root) %}
+<form action="" method="POST" name="login">
+<div class="red">{{error}}</div>
+    <table height="400" style="width:60%;height:1px;" class="table tahoma ctext">
+<tr>
+<td style="padding:10px;" colspan="2">
+ <p style="font-size:14px;"> Если у вас есть аккаунт на сайте
+        - введите имя и пароль, если нет - <a  href="{{root~'onlinereg'}}">зарегистрируйтесь</a>, пожалуйста</p></td>
+</tr>
+	<tr class="borderdn odd">
+			<td class="pad10 text">Логин</td><td class="pad10 text"> <input type="text" class="input long" name="login_name"> </td>
+		</tr>
+	<tr class="borderdn even">
+			<td class="pad10 text">Пароль</td><td class="pad10 text"> <input type="password" name="login_pass" class="input long"> </td>
+		</tr>
+<tr style="border: 1px solid #dddddd; border-width:1px 0;">
+<td class="text pad10"></td><td class="pad10 text align_left"><div class="button" style="width:100px;"> <input type="submit" value="Отправить"> </div></td>
+</tr>
+</tbody></table>
+
+</form>
+{% endmacro %}
+
+##################################################################
+##
+##  информация о юзере для показа в форуме
+##
+{% macro userinfo (visible,user,names,root) %}
+<b>{{user.first_name}}
+{% if visible.patronymic%} {{user.patronymic}}{% endif %}
+ {{user.surname}}</b>
+<span style="display:block;clear:both;margin-top:10px;"></span>
+{% if user.avatar %}
+<img style="float:left; margin-right:15px;" onload="checkImg(this,100,100)" width=100 hight=100 src="{{root~user.avatar}}">
+{% endif %}
+{% for v in user.visible %}
+{% if user[v] and not( v=='patronymic')%}<b>{{names[v]}}:</b> {{user[v]}}<br/>{% endif %}
+{% endfor %}
+
+{% endmacro %}
+##################################################################
+##
+##  форма авторизации. Вставляется в главную страницу сайта
+##
+{% macro authform (user=0,userhello=0) %}
+
+	<div id="auth" onMouseOut="hide_auth_pre();"  onMouseOver="show_auth();">
+		<form name="login" method="POST" style="margin:0;">
+			<table style="table-layout:fixed;margin:0px;" class="long size11 tahoma">
+				<col width="auto">
+				<col width="30">
+				<tr style="border-left:solid 1px #1f4fb7;border-right:solid 1px #1f4fb7;">
+					<td colspan=2 style="background:#1f4fb7;color:#FFFFFF;font-weight:bold;letter-spacing:1px;height:28px;vertical-align:middle;padding-left:20px;">
+					<p>АВТОРИЗАЦИЯ</p></td>
+				</tr>
+		{% if user.name %}
+				<tr class="out_hide">
+					<td colspan="2" style="border-bottom:solid 1px #d7dee9;border-right:solid 1px #d7dee9;">
+						<a href="?do=profile">Профиль пользователя</a>
+					</td>
+				</tr>
+				<tr class="out_hide">
+					<td colspan="2" style="padding-bottom:16px;border-bottom:solid 1px #d7dee9;border-right:solid 1px #d7dee9;">
+						<a href="?do=logout"
+	 onclick="if(!confirm('Хотите закончить сеанс?')) return false;">Завершение сеанса &laquo;{{user.name}}&raquo;</a>
+					</td>
+				</tr>
+		{% else %}
+				<tr class="ugol" style="border-left:solid 1px #1f4fb7;">
+					<td colspan=2 style="height:7px;background:url(img/auth_form_bg.gif) transparent no-repeat top left;">
+					</td>
+				</tr>
+				<tr class="out_hide">
+				<td style="padding-top:22px;"><input name="login_name" type="text"></td>
+				<td style="border-right:solid 1px #d7dee9;"></td>
+				</tr>
+				<tr class="out_hide">
+					<td><input name="login_pass" type="password"></td>
+					<td style="border-right:solid 1px #d7dee9;"><input type="submit" style="border:0;padding:0;margin:0;width:12px; height:19px; background:url(img/button2.gif);" value="&nbsp;"></td>
+				</tr>
+				<tr class="out_hide">
+					<td colspan="2" style="border-right:solid 1px #d7dee9;">
+						<a href="?do=onlinereg">Регистрация</a>
+					</td>
+				</tr>
+				<tr class="out_hide">
+					<td colspan="2" style="padding-bottom:16px;border-right:solid 1px #d7dee9;">
+						<a href="?do=writeus">забыли пароль?</a>
+					</td>
+				</tr>
+		{% endif %}
+			</table>
+		</form>
+	</div>
+{% endmacro %}
+
+##################################################################
+##
+##  Вывод информации об успешной регистрации юзера
+##
+{% macro qathanks(url=0, result=0,user=0) %}
+<div class="para tahoma ctext link">
+##  style="padding-top:60px; padding-right:0; padding-bottom:0; padding-left:60px;" class="
+<p>Вы успешно зарегистрированы. Подтверждение регистрации будет в течение 24 часов. 
+</p><p>Нажмите на <a href="{{url}}">ссылку</a> для возврата.
+</p>
+<p class="red size11">{{result}}</p>
+</div>
+{% endmacro %}
+
+{% macro line(title,name,star=0,type='text',user=0) %}
+<tr class="even borderdn">
+ <td class="pad10 text">{{title}}{% if star %}<span class="red">{{star}}</span>{% endif %}</td><td  class="pad10 text"><input class="input long"  type="{{typpe}}" name="{{name}}"></td>
+</tr>
+{% endmacro %}
+
+##################################################################
+##
+##  Вывод формы online-регистрации
+##
+{% macro onlinereg(fields=0,error=0, result=0,user=0,root=0) %}
+<form action="" enctype="multipart/form-data" method="POST" name="onlinereg">
+<style>
+.table td.pad10 {
+ padding-top:10px;
+ padding-bottom:10px;
+}
+.table input.long, textarea.long {width:400px;}
+</style>
+<div class="align_center" style="padding-top:60px;">
+<table class="table tahoma ctext" style="width:80%;height:1px;" height="613">
+<tr>
+{% if error %}
+<td colspan=2>
+ <p class="red" style="font-size:16px;">{{error}}</p></td>
+</tr>{% endif %}
+<td colspan=2 style="padding:10px;">
+ <p style="font-size:14px;"><span class="red">*</span> - Поля, обязательные для заполнения</p></td>
+</tr>
+{% for field in fields %}
+	<tr class="borderdn{{loop.cycle(' odd',' even')}}">
+	{% if field.type=='password' %}
+		<td class="pad10 text">{{field.title}}{% if field.star %}<span class="red">*</span>{% endif %}</td><td  class="pad10 text"><input class="input long"  type="{{field.type}}" name="{{field.name}}"></td>
+	{% elif field.type=='title' %}
+		<td class="pad10 text" colspan=2><b>{{field.title}}</b></td>
+	{% elif field.type=='textarea' %}
+		<td class="pad10 text">
+		<input style="float:right;" title="показывать {{field.title|e}}" type="checkbox" value="1" name="show_{{field.name}}">
+		{{field.title}}{% if field.star %}<span class="red">*</span>{% endif %}</td>
+		<td class="pad10 text"><textarea name="{{field.name}}" style="height:60px;" rows=5 cols=40 class="long input"></textarea></td>
+	{% elif field.type=='avatar' %}
+		{% if not user.avatar %}
+			 <td class="pad10 text">Фото (аватар)</td><td  class="pad10 text"><input class="input long" type="file" name="avatar"></td>
+		{% else %}
+			 <td class="pad10 text">сменить аватар </td><td  class="pad10 text">
+			 <input class="input long" type="file" name="avatar"></td>
+			</tr>
+			<tr class="even borderdn">
+			 <td class="pad10 text align_center" colspan=2>
+			 <img onload="chkImg(80,80)" width=80 height=80 src="{{root~user.avatar}}" alt="{{user.name|e}}">
+		</td>
+		{% endif %}
+	{% else %}
+		<td class="pad10 text">
+		{%- if not field.nocheck %}
+		<input style="float:right;" title="показывать {{field.title|e}}" value="1" type="checkbox" name="show_{{field.name}}">
+		{%- endif %}
+		{{field.title}}{% if field.star %}<span class="red">*</span>{% endif %}</td><td  class="pad10 text"><input class="input long"  type="text" name="{{field.name}}"></td>
+	{% endif %}
+	</tr>
+{% endfor %}
+{% if not user %}
+	<tr class="even">
+	<td class="pad10 text">Введите номер, изображенный на картинке:<br></td><td class="text"><img src="captcha.php" style="float:right;" alt="" />
+	<input  class="input" type="pad10 text" name="captcha" /></td>
+	</tr>
+{% endif %}
+<tr style="border: 1px solid #dddddd; border-width:1px 0;">
+<td class="text pad10"></td><td class="pad10 text align_left"><div style="width:100px;" class="button"><input type="submit" value="Отправить"></div></td>
+</tr>
+</table>
+</div>
+</form>
+{% endmacro %}

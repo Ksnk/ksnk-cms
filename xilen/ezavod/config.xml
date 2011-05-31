@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+<!-- ****************************************************************** -->
+<!-- ****   перечисляем используемые плагины                         *** -->
+<!-- ****************************************************************** -->
+	<files>
+		<file>plugins/forum/forum.ezavod.php</file>
+	</files> 
+	<files>
+		<file>plugins/captcha/captcha.ezavod.php</file>
+	</files> 
+
+<!-- ****************************************************************** -->
+<!-- ****   копируем общие файлы из common на место                 *** -->
+<!-- ****************************************************************** -->
+	<files dir="/xilen/common/" dstdir="$dst">
+		<copy>Comic_Sans_MS.ttf</copy>
+	</files>
+	<files  dstdir="$dst">
+		<copy>Debug/HackerConsole/*.*</copy>
+	</files><!-- ****************************************************************** -->
+<!-- ****   копируем файлы отсюда на место                          *** -->
+<!-- ****************************************************************** -->
+	<files dstdir="$dst">
+		<file>*.php</file>
+		<file>.htaccess</file>
+		<copy>*.swf</copy>
+		<copy>*.ico</copy>
+		<copy>*.css</copy>
+		<file>admin/*.php</file>
+		<file>admin/css/*.*</file>
+		<file>admin/engine/*.php</file>
+		<file>admin/engine/plugins/*.php</file>
+		<copy>admin/img/*.*</copy>
+		<file>admin/js/*.*</file>
+		<file>admin/templates/*.*</file>
+		<copy>style/*.*</copy>
+		<file>engine/*.*</file>
+		<copy>img/*.*</copy>
+		<file>js/*.*</file>
+		<file>templates/*.*</file>
+	</files>
+
+	<files  dstdir="$dst">
+		<copy>uploaded/*.*</copy>
+	</files>
+	
+<!-- перетаскиваем запчасти от cms 
+	<files dir="/xilen/cms/" dstdir="$dst">
+		<file>admin/engine/plugins/fileman.php</file>
+		<file>admin/templates/jfiles.jtpl</file>
+		<file>admin/templates/jusers.jtpl</file>
+ 		<file>admin/engine/engine.php</file>  
+	</files>-->	
+</config>

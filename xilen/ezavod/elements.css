@@ -1,0 +1,59 @@
+/**
+ *  parts on this file somethere and sometimes been changed by CMS, 
+ *  so never touch anything manually if no sure
+ */
+
+/**
+ *  оформление стандартных элементов text+фото
+ */
+.text {
+	line-height:16px; /**/
+	font-size:12px;
+	color:rgb(87,101,115);
+}
+.text a {
+	color: rgb(85,134,186);
+}
+.text a:hover {
+	color:#f37e01;
+}
+
+.cat_border img { /**/
+	border: 10px solid rgb(227,230,234);
+}
+.cat_border div{ /* комментарий */
+	padding:5px 10px 10px 10px;
+	text-align:center;
+	font-size:12px;
+	line-height:16px;
+	color:rgb(87,101,115);
+}
+/**
+ *  оформление стандартных элементов: header
+ */
+.header { /* обрамление, выравнивание */
+	padding:10px 40px 10px 20px;
+}
+.header img { /* значек */	
+	vertical-align:middle;margin-right:20px;
+}
+.header .inner{	/* текст - оформление */
+	display:inline-block;
+	vertical-align:middle;
+	padding-bottom:5px;
+	border-bottom:solid 4px #1c7dab;
+	/**/
+	font-size:18px;
+}
+/**
+ *  оформление стандартных элементов Линия
+ */
+.xline {
+	overflow:hidden; /**/
+}
+/**
+ *  оформление стандартных элементов Ссылка
+ */
+.links a.xlink {
+	/**/
+}
