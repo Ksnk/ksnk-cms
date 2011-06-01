@@ -643,7 +643,7 @@ class engine extends engine_Main
         } else if (pps($_GET['step'])==2){
             //вывод квитанции наружу
             $this->tpl=array(ELEMENTS_TPL,'ajax');
-            return $_SESSION['orderprint'] ;
+            return $this->export('order_history','print_order',$_SESSION['order_id']) ;
         }
         if(!isset($_SESSION['USER_ID'])){
             $x=array_merge(array(
@@ -697,9 +697,9 @@ class engine extends engine_Main
             foreach($x as $v){
                 $key[$v[0]]=$form->var[$v[0]];
             }
-            $_SESSION['order']=$key;
 
             $_SESSION['zakaz']=smart_template(array('tpl_admin','mail_callback'),array('list'=>$this->SimpleFormPrint($x)));//$this->createTpl($tpl,$key);
+
             $_SESSION['orderprint']=
                     $this->_tpl('tpl_jorders','_print'.ppi($form->var['cust_order']),array('order'=>array_merge($this->user,$form->var),2));
             //оформление заказа и пресылка по почте
@@ -713,10 +713,9 @@ class engine extends engine_Main
             if(!empty($cto)){
                 $headers.=html_mime_mail::mail_header('Cc: ',$cto);
             };
-            $key=$this->export('basket','recalc');
-            $key['descr']=$_SESSION['zakaz'];
-            $key['type']=$title;
-            $this->parent->export('order_history','save',$key);//);
+            $keys=$this->export('basket','recalc');
+            $keys['type']=$title;
+            $_SESSION['order_id']=$this->parent->export('order_history','save',array_merge($keys,$key));//);
             //$fio=pps($key['cust_FIO']);
             $mail=new html_mime_mail(
                 $headers.
@@ -727,7 +726,7 @@ class engine extends engine_Main
                 ."\n<hr>"	);
             //$mail->add_html($_SESSION['zakaz']);
             if($_GET['id']=='kvit')
-                $mail->add_new_html(' витанци€.html',$_SESSION['zakaz']);
+                $mail->add_new_html(' витанци€.html',$this->export('order_history','print_order',$_SESSION['order_id']));
             $mail->add_html($_SESSION['zakaz']);
                 $mail->build_message('win');
             if($mail->send(  $to, $subj)){
