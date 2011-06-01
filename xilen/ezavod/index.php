@@ -1,19 +1,29 @@
 <?php
 include_once('project.php');
-include_once('basefolder.php');
+//include_once('basefolder.php');
 
 if(isSet($_GET['url']))
 	$_GET['url'] = str_replace(BASE_FOLDER.'/', '', $_GET['url']);
 
-define('INDEX_PATH',dirname(__FILE__));
-if(file_exists(INDEX_PATH.DIRECTORY_SEPARATOR.'engine'))
+define('INDEX_PATH',str_replace('\\', '/', dirname(__FILE__)));
+if(file_exists(INDEX_PATH.'/engine'))
 	define("ROOT_PATH",INDEX_PATH);
 else
 	define("ROOT_PATH",dirname(INDEX_PATH));
+
+$x=explode(
+     str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT'])
+    ,str_replace('\\', '/', ROOT_PATH)
+);
+if(isset($x[1]))
+    define('BASE_FOLDER1',trim($x[1],'/'));
+else
+    define('BASE_FOLDER1',INDEX_PATH);
+
 ini_set('include_path',
-		ROOT_PATH.DIRECTORY_SEPARATOR.'engine'.DIRECTORY_SEPARATOR.PATH_SEPARATOR
-		.ROOT_PATH.DIRECTORY_SEPARATOR.ADMIN.DIRECTORY_SEPARATOR.'engine'.DIRECTORY_SEPARATOR.PATH_SEPARATOR
-		.ROOT_PATH.DIRECTORY_SEPARATOR.ADMIN.DIRECTORY_SEPARATOR.'engine'.DIRECTORY_SEPARATOR.'plugins'.DIRECTORY_SEPARATOR.PATH_SEPARATOR
+		ROOT_PATH.'/engine/'.PATH_SEPARATOR
+		.ROOT_PATH.'/'.ADMIN.'/engine/'.PATH_SEPARATOR
+		.ROOT_PATH.'/'.ADMIN.'/engine/plugins/'.PATH_SEPARATOR
 		.'./'
 	);
 
