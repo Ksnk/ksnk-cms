@@ -60,11 +60,11 @@ class order_history extends plugin {
      * сохранить запись о заказе в истории заказов
      * @param  $par
      * @return void
+     * 
      */
     function save($keys,$id=0){
         $par=array();
-        $par['descr']=pps($keys['descr']);
-//        debug($keys);
+        $par['descr']=serialize($keys);
 
         $par['cost']=pps($keys['cost']);
         $par['user']=pps($keys['username'],$this->parent->user['name']);
@@ -73,12 +73,12 @@ class order_history extends plugin {
         $par['date']=pps($keys['date'],date('Y/m/d H:i:s'));
         $par['status']='active';
         if(empty($id)){
-            $this->database->query('INSERT INTO '.$this->table_name.' (?#) VALUES(?a);',
+            $id=$this->database->query('INSERT INTO '.$this->table_name.' (?#) VALUES(?a);',
 		   			array_keys($par),array_values($par));
         } else {
             $this->database->query('update '.$this->table_name.' set ?a where `id`=?;',$par,$id);
         }
-
+        return $id;
     }
 
     function searchform(&$sql_where,$tpl='tpl_jorders'){
@@ -121,7 +121,12 @@ class order_history extends plugin {
         return $form;
     }
 
-    function get_List(){
+    function order_print($id) {
+        $rec=$this->database->selectRow('select * from '.$this->table_name." where id=?;".$id);
+        return $this->_tpl('tpl_jorders','_print'.ppi($rec['type']),array('order'=>unserialize($rec["descr"])));
+    }
+
+    function get_List() {
         $this->parent->sessionstart();
         //проверка формы сортировки
         // запрос - условие

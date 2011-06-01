@@ -1762,8 +1762,7 @@ LIMIT 100;';
                     switch ($v['validate']){
                         
                     case 'email':
-                        debug('email');
-                        if(!filter_var($form->var[$v[0]], FILTER_VALIDATE_EMAIL)){
+                         if(!filter_var($form->var[$v[0]], FILTER_VALIDATE_EMAIL)){
                             $error=true;
                             $this->error('поле "'.$k.'" не является email адресом<br>');
                         };
