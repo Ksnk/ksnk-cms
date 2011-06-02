@@ -1762,7 +1762,10 @@ LIMIT 100;';
                     switch ($v['validate']){
                         
                     case 'email':
-                         if(!filter_var($form->var[$v[0]], FILTER_VALIDATE_EMAIL)){
+                        if(isset($v['require']) && empty($form->var[$v[0]])){
+                            $error=true;
+						    $this->error('поле "'.$k.'" не заполнено<br>');
+                        } elseif(!filter_var($form->var[$v[0]], FILTER_VALIDATE_EMAIL)){
                             $error=true;
                             $this->error('поле "'.$k.'" не является email адресом<br>');
                         };
