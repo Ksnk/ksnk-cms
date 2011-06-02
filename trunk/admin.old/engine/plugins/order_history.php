@@ -121,9 +121,15 @@ class order_history extends plugin {
         return $form;
     }
 
-    function order_print($id) {
-        $rec=$this->database->selectRow('select * from '.$this->table_name." where id=?;".$id);
-        return $this->_tpl('tpl_jorders','_print'.ppi($rec['type']),array('order'=>unserialize($rec["descr"])));
+    function order_print($id,$tpl='web') {
+        if (empty($id)){
+            //берем текущее значение из корзины
+
+        }
+        $rec=$this->database->selectRow('select * from '.$this->table_name." where id=?;",$id);
+        $par=unserialize($rec["descr"]);
+        debug($par);
+        return $this->parent->_tpl('tpl_jorders','_print'.$par['cust_order'],array('order'=>$par));
     }
 
     function get_List() {

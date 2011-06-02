@@ -32,6 +32,7 @@ template_compiler::checktpl();/****finish point site_includes *//*
  */
 class engine extends engine_Main
 {
+    var $step=0;
 	
 	function userinfo($id){
 		static $cache=array();
@@ -498,12 +499,8 @@ class engine extends engine_Main
 	}
 
 	function createTpl($tpl){
-			$res=array();
-			foreach($this->user as $k=>$v){
-				if (preg_match('/^cust_/',$k)){
-					$res[$k]=trim($this->user[$k]);
-				}
-			}
+			$res=$this->user;
+
 			foreach($this->parameters as $k=>$v){
 				if (preg_match('/^spec_/',$k)){
 					$res[$k]=trim($this->parameters[$k]);
@@ -540,7 +537,7 @@ class engine extends engine_Main
 						$data[$k]['ccost']=number_format($ccost, 2, ',', '');
 						$data[$k]['cccost']=number_format($ccost*$data[$k]['cnumb'], 2, ',', '');
 						$summ+=$ccost*$data[$k]['cnumb'];
-						/*
+					/*
 						$data[$k]['numb']=$i++;
 						$data[$k]['cnumb']=$_SESSION['basket'][ppi($v['id'])]['n'];
 						$inum+=$data[$k]['cnumb'];
@@ -582,33 +579,48 @@ class engine extends engine_Main
      * Оформление договоров по корзине.
      * В зависимости от выбора способа оплаты, выбираем поля для вывода в форме
      */
+    function do_ordersave(){
+        $this->step=1;
+        return $this->do_order();
+    }
+    
+    function do_orderdisplay(){
+        $this->sessionstart();
+        $this->tpl=array(ELEMENTS_TPL,'ajax');
+        return $this->export('order_history','order_print',$_SESSION['order_id']) ;
+    }
+    
     function do_order(){
         $this->sessionstart();
-        // если не зарегистрирован - перенаправляем на форму login
+      /*  if(!isset($_SESSION['USER_ID'])){
+            return $this->do_login();
+        } */
+
         if (defined('SECOND_TPL')){
             $this->tpl=SECOND_TPL;
         }
-       //  if(!isset($_SESSION['USER_ID'])){
-        //    return $this->do_login();
-        //}
-
-        if(isset($_SESSION['zk_Message'])) {
-            $error=$_SESSION['zk_Message'];
-            unset($_SESSION['zk_Message']);
-        }
-
+        /**
+         * выставляем заголовок оформлялки.
+         * Только для случая, если оно не включено в меню сайта
+         */
         ml_plugin::setupmenu('Оформление заказа');
 
-        //$this->export('sitemap','tit','Оформляем заказ ');
+        /**
+         * tpl_printbody - простой шаблон вывода списка товаров в виде таблицы
+         */
 
         $tpl='tpl_printbody';
+
+        /**
+         *  список полей для заполнения, в зависимости от способа выбора формы оплаты
+         */
         $x=array(
             'Форма оплаты'=>array("cust_order","radio",//"Безналичный расчет (для юр. лиц)|Оплата квитанцией Сбербанка|Наличный расчет (в офисе компании)",
-                                  "Безналичный расчет (для юр. лиц)|" //1
-                                  ."Оплата квитанцией Сбербанка|"    //2
-                                  ."Наличный расчет (в офисе компании)", //3
-                'onchange'=>'submitform(this);',
-                'value'=>ppi($this->parent->user['cust_order'],2)
+                      "Безналичный расчет (для юр. лиц)|" //1
+                      ."Оплата квитанцией Сбербанка|"    //2
+                      ."Наличный расчет (в офисе компании)", //3
+               'onchange'=>'submitform(this);',
+               'value'=>ppi($this->parent->user['cust_order'],2)
             ),
             "Ф.И.О."=>array('cust_FIO','require'=>true),
             "адрес"=>array('address','require'=>true,"rule"=>'r2 r3'),
@@ -629,21 +641,17 @@ class engine extends engine_Main
             "№ счета"=>array('cust_BANK_OKG','require'=>true,"rule"=>'r1'),
             "№ Корр. счета"=>array('cust_BANK_OKG','require'=>true,"rule"=>'r1'),
             "Ваш заказ",
-            array($this->createTpl($tpl,array()),'scrolltext'),
+            array($this->export('order_history','order_print',$_SESSION['order_id'],'web'),'scrolltext'),
         );
 // варианты оформления счета
-        if (pps($_GET['step'])==1){
+        if ($this->step==1){
             $err=$this->error();
             basket::getStore()->clear();
             return '<div class="link" style="padding-top:30px;">
                 '.pp($err,'<div class="red">','</div>'
                     ,'Ваш заказ отправлен на указанный Вами e-mail. <br>').
-                '<a class="blue tahoma" href="'.$this->curl('do','step').'do=order&step=2" target="order">
+                '<a class="blue tahoma" href="'.$this->curl('do','step').'do=orderdisplay" target="order">
                 Печатать квитанцию</a></div>';
-        } else if (pps($_GET['step'])==2){
-            //вывод квитанции наружу
-            $this->tpl=array(ELEMENTS_TPL,'ajax');
-            return $this->export('order_history','print_order',$_SESSION['order_id']) ;
         }
         if(!isset($_SESSION['USER_ID'])){
             $x=array_merge(array(
@@ -715,6 +723,7 @@ class engine extends engine_Main
             };
             $keys=$this->export('basket','recalc');
             $keys['type']=$title;
+            $keys['list']=basket::getStore()->get();
             $_SESSION['order_id']=$this->parent->export('order_history','save',array_merge($keys,$key));//);
             //$fio=pps($key['cust_FIO']);
             $mail=new html_mime_mail(
@@ -735,7 +744,7 @@ class engine extends engine_Main
             else {
                 $this->error("К сожалению не удалось отослать Ваше письмо.");
             }
-            $this->parent->go($this->parent->curl('step').'step=1');
+            $this->parent->go($this->parent->curl('do').'do=ordersave');
         }
 
         return $form.

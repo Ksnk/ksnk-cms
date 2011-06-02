@@ -1,9 +1,5 @@
 <?php
 include_once('project.php');
-//include_once('basefolder.php');
-
-if(isSet($_GET['url']))
-	$_GET['url'] = str_replace(BASE_FOLDER.'/', '', $_GET['url']);
 
 define('INDEX_PATH',str_replace('\\', '/', dirname(__FILE__)));
 if(file_exists(INDEX_PATH.'/engine'))
@@ -16,9 +12,9 @@ $x=explode(
     ,str_replace('\\', '/', ROOT_PATH)
 );
 if(isset($x[1]))
-    define('BASE_FOLDER1',trim($x[1],'/'));
+    define('BASE_FOLDER',trim($x[1],'/'));
 else
-    define('BASE_FOLDER1',INDEX_PATH);
+    define('BASE_FOLDER',INDEX_PATH);
 
 ini_set('include_path',
 		ROOT_PATH.'/engine/'.PATH_SEPARATOR
