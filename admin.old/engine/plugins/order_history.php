@@ -122,14 +122,15 @@ class order_history extends plugin {
     }
 
     function order_print($id,$tpl='web') {
-        if (empty($id)){
+        if (is_array($id)){
+            $par = $id;
             //берем текущее значение из корзины
-
+        } else {
+            $rec=$this->database->selectRow('select * from '.$this->table_name." where id=?;",$id);
+            $par=unserialize($rec["descr"]);
         }
-        $rec=$this->database->selectRow('select * from '.$this->table_name." where id=?;",$id);
-        $par=unserialize($rec["descr"]);
         debug($par);
-        return $this->parent->_tpl('tpl_jorders','_print'.$par['cust_order'],array('order'=>$par));
+        return $this->parent->_tpl('tpl_jorders','_print'.ppi($par['cust_order'],2),array('order'=>$par));
     }
 
     function get_List() {
