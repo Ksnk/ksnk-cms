@@ -1658,6 +1658,7 @@ LIMIT 100;';
         $ruller=pps($options['ruller']);
 
 		$values=array();
+        $default=array();
 		$hidden=array();
 		if(is_array($fields)){
 			foreach($fields as $k=>$v){
@@ -1668,6 +1669,9 @@ LIMIT 100;';
 				if(is_numeric($k)) $k='';
 				if(isset($v['value'])){
 					$values[$v[0]]=$v['value'];
+				}
+                if(isset($v['default'])){
+					$default[$v[0]]=$v['default'];
 				}
                 if(!isset($v[2]))
                     $param='';
@@ -1819,7 +1823,9 @@ LIMIT 100;';
 		}
 		if(isset($_SESSION['USER_ID'])){
 			foreach($form->var as $k=>$v){
-				if (preg_match('/^cust_/',$k) && isset($this->user[$k])){
+                if(isset($default[$k])){
+                    if(empty($form->var[$k])) $form->var[$k]=$default[$k];
+                } elseif (preg_match('/^cust_/',$k) && isset($this->user[$k])){
 					$form->var[$k]=$this->user[$k];
 				}
 			}
@@ -1828,6 +1834,9 @@ LIMIT 100;';
 		foreach($values as $k=>$v){
 			$form->var[$k]=$v;
 		}
+        foreach($default as $k=>$v){
+            if(empty($form->var[$k])) $form->var[$k]=$v;
+        }
 		$form->var["captcha"]="";
 		return $form->getHtml(' ');
 	}

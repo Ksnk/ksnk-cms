@@ -498,7 +498,12 @@ class engine extends engine_Main
 		return smart_template(array(ELEMENTS_TPL,'ermess'),' ');
 	}
 
-	function createTpl($tpl){
+    /**
+     * @param  $tpl
+     * @return mixed|string|void
+     */
+	function get_basketData(){
+
 			$res=$this->user;
 
 			foreach($this->parameters as $k=>$v){
@@ -515,15 +520,14 @@ class engine extends engine_Main
 			$res['Date']=date('d. m. Y');
 			$res['Time']=date("H:i:s");
 			$res['user']=$this->user['name'];
+
 			$i=1;
 			$summ=0;
 			$inum=0;
-			$_SERVER['REQUEST_METHOD']='';
 			$bdata=$this->export('basket','basket_data');
 			$res['llist']=array();
-			// обман трудящися!!!
-			$_COOKIE['perpage']=3000;
-		
+            $_SERVER['REQUEST_METHOD']='';
+
 			foreach($bdata as $bas=>$v){
 				$this->parent->export('katalog','get_category',$bas,$par);
 				if(!empty($data))
@@ -555,10 +559,8 @@ class engine extends engine_Main
 			$prop = &new prop();
 			$res['inumb']=$bas['pos'].' '.$bas['tovar'];
 			$res['summprop']=$prop->num2str($summ,prop::prep("рубл|ь|я|ей","+копе|йка|йки|ек"));
-			//debug($res);
-			return
-				smart_template($tpl,$res);
-			
+			debug($res);
+			return $res;
 	}
 
     function do_login(){
@@ -595,8 +597,7 @@ class engine extends engine_Main
       /*  if(!isset($_SESSION['USER_ID'])){
             return $this->do_login();
         } */
-
-        if (defined('SECOND_TPL')){
+       if (defined('SECOND_TPL')){
             $this->tpl=SECOND_TPL;
         }
         /**
@@ -610,7 +611,7 @@ class engine extends engine_Main
          */
 
         $tpl='tpl_printbody';
-
+        $basketdata=$this->get_basketData();
         /**
          *  список полей для заполнения, в зависимости от способа выбора формы оплаты
          */
@@ -620,7 +621,7 @@ class engine extends engine_Main
                       ."Оплата квитанцией Сбербанка|"    //2
                       ."Наличный расчет (в офисе компании)", //3
                'onchange'=>'submitform(this);',
-               'value'=>ppi($this->parent->user['cust_order'],2)
+               'default'=>ppi($this->parent->user['cust_order'],2)
             ),
             "Ф.И.О."=>array('cust_FIO','require'=>true),
             "адрес"=>array('address','require'=>true,"rule"=>'r2 r3'),
@@ -641,10 +642,11 @@ class engine extends engine_Main
             "№ счета"=>array('cust_BANK_OKG','require'=>true,"rule"=>'r1'),
             "№ Корр. счета"=>array('cust_BANK_OKG','require'=>true,"rule"=>'r1'),
             "Ваш заказ",
-            array($this->export('order_history','order_print',$_SESSION['order_id'],'web'),'scrolltext'),
+            array($this->export('order_history','order_print',$basketdata,'web'),'scrolltext'),
         );
 // варианты оформления счета
-        if ($this->step==1){
+        //sdebug(22222);
+         if ($this->step==1){
             $err=$this->error();
             basket::getStore()->clear();
             return '<div class="link" style="padding-top:30px;">
@@ -653,7 +655,8 @@ class engine extends engine_Main
                 '<a class="blue tahoma" href="'.$this->curl('do','step').'do=orderdisplay" target="order">
                 Печатать квитанцию</a></div>';
         }
-        if(!isset($_SESSION['USER_ID'])){
+         //debug(33333);
+         if(!isset($_SESSION['USER_ID'])){
             $x=array_merge(array(
                  "Логин"=>array('newlogin','require'=>true),
                  "Пароль"=>array('newpassword','password','require'=>true),
@@ -666,18 +669,16 @@ class engine extends engine_Main
         }
         // проверка входа в систему по первым полям
         if(isset($_POST['newlogin']) && isset($_POST['newpassword'])){
-            if($this->export('Auth','auth_check'
-                ,$_POST['newlogin']
-                ,$_POST['newpassword'])
-            ){
+            if( $this->export('Auth','auth_check',$_POST['newlogin'],$_POST['newpassword']) ){
                 $this->go($this->curl());
             }
         }
-
+//debug(111);
         $form=$this->parent->export('MAIN','SimpleForm',$x,array('ruller'=>'cust_order'));
+        //$x['Форма оплаты']['value']=ppi($this->parent->user['cust_order'],2);
 //debug($form);
         if(!is_string($form)) {
-
+//debug ('aaa');
             $key=array();
             if(!isset($_SESSION['USER_ID'])){
                 $_SESSION['USER_ID']=$this->parent->writeRecord(array('record'=>'user'
@@ -709,7 +710,7 @@ class engine extends engine_Main
             $_SESSION['zakaz']=smart_template(array('tpl_admin','mail_callback'),array('list'=>$this->SimpleFormPrint($x)));//$this->createTpl($tpl,$key);
 
             $_SESSION['orderprint']=
-                    $this->_tpl('tpl_jorders','_print'.ppi($form->var['cust_order']),array('order'=>array_merge($this->user,$form->var),2));
+                    $this->_tpl('tpl_jorders','_print'.ppi($form->var['cust_order'],1),array('order'=>array_merge($this->user,$form->var),2));
             //оформление заказа и пресылка по почте
             //
             $to=pps($this->getPar('mail_admin'),'art@xilen.ru');
@@ -721,10 +722,7 @@ class engine extends engine_Main
             if(!empty($cto)){
                 $headers.=html_mime_mail::mail_header('Cc: ',$cto);
             };
-            $keys=$this->export('basket','recalc');
-            $keys['type']=$title;
-            $keys['list']=basket::getStore()->get();
-            $_SESSION['order_id']=$this->parent->export('order_history','save',array_merge($keys,$key));//);
+            $_SESSION['order_id']=$this->parent->export('order_history','save',array_merge($basketdata,$key));//);
             //$fio=pps($key['cust_FIO']);
             $mail=new html_mime_mail(
                 $headers.
@@ -1274,73 +1272,6 @@ class engine extends engine_Main
 
 	function do_error(){
 		return smart_template(array(ELEMENTS_TPL,'ermess'),' ');
-	}
-
-	function createTpl($tpl){
-			$res=array();
-			foreach($this->user as $k=>$v){
-				if (preg_match('/^cust_/',$k)){
-					$res[$k]=trim($this->user[$k]);
-				}
-			}
-			foreach($this->parameters as $k=>$v){
-				if (preg_match('/^spec_/',$k)){
-					$res[$k]=trim($this->parameters[$k]);
-				}
-			}
-
-			$pages=array();
-			$data=array();
-			$par=array('pages'=>&$pages,
-				'data'=>&$data);
-			$res['ordernum']=$this->getPar('ordernum');
-			$res['Date']=date('d. m. Y');
-			$res['Time']=date("H:i:s");
-			$res['user']=$this->user['name'];
-			$i=1;
-			$summ=0;
-			$inum=0;
-			$_SERVER['REQUEST_METHOD']='';
-			$bdata=$this->export('basket','basket_data');
-			$res['llist']=array();
-			// обман трудящися!!!
-			$_COOKIE['perpage']=3000;
-		
-			foreach($bdata as $bas=>$v){
-				$this->parent->export('katalog','get_category',$bas,$par);
-				if(!empty($data))
-                    $basket=basket::getStore()->get();
-				foreach($data as $k=>$v){
-					if (!empty($basket[ppi($v['xid'])])){
-						$data[$k]['numb']=$i++;
-						$data[$k]['cnumb']=$basket[pps($v['xid'])]['n'];
-						$inum+=$data[$k]['cnumb'];
-						$ccost=$basket[pps($v['xid'])]['cost']/100;
-						$data[$k]['ccost']=number_format($ccost, 2, ',', '');
-						$data[$k]['cccost']=number_format($ccost*$data[$k]['cnumb'], 2, ',', '');
-						$summ+=$ccost*$data[$k]['cnumb'];
-						/*
-						$data[$k]['numb']=$i++;
-						$data[$k]['cnumb']=$_SESSION['basket'][ppi($v['id'])]['n'];
-						$inum+=$data[$k]['cnumb'];
-						$data[$k]['ccost']=$_SESSION['basket'][ppi($v['id'])]['cost']/100;
-						$data[$k]['cccost']=$data[$k]['ccost']*$data[$k]['cnumb'];
-						$summ+=$data[$k]['cccost'];
-**/
-						$res['llist'][]=$data[$k];
-					}
-				}
-			}
-			$bas=$this->export('basket','recalc');
-			$res['summ']=number_format($summ, 2, ',', '');
-			$res['nds']=number_format(round($bas['cost']*18)/100, 2, ',', '');
-			$prop = &new prop();
-			$res['inumb']=$bas['pos'].' '.$bas['tovar'];
-			$res['summprop']=$prop->num2str($summ,prop::prep("рубл|ь|я|ей","+копе|йка|йки|ек"));
-			//debug($res);
-			return
-				smart_template($tpl,$res);
-			
 	}
 
     function do_login(){
