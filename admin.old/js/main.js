@@ -306,6 +306,10 @@ function setup_menu(menu){
 setup_menu('xrights');	
 setup_menu('xuser');
 setup_menu('xoptions');
+    
+/* <% insert_point('js_admin');%>
+*/
+
 		
 if(window.setup_menu_plus) {
 	var x= window.setup_menu_plus.length;

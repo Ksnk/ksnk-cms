@@ -103,9 +103,12 @@
             ## метка для массовых операций с заказами
             ##
             <th class="nopage align_center" style="padding:0 2px;"><div class="win_max closed  open_close">&nbsp;</div></th>
-            <td class="blue"><nobr><label><input type="checkbox" class="glass select" value="{{l.url|e}}" name="ff[]">{{l.url|e}}</label></nobr></td>
+            <td class="blue"><nobr><label><input type="checkbox" class="glass select" value="{{row.id|e}}" name="ff[]"></label></nobr></td>
             <td>{{row.date}}</td>
-            <td>{{row.status}}</td>
+            <td><div class="wide long xstate">
+		<input class="long" type="text" name="us_status" value="{{row.status}}">
+		</div>
+                </td>
             <td>{{row.type}}</td>
             <td>{{row.cost}}</td>
             <td>{{row.user}}</td>
@@ -115,6 +118,7 @@
         </tr>
         </table></td></tr>
     {% endfor %}
+    <tr><th class="bblue" style="height:60px;" colspan=7></td></tr>
 </table>
 </div>
 <div class="pages" >{{pages}}</div>
