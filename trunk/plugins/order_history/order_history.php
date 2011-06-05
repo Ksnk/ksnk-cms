@@ -16,6 +16,21 @@ class order_history extends plugin {
     var $table_name='?_orders',
         $perpage=20;
 
+
+    function __construct($parent){
+        plugin::plugin($parent);
+		if(defined('IS_ADMIN')){
+            $list=array('');
+            $i=0;
+            foreach(self::$STATUS as $v)
+                if(!empty($v))
+                $list[]=array('id'=>$v,'text'=>$v);
+		    $this->parent->par['dd_menu'][]=array(
+                'name'=>'xstate',
+                'list'=>$list
+            );
+		}
+    }
 /**
  * название плагина
  * @return string
@@ -121,7 +136,7 @@ class order_history extends plugin {
         return $form;
     }
 
-    function order_print($id,$tpl='web') {
+    function order_print($id,$tpl='') {
         if (is_array($id)){
             $par = $id;
             //берем текущее значение из корзины
@@ -129,8 +144,12 @@ class order_history extends plugin {
             $rec=$this->database->selectRow('select * from '.$this->table_name." where id=?;",$id);
             $par=unserialize($rec["descr"]);
         }
+        $par=array_merge($this->parent->parameters,$par);
         debug($par);
-        return $this->parent->_tpl('tpl_jorders','_print'.ppi($par['cust_order'],2),array('order'=>$par));
+        if (empty($tpl))
+            return $this->parent->_tpl('tpl_jorders','_print'.ppi($par['cust_order'],2),array('order'=>$par));
+        else
+            return $this->parent->_tpl('tpl_jorders','_'.$tpl,array('order'=>$par));
     }
 
     function get_List() {
@@ -171,12 +190,25 @@ class order_history extends plugin {
 		if(!$this->parent->has_rights(right_WRITE))
 			return $this->parent->ffirst('_loginform');
 		//
-		$this->parent->menu['head']=array('MAIN','_modules',$this->getPluginName(),get_class($this));
+        if(isset($_POST['ff'])){
+			if(!empty($_POST['ff'])){
+                $key=array();
+				foreach($_POST['ff'] as $v){
+                    if(!empty($v) && ctype_digit($v))
+                        $key[]=$v;
+				}
+                if(!empty($key))
+                    $this->database->query('delete from '.$this->table_name.' where id in ('.implode(',',$key).');');
+			}
+			$this->parent->go($this->parent->curl());
+		}
+
+        $this->parent->menu['head']=array('MAIN','_modules',$this->getPluginName(),get_class($this));
 
         // запрос - условие
         $sql_where='';
         $form=$this->searchform($sql_where,'tpl_jorderhistory');
-        // запрос - порялодок сортировки
+        // запрос - порядок сортировки
         $sql_order='';
         // страничный сервис
         $cnt=$this->database->selectCell('select count(*) from '.$this->table_name.pp($sql_where,' where ').';');
@@ -208,8 +240,8 @@ class order_history extends plugin {
                 'users'=>$users,
                 'data'=>$result
                 ,'pages'=>$pages
-             )).
-             $this->parent->ffirst('do_siteparam','basket')
+             ))
+           //  .$this->parent->ffirst('do_siteparam','basket')
         ));
 
 	}

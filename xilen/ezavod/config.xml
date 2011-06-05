@@ -9,6 +9,9 @@
 	<files>
 		<file>plugins/captcha/captcha.ezavod.php</file>
 	</files> 
+    <files>
+        <file>plugins/order_history/orders.ezavod.php</file>
+    </files>
 
 <!-- ****************************************************************** -->
 <!-- ****   копируем общие файлы из common на место                 *** -->

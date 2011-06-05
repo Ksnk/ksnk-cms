@@ -117,7 +117,7 @@
 
 #########################################################################
 ##
-##  список закрепленных файлов
+##  вывод квитанции на оплату сбербанка
 ##
 #########################################################################
 
@@ -241,14 +241,14 @@ td.table31 {
 						<td align=center class=table31><b style="font-size: 12px">Цена</td>
 						<td align=center class=table31><b style="font-size: 12px">Сумма</td>
 					</tr>
-					{% for row in list %}
+					{% for row in order.llist %}
 					<tr>
-						<td class=table31>{numb}</td>
-						<td class=table31>{descr}</td>
-						<td class=table31>{cnumb}</td>
+						<td class=table31>{{row.numb}}</td>
+						<td class=table31>{{row.name}}</td>
+						<td class=table31>{{row.cnumb}}</td>
 						<td class=table31>шт.</td>
-						<td class=table31>{ccost}</b></td>
-						<td class=table31>{cccost}</td>
+						<td class=table31>{{row.ccost}}</b></td>
+						<td class=table31>{{row.cccost}}</td>
 					</tr>
 					{% endfor %}
 					<tr>
@@ -290,4 +290,46 @@ td.table31 {
 	</tr>
 </table>
 </body>
+{% endmacro %}
+
+#########################################################################
+##
+##  вывод заказа для отображения на страничке
+##
+#########################################################################
+
+{% macro web(order) %}
+<table class="align_center" style="width:100%; border-top:3px solid #e3e6ea; border-bottom:3px solid #e3e6ea; border-left:none; border-right:none; margin-top:0px; margin-bottom:10px;">
+		<tr><td style="padding-top:1px; padding-bottom:1px">
+            <table class="table tablex" style="width:100%; text-align:left">
+					<tr>
+						<th class="first_td">№</th>
+						<th>Товар</th>
+						<th>Кол-во</th>
+						<th>Ед.</th>
+						<th>Цена</th>
+						<th>Сумма</th>
+					</tr>
+					{% for i in order.llist %}
+					<tr>
+						<td class="first_td">{{i.numb}}</td>
+						<td>{{i.name}}</td>
+						<td>{{i.cnumb}}</td>
+						<td>шт.</td>
+						<td>{{i.ccost}}</td>
+						<td>{{i.cccost}}</td>
+					</tr>
+					{% endfor %}
+					<tr>
+						<th class="first_td" colspan=5 align=right>Итого:</td>
+						<td align=left>{{order.summ}}</td>
+					</tr>
+					<tr>
+						<th class="first_td" colspan=5 align=right >В том числе НДС:</td>
+						<td align=left >{{order.nds}}</td>
+					</tr>
+				</table>
+                </td></tr>
+                </table>
+<nobr>Всего {{order.inumb}} на сумму {{order.summ}} руб.</nobr> <nobr>( <i>{{order.summprop}}</i>  )</nobr>
 {% endmacro %}

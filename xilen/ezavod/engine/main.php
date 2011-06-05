@@ -645,8 +645,8 @@ class engine extends engine_Main
             array($this->export('order_history','order_print',$basketdata,'web'),'scrolltext'),
         );
 // варианты оформления счета
-        //sdebug(22222);
-         if ($this->step==1){
+
+        if ($this->step==1){
             $err=$this->error();
             basket::getStore()->clear();
             return '<div class="link" style="padding-top:30px;">
@@ -655,8 +655,8 @@ class engine extends engine_Main
                 '<a class="blue tahoma" href="'.$this->curl('do','step').'do=orderdisplay" target="order">
                 Печатать квитанцию</a></div>';
         }
-         //debug(33333);
-         if(!isset($_SESSION['USER_ID'])){
+
+        if(!isset($_SESSION['USER_ID'])){
             $x=array_merge(array(
                  "Логин"=>array('newlogin','require'=>true),
                  "Пароль"=>array('newpassword','password','require'=>true),
@@ -673,12 +673,9 @@ class engine extends engine_Main
                 $this->go($this->curl());
             }
         }
-//debug(111);
+
         $form=$this->parent->export('MAIN','SimpleForm',$x,array('ruller'=>'cust_order'));
-        //$x['Форма оплаты']['value']=ppi($this->parent->user['cust_order'],2);
-//debug($form);
         if(!is_string($form)) {
-//debug ('aaa');
             $key=array();
             if(!isset($_SESSION['USER_ID'])){
                 $_SESSION['USER_ID']=$this->parent->writeRecord(array('record'=>'user'
