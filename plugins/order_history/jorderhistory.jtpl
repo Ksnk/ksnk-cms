@@ -106,7 +106,7 @@
             <td class="blue"><nobr><label><input type="checkbox" class="glass select" value="{{row.id|e}}" name="ff[]"></label></nobr></td>
             <td>{{row.date}}</td>
             <td><div class="wide long xstate">
-		<input class="long" type="text" name="us_status" value="{{row.status}}">
+		<input class="long" type="text" name="oh_status_{{row.id}}" value="{{row.status}}">
 		</div>
                 </td>
             <td>{{row.type}}</td>
@@ -118,7 +118,10 @@
         </tr>
         </table></td></tr>
     {% endfor %}
-    <tr><th class="bblue" style="height:60px;" colspan=7></td></tr>
+    <tr><th class="bblue" style="height:60px;" colspan=7>
+
+        <input type="submit" value=" Сохранить " class="button savebutton">
+    </th></tr>
 </table>
 </div>
 <div class="pages" >{{pages}}</div>

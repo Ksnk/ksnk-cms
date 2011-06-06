@@ -10,7 +10,7 @@
 
 class order_history extends plugin {
 
-    static $STATUS=array('','active','closed','complete') ;
+    static $STATUS=array(0=>'','active'=>"Активен",'closed'=>"Неактивен",'complete'=>"Оплачен") ;
     static $TYPES=array('','Безналичный расчет','Квитанция','оплата в офисе') ;
 
     var $table_name='?_orders',
@@ -22,9 +22,9 @@ class order_history extends plugin {
 		if(defined('IS_ADMIN')){
             $list=array('');
             $i=0;
-            foreach(self::$STATUS as $v)
-                if(!empty($v))
-                $list[]=array('id'=>$v,'text'=>$v);
+            foreach(self::$STATUS as $k=>$v)
+                if(!empty($k))
+                $list[]=array('id'=>$k,'text'=>$v);
 		    $this->parent->par['dd_menu'][]=array(
                 'name'=>'xstate',
                 'list'=>$list
@@ -105,11 +105,12 @@ class order_history extends plugin {
          $form->scanHtml($this->parent->_tpl($tpl,'_searchform',$par));//array('users')));
 
          if($form->handle()){
-            debug($form->var);debug(self::$STATUS[$form->var['status']]);
+           // debug($form->var);debug(self::$STATUS[$form->var['status']]);
             $sql_where=array();
+             $status=array_keys(self::$STATUS);
             // изменяем критерии поиска
-            if(!empty($form->var['status']) && key_exists($form->var['status'],self::$STATUS))
-                $sql_where[]='`status`="'.self::$STATUS[$form->var['status']].'"';
+            if(!empty($form->var['status']) && key_exists($form->var['status'],$status))
+                $sql_where[]='`status`="'.$status[$form->var['status']].'"';
 
             if(!empty($form->var['type']) && key_exists($form->var['type'],self::$TYPES))
                 $sql_where[]='`type`="'.self::$TYPES[$form->var['type']].'"';
@@ -203,13 +204,53 @@ class order_history extends plugin {
 			$this->parent->go($this->parent->curl());
 		}
 
-        $this->parent->menu['head']=array('MAIN','_modules',$this->getPluginName(),get_class($this));
-
         // запрос - условие
         $sql_where='';
-        $form=$this->searchform($sql_where,'tpl_jorderhistory');
         // запрос - порядок сортировки
         $sql_order='';
+
+        $form=$this->searchform($sql_where,'tpl_jorderhistory');
+        // обработка новой записи
+        if($form->handle()){
+            $sql_where=array();
+            if (!empty($form->var["status"])){
+                $status=array_keys(self::$STATUS);
+                $sql_where[]='`status`="'.$status[$form->var["status"]].'"';
+            }
+            if (!empty($form->var["type"])){
+                $sql_where[]='`type`="'.self::$TYPES[$form->var["type"]].'"';
+            }
+            if (!empty($form->var["period"])){
+                switch ($form->var["period"]){
+                    case 1:// неделя
+                        $time=strtotime("-1 week");
+                        break;
+                    case 2:// месяц
+                        $time=strtotime("-1 month");
+                        break;
+                    case 3:// год
+                        $time=strtotime("-1 year");
+                        break;
+                }
+                $sql_where[]='`date`>"'.date(DATE_ATOM,$time).'"';
+            }
+            if(is_array($sql_where))
+               $sql_where=implode(' and ',$sql_where);
+        } else if(!empty($_POST) ){
+
+            foreach($_POST as $k=>$v){
+                if (preg_match('/^oh_(\w+)_(\d+)$/',$k,$m)){
+                    if($m[1]=='status'){
+                        $this->database->query('update '.$this->table_name.' set `status`=? where id=?',$v,$m[2]);
+                    }
+                }
+            }
+            //$this->save(array('userid'=>$_POST['newuser'],'file'=>$_POST['newfile'],'descr'=>$_POST['newdescr']));
+            $this->parent->go($this->parent->curl());
+        }
+
+        $this->parent->menu['head']=array('MAIN','_modules',$this->getPluginName(),get_class($this));
+
         // страничный сервис
         $cnt=$this->database->selectCell('select count(*) from '.$this->table_name.pp($sql_where,' where ').';');
         if(!isset($_GET['pg']))

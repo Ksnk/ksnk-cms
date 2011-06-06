@@ -8,10 +8,15 @@
 ##
 ##  вывод списка постов форума
 ##
-{% macro forum_posts (pages,list,all_topics,user) %}
+{% macro forum_posts (pages,list,all_topics,user,root) %}
 
 <div class="tahoma size11" style="padding-top:49px;">
 {{pages}}
+    {% if user.id %}
+    {% else %}
+    <div> Оставлять комментарии могут только зарегистрированные пользователи.
+        <a href="{{root}}onlinereg">Зарегистрируйтесь</a>, пожалуйста</div>
+    {% endif %}
 <table style="width:75%;margin-top:30px;">
 
     {% for post in list %}
@@ -89,9 +94,14 @@
 ##
 ##  вывод списка постов форума
 ##
-{% macro forum_topics (list,user=0) %}
+{% macro forum_topics (list,user=0,root) %}
 
 <div class="tahoma size12">
+`{% if user.id %}
+    {% else %}
+    <div> Оставлять комментарии могут только зарегистрированные пользователи.
+        <a href="{{root}}onlinereg">Зарегистрируйтесь</a>, пожалуйста</div>
+    {% endif %}
 <table style="width:70%;margin-top:31px;">
 
     {% for theme in list %}

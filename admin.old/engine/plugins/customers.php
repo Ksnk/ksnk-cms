@@ -192,7 +192,7 @@ INDEX ( `userid` )
     function admin_customers(){
 		if(!$this->parent->has_rights(right_WRITE))
 			return $this->parent->ffirst('_loginform');
-		// обработка удаения
+		// обработка удаления
         if(isset($_POST['delete'])){
             $x=implode(',',$_POST['ff']);
             if(preg_match('/^[\d,]*$/',$x)){
