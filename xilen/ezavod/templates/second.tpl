@@ -20,19 +20,29 @@
 
 <script>
 
-
-function show_block(id)
-	{
-		$('a.' + id).animate({height: '40px'}, 150);
-	}
-
-function hide_block(id)
-	{
-		$('a.' + id).animate({height: '44px'}, 150);
-	}
+$(document).ready(function () {
+     
+    $('#first_menu li').hover(
+        function () {
+            //show its submenu
+            $('ul', this).slideDown(300);
+            $('a.red_line', this).animate({height: '40px'}, 150);
+ 
+        },
+        function () {
+            //hide its submenu
+            $('ul', this).slideUp(300);       
+			$('a.red_line', this).animate({height: '44px'}, 150);
+ 
+        }
+    );
+     
+});
 
 
 </script>
+
+
 
 </HEAD>
 
@@ -60,7 +70,7 @@ function hide_block(id)
                             
                             </div>
                             <!-- Left banner block  -->
-							<div style="position:absolute; z-index:10; top:87px; left:0px; background:url({::index}/img/bg3_1.gif) repeat-x bottom; width:35%; height:140px; text-align:right"><a title="На главную страницу" href="{::index}/"><img width="355px" height="140px" class="iePNG" src="{::index}/img/{::holiday_theme}"></a></div>
+							<div style="position:absolute; z-index:10; top:87px; left:0px; background:url({::index}/img/{::holiday_theme}) no-repeat bottom right; width:35%; height:140px; text-align:right;"><a title="На главную страницу" href="{::index}/" style="display:block; margin-top:50px"><img width="355px" height="90px" class="iePNG" src="{::index}/img/bg3_empty.gif"></a></div>
                             <!-- Top menu block (mail,search,sitemap,home) -->
                             <div style="position:absolute; z-index:11; margin-left:0px; top:0px; left:8%;">
                             		<table class="topmenu">
@@ -70,9 +80,11 @@ function hide_block(id)
                                             <td class="home"><a title="На главную страницу"  href="{::index}/" class="home"><img class="iePNG" width="30px" height="47px" src="{::index}/img/bg5.png"></a></td>
                                             <td class="empty"></td>
                                             <td><a  title="Карта сайта"  href="{::index}/sitemap" class="sitemap"><img src="{::index}/img/empty_topmenu.gif"></a></td>
-                                            <td class="empty"></td><td><a title="Обратная связь" href="{::index}/writeus" class="mail"><img src="{::index}/img/empty_topmenu.gif"></a></td>
+                                            <td class="empty"></td>
+                                            <td><a title="Обратная связь" href="{::index}/writeus" class="mail"><img src="{::index}/img/empty_topmenu.gif"></a></td>
+                                            <td class="empty"></td>
                                             <td>{::_tpl:tpl_jusers:_toplogin}</td>
-                                       </tr>
+                                        </tr>
                                     </table>
                                     
                                     <form action="?do=search" method="post" style="margin: 0px; padding: 0px;">
@@ -88,9 +100,10 @@ function hide_block(id)
                   
                             </div>
                             <!-- Block for advisory services on-line-->
-                            <div style="position:absolute; z-index:12; width:21%; min-width:268px; margin-left:-134px; height:84px; top:104px; left:81%; background:url({::index}/img/phone.gif) no-repeat left 15px"><div style="top:0px; float:right; width:93px; height:87px; background:url({::index}/img/on-line.gif) center top no-repeat;"><a href="https://siteheart.com/webconsultation/94867?byhref=1&s=1" target="siteheart_sitewindow_94867" onclick="o=window.open;o('https://siteheart.com/webconsultation/94867?s=1', 'siteheart_sitewindow_94867', 'width=600,height=450,top=30,left=30,resizable=yes'); return false;" class="on-line">консультации</a></div></div>
+                            <div style="position:absolute; z-index:12; width:21%; min-width:268px; margin-left:-134px; height:110px; top:90px; left:81%; background:url({::index}/img/phone.gif) no-repeat left 0px"><div style="top:0px; margin-top:3px; float:right; width:93px; height:87px; background:url({::index}/img/on-line.gif) center top no-repeat;"><a href="https://siteheart.com/webconsultation/94867?byhref=1&s=1" target="siteheart_sitewindow_94867" onclick="o=window.open;o('https://siteheart.com/webconsultation/94867?s=1', 'siteheart_sitewindow_94867', 'width=600,height=450,top=30,left=30,resizable=yes'); return false;" class="on-line">консультации</a></div></div>
                             <!-- Language menu block -->
-                            <div style="position:absolute; z-index:13; width:75px; height:23px; top:22px; left:83%;"><div style="float:left; width:37px; height:23px;"><a href="{::index}/"><img src="{::index}/img/rus.gif"></a></div><div style="float:left; width:37px; height:23px;"><a href="{::index}/"><img src="{::index}/img/eng.gif"></a></div></div>
+                            <div style="position:absolute; z-index:13; width:75px; height:23px; top:22px; left:83%; padding: 4px 0px 0px 40px; background:url({::index}/img/basket.gif) left top no-repeat"><a class="basket_s" href="{::index}/basket">Корзина</a></div>
+
 
                         </div>
 
@@ -101,14 +114,14 @@ function hide_block(id)
 
 <!-- Second row -->
 
-					<TD style="border-bottom:1px solid #dee1e3; background-color:#FFFFFF; min-width:950px">
+					<TD style="border-bottom:1px solid #dee1e3; background-color:#FFFFFF;">
    
    
 		 <!-- Main menu  -->               
 						<div style="left:13%; margin-left:-110px; width:860px; height:44px; float:left; position:relative">
 							{::menu_1}
                         </div>
-                        <div style="float:right; position:relative; padding-top:11px; right:3%;"><a href="{::index}/basket"><img src="{::index}/img/basket2.gif"></a></div>
+                        <div style="float:right; position:relative; padding-top:12px; right:7%;"><a href="{::index}/"><img src="{::index}/img/eng2.gif"></a></div>
          
             		</TD>
             </TR>
@@ -120,7 +133,7 @@ function hide_block(id)
                     	<table width="100%" height="545px">
                         	<tr>
                             	<td width="5%" style="padding-left:30px;  background:url({::index}/img/nfirst.gif) no-repeat 0px 51px;">&nbsp;</td>
-                            	<td width="70%" style="min-width:610px;">
+                            	<td width="70%" style="min-width:610px; padding-right:0px">
 									
                                     <div style="padding: 35px 0px 50px 0px">
 	                                    {::_first}  
@@ -130,11 +143,13 @@ function hide_block(id)
         
                                </td>
 
-                                <td width="25%" align="center" style="padding-right:40px;padding-left:40px;">
+                               <td width="25%" align="center" style="padding-right:40px;padding-left:40px;">
 
-	<!-- Second column -->
+	<!-- Second column -->		
+    
+    							
 								{::menu_2}
-
+								{::news_x}
  
                      
                                 
@@ -148,23 +163,28 @@ function hide_block(id)
 
 
 
-            		<TD style="background: url({::index}/img/bg_bottom.gif) no-repeat top left #eff1f4">
+            		<TD style="background:url({::index}/img/bg_bottom2.gif) top left repeat-x;">
                     
- 								<table height="110px" width="100%"><tr><td width="12%">&nbsp;</td><td style=" font-size:11px; color:#748699; padding-top:36px; padding-left:34px; white-space:nowrap; line-height:17px">
-                                <a class="link_bottom" href="mailto:sales@ezavodspb.ru">sales@ezavodspb.ru</a>&nbsp;&nbsp;/&nbsp;&nbsp;<a class="link_bottom" href="mailto:info@ezavodspb.ru">info@ezavodspb.ru</a><br>
-								© ЗАО "Экспериментальный завод", 2008
+ 							<div style="background:url({::index}/img/contakts.gif) 13% 0% no-repeat; ">
+                                <table height="110px" width="100%" style="background: url({::index}/img/bg_bottom.gif) no-repeat top left"><tr><td width="12%">&nbsp;</td><td style=" font-size:11px; color:#748699; padding-top:50px; padding-left:34px; padding-right:30px; white-space:nowrap; line-height:17px">
+                                <a class="link_bottom" href="mailto:sales@ezavodspb.ru">sales@ezavodspb.ru</a>&nbsp;&nbsp;/&nbsp;&nbsp;<a class="link_bottom" href="mailto:info@ezavodspb.ru">info@ezavodspb.ru</a>
+                                <div style="float:none; clear:both; margin-top:5px">
+								© 2011, ЗАО  Экспериментальный завод<br>195279, Россия, СПб, Индустриальный пр. 44, к. 1
+                                </div>
 								</td>
-                                <td width="68%">&nbsp;</td>
-                                <td  style="padding-top:36px; white-space:nowrap; line-height:22px">
+                                <td width="68%" style="padding-top:50px;"><ul class="social_networks"><li style="background:url({::index}/img/facebook.gif) left top no-repeat"><a href="">Facebook</a></li><li  style="background:url({::index}/img/lifejournal.gif) left top no-repeat"><a href="">LiveJournal</a></li><li  style="background:url({::index}/img/vkontakte.gif) left top no-repeat"><a href="">Вконтакте</a></li><li  style="background:url({::index}/img/twiter.gif) left top no-repeat"><a href="">Twiter</a></li></ul></td>
+                                <td  style="padding-top:32px; white-space:nowrap; line-height:22px; padding-left:85px">
                                 <a href="http://www.xilen.spb.ru"><img src="{::index}/img/xilen.gif"></a><br>
                                 <a class="link_xilen" href="http://www.xilen.spb.ru">Создание сайтов</a>
                                 </td><td width="20%">&nbsp;</td>
                                 
                                 </tr></table>
+                           </div>
             
             		</TD>
 
            </TR>  
+
                      
            
 	</TABLE>

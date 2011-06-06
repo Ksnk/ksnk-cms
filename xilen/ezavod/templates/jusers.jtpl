@@ -20,7 +20,7 @@
             {{error}}</div>{% endif %}
 <div class="fills" id="loginbar" style="top: 30px; right: 0px; position: absolute; overflow: hidden;  display: none; height: 80px; ">
     <form method="post" href="">
-    <div style="padding:15px 10px;width:160px;">
+    <div style="padding:15px 10px;width:170px;">
     <div style="float:right;margin-top:15px;"><input class="submit" align="middle" type="image" src="{{root~'img/search1.gif'}}"></div>
     <input alt="имя пользователя" title="имя пользователя" id='login' name="login_name" type="text"><br>
     <input alt="пароль" title="пароль" name="login_pass" type="password"><br>
