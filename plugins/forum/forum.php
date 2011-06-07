@@ -61,7 +61,7 @@ class forum extends ml_plugin {
 			$upd['parent'] = pps($_GET['id']);
 		}
 		else {
-			$upd['topic'] = pps($_GET['id']);
+			$upd['topic'] = pps($_GET['topic']); // для админки так. Для сайта topic будет в id
 			if(empty($res['user']))
 				$upd['user'] = $_SESSION['USER_ID'];
 
@@ -346,6 +346,7 @@ class forum extends ml_plugin {
                 }
 				break;
 			case "ins":
+                if (isset($from['topic']))
 				return $this->database->query('INSERT INTO ?'.$this->base.' (?#) VALUES(?a);',
 		   			array_keys($from),array_values($from));
 		}
