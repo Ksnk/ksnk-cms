@@ -30,11 +30,54 @@ class sysPar extends plugins {
 	 */
 	function getRoot($addr=''){
 		return toUrl(INDEX_PATH.'/');
-		/*	if(empty($this->root))
-			$this->root=preg_replace('/index.php$/i','',$_SERVER['PHP_SELF']);
-		return rtrim($this->root,'/');	*/
 	}
-	
+
+	/**
+     * построить урл? получив параметрами парамеры
+     * @param array url - параметры урла.
+     *
+     * Чистка как для curl'а
+     */
+    function url($par){
+        static $url;
+        if (!isset($url)){
+            //$this->strips($_SERVER['QUERY_STRING']);
+            parse_str( htmlspecialchars_decode ($_SERVER['QUERY_STRING']),$url);
+            if (!empty($_GET['do'])) $url['do']=$_GET['do'];
+            if (!empty($_GET['id'])) $url['id']=$_GET['id'];
+        }
+
+        unset($x['ajax'],$x['url'],$x['lang']);
+        if($par=='do'){
+            unset($x['item'],$x['user'],$x['year'],$x['pg'],$x['url'],$x['ch'],$x['plugin'],$x['cat'],$x['topic']);
+        }
+
+        $x=array_merge($url,$par);
+        $url=toUrl(INDEX_PATH.'/');
+        debug($x);
+        debug($url);
+        if(!defined('IS_ADMIN') && class_exists('altname')){
+            if (isset($x['do']) && $x['do']=='menu' && isset($x['id'])){
+                $url=$this->export('altname','getrealaddr',$x['id']);
+                unset($x['do'],$x['id']);
+            } else if(isset($x['do'])) {
+                if($x['do']!='menu')
+                    $url.='/'.$x['do'];
+                unset($x['do']);
+                if(isset($x['id'])){
+                    if(!empty($x['id']))
+                        $url.='/'.$x['id'];
+                    unset($x['id']);
+                }
+            }
+        }
+        if(empty($x))
+            return $url;
+        else
+            return $url.'?'.http_build_query($x);
+
+    }
+
 	/**
 	 * выдать адрес, начиная от рута
 	 * @param $arr - адрес от рута
@@ -1308,13 +1351,21 @@ LIMIT 100;';
 
 	function curl($par='',$par2='',$par3=''){
 		static $url;
-		if (!isset($url)){
-			//$this->strips($_SERVER['QUERY_STRING']);
-			parse_str( htmlspecialchars_decode ($_SERVER['QUERY_STRING']),$url);
-			if (!empty($_GET['do'])) $url['do']=$_GET['do'];
-			if (!empty($_GET['id'])) $url['id']=$_GET['id'];
-		}
-		$x=$url;
+        if (!isset($url)){
+            //$this->strips($_SERVER['QUERY_STRING']);
+            parse_str( htmlspecialchars_decode ($_SERVER['QUERY_STRING']),$url);
+            if (!empty($_GET['do'])) $url['do']=$_GET['do'];
+            if (!empty($_GET['id'])) $url['id']=$_GET['id'];
+        }
+
+        $x=$url;
+        if (is_array($par)){
+
+            $x=array_merge($url,$par);
+            list($par,$par2,$par3)=array_keys($par);
+ //           debug($par." ".$par2." ".$par3);
+        }
+
 		if(array_key_exists($par,$x))unset($x[$par]);
 		if(array_key_exists($par2,$x))unset($x[$par2]);
 		if(array_key_exists($par3,$x))unset($x[$par3]);
@@ -1322,6 +1373,7 @@ LIMIT 100;';
 		if($par=='do'){
 			unset($x['item'],$x['user'],$x['year'],$x['pg'],$x['url'],$x['ch'],$x['plugin'],$x['cat'],$x['topic']);
 		}
+        debug($x);
 		if (empty($x)) return'?';
 		return '?'.http_build_query($x).'&';
 	}
