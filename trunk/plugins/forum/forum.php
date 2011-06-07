@@ -27,8 +27,8 @@ class forum extends ml_plugin {
 						array('Автор','sval', 'dontedit'),
 						//array('Автор','user', 'dontedit'),
 						array('Дата','date', 'dontedit'),
-						array('цитата','quote'),
-						array('комментарий','question')
+						array('комментарий','question'),
+                        array('цитата','quote'),
 			)
 			,'base'=>'_forum'
 			,'orderbystr'=>' where topic = '.pps($_GET['topic']).' order by `date`'
@@ -164,11 +164,10 @@ class forum extends ml_plugin {
 						'topic'=>$_POST['newtopic'],
 						'parent'=>$_POST['parent'],
 					);
-					$this->database->query('INSERT INTO ?_forum_topics (?#) VALUES(?a);',
+					$id=$this->database->query('INSERT INTO ?_forum_topics (?#) VALUES(?a);',
 			   			array_keys($key),array_values($key)
 			   		);
-
-			   	$res_id=$this->database->select('select max(id) as maxid from ?_forum_topics '.
+ 			    	$res_id=$this->database->select('select max(id) as maxid from ?_forum_topics '.
 						'where `topic` = \''.$key['topic'].'\' '.
 						'AND `parent` = '.$key['parent'].
 						';');
@@ -182,14 +181,18 @@ class forum extends ml_plugin {
 					$this->database->query('INSERT INTO ?_forum (?#) VALUES(?a);',
 			   			array_keys($key),array_values($key)
 			   		);
-			   }
-			   $this->parent->go('',$_SERVER["REQUEST_URI"]);
+			    }
+                debug($id);
+                if(!empty($id)){
+                    $this->parent->go("",$this->parent->url(array('do'=>'forum','id'=>$id)));
+                } else
+                    $this->parent->go($this->parent->curl());
 			/*	$url=$this->parent->curl('do','id')."do=forum&id=".$res_id[0]['maxid'];
 				$this->parent->go($this->parent->curl('do','id')."do=forum&id=".$res_id[0]['maxid']);*/
 			}
 		}
 
-		if(empty($_GET['id'])) {
+		if(empty($_GET['id']) or $_GET['id']=='forum') {
 			$res=$this->database->select('select * from ?_forum_topics '.
 				'where `parent` = 0'.
 				' order by `id`;');
@@ -338,7 +341,9 @@ class forum extends ml_plugin {
 					$this->database->query('DELETE from ?'.$this->base.' where `id`=?d;',$from);
 				break;
 			case "upd":
-				$this->database->query('update ?'.$this->base.' set ?a where `id`=?;',$from,$perpage);
+                if($this->base == "_forum_topics") {
+					$this->database->query('update ?'.$this->base.' set ?a where `id`=?;',$from,$perpage);
+                }
 				break;
 			case "ins":
 				return $this->database->query('INSERT INTO ?'.$this->base.' (?#) VALUES(?a);',
