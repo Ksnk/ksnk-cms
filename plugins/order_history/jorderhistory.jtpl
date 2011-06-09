@@ -109,7 +109,9 @@
 		<input class="long" type="text" name="oh_status_{{row.id}}" value="{{row.status}}">
 		</div>
                 </td>
-            <td>{{row.type}}</td>
+            <td><div class="wide long xorderstyle">
+		<input class="long" type="text" name="oh_type_{{row.id}}" value="{{row.type}}">
+		</div>{#{{row.type}} #}</td>
             <td>{{row.cost}}</td>
             <td>{{row.user}}</td>
         </tr>
