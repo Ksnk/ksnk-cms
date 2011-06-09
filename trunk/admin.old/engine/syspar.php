@@ -54,8 +54,8 @@ class sysPar extends plugins {
 
         $x=array_merge($url,$par);
         $url=toUrl(INDEX_PATH.'/');
-        debug($x);
-        debug($url);
+       // debug($x);
+        //debug($url);
         if(!defined('IS_ADMIN') && class_exists('altname')){
             if (isset($x['do']) && $x['do']=='menu' && isset($x['id'])){
                 $url=$this->export('altname','getrealaddr',$x['id']);
@@ -103,7 +103,7 @@ class sysPar extends plugins {
 		$x=rtrim($this->root,'/');
 		if(!defined('IS_ADMIN') && class_exists('altname')){
 			if ($res=$this->export('altname','getrealaddr',$id)){
-				debug($res);
+				//debug($res);
 			} else if(isset($arr['do'])){
 				if($arr['do']!='menu')
 					$x.='/'.$arr['do'];

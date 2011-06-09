@@ -11,7 +11,8 @@
 class order_history extends plugin {
 
     static $STATUS=array(0=>'','active'=>"Активен",'closed'=>"Неактивен",'complete'=>"Оплачен") ;
-    static $TYPES=array('','Безналичный расчет','Квитанция','оплата в офисе') ;
+    static $TYPES=array(0=>'','bnal'=>'Безналичный расчет','kvit'=>'Квитанция','nal'=>'оплата в офисе') ;
+//    static $TYPES=array('','Безналичный расчет','Квитанция','оплата в офисе') ;
 
     var $table_name='?_orders',
         $perpage=20;
@@ -21,7 +22,6 @@ class order_history extends plugin {
         plugin::plugin($parent);
 		if(defined('IS_ADMIN')){
             $list=array('');
-            $i=0;
             foreach(self::$STATUS as $k=>$v)
                 if(!empty($k))
                 $list[]=array('id'=>$k,'text'=>$v);
@@ -29,6 +29,16 @@ class order_history extends plugin {
                 'name'=>'xstate',
                 'list'=>$list
             );
+            $list=array('');
+            foreach(self::$TYPES as $k=>$v)
+                if(!empty($k))
+                $list[]=array('id'=>$k,'text'=>$v);
+		    $this->parent->par['dd_menu'][]=array(
+                'name'=>'xorderstyle',
+                'list'=>$list
+            );
+
+  //          xorderstyle
 		}
     }
 /**
@@ -83,7 +93,7 @@ class order_history extends plugin {
 
         $par['cost']=pps($keys['cost']);
         $par['user']=pps($keys['username'],$this->parent->user['name']);
-        $par['type']=pps($keys['type'],'свободный');
+        $par['type']=pps($keys['type'],'nal');
         $par['userid']=pps($keys['user'],$this->parent->user['id']);
         $par['date']=pps($keys['date'],date('Y/m/d H:i:s'));
         $par['status']='active';
@@ -108,12 +118,13 @@ class order_history extends plugin {
            // debug($form->var);debug(self::$STATUS[$form->var['status']]);
             $sql_where=array();
              $status=array_keys(self::$STATUS);
+             $types=array_keys(self::$STATUS);
             // изменяем критерии поиска
             if(!empty($form->var['status']) && key_exists($form->var['status'],$status))
                 $sql_where[]='`status`="'.$status[$form->var['status']].'"';
 
-            if(!empty($form->var['type']) && key_exists($form->var['type'],self::$TYPES))
-                $sql_where[]='`type`="'.self::$TYPES[$form->var['type']].'"';
+            if(!empty($form->var['type']) && key_exists($form->var['type'],$types))
+                $sql_where[]='`type`="'.$types[$form->var['type']].'"';
 
             if(!empty($form->var['user']))
                 $sql_where[]='`userid`="'.ppi($form->var['user']).'"';
@@ -218,7 +229,7 @@ class order_history extends plugin {
                 $sql_where[]='`status`="'.$status[$form->var["status"]].'"';
             }
             if (!empty($form->var["type"])){
-                $sql_where[]='`type`="'.self::$TYPES[$form->var["type"]].'"';
+                $sql_where[]='`type`="'.$types[$form->var["type"]].'"';
             }
             if (!empty($form->var["period"])){
                 switch ($form->var["period"]){
@@ -236,12 +247,17 @@ class order_history extends plugin {
             }
             if(is_array($sql_where))
                $sql_where=implode(' and ',$sql_where);
-        } else if(!empty($_POST) ){
-
+        }
+        if(!empty($_POST) ){
+            $vals=$this->database->select('select id AS ARRAY_KEY, `status`, `type` from '.$this->table_name.';');
             foreach($_POST as $k=>$v){
                 if (preg_match('/^oh_(\w+)_(\d+)$/',$k,$m)){
-                    if($m[1]=='status'){
-                        $this->database->query('update '.$this->table_name.' set `status`=? where id=?',$v,$m[2]);
+                    if(isset($vals[$m[2]][$m[1]]) && $vals[$m[2]][$m[1]]!=$v){
+                        if($m[1]=='status'){
+                            $this->database->query('update '.$this->table_name.' set `status`=? where id=?',$v,$m[2]);
+                        } elseif($m[1]=='type'){
+                            $this->database->query('update '.$this->table_name.' set `type`=? where id=?',$v,$m[2]);
+                        }
                     }
                 }
             }

@@ -6,7 +6,7 @@
 ##    прописать css
 ##
 point_start('js_admin');%>
-setup_menu('xstate');
+setup_menu('xstate');setup_menu('xorderstyle');
         
 <% point_finish('js_admin');
 ##
