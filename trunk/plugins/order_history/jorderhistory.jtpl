@@ -16,35 +16,41 @@
 ## табличка про панель управления
 ##
 <form name="searchform" action="" method="POST">
-<table class="long tahoma thetable" style="margin:20px 0;"><tr>
-<td>статус заказа</td><td><select name="status">
+    <table class="long thetable tahoma" >
+        <tr>
+            <th class="bblue align_left">
+            <input type="checkbox" class="glass" id="aaa" name="ff">
+            <input class="button" type="submit" name="delete" value="Удалить">
+            </th>
+<th class="bblue">статус заказа<select name="status">
 <option value="0">Все</option>
 <option value="1">Активен</option>
 <option value="2">Неактивный</option>
 <option value="3">Оплачен</option>
-</select></td><td></td>
-<td>Способ оплаты</td><td><select name="type">
+</select></th>
+<th class="bblue">Способ оплаты <select name="type">
 <option value="0">все</option>
 <option value="1">Безналичный</option>
 <option value="2">Квитанция</option>
 <option value="3">Наличный</option>
-</select></td><td></td>
-<td>Период</td><td><select name="period">
+</select></th>
+<th class="bblue">Период <select name="period">
 <option value="0">все</option>
 <option value="1">неделя</option>
 <option value="2">месяц</option>
 <option value="3">год</option>
-</select></td>
+</select></th>
     {%if users %}
-<td>пользователи</td><td><select name="user">
+<th class="bblue">пользователи <select name="user">
     <option value="0">все</option>
     {% for user in users %}
 <option value="{{user.userid}}">{{user.user|e}}</option>
     {% endfor %}
-</select></td>
+</select></th>
     {% endif %}
-<td><input type="submit" value="Искать">
-</td></tr></table></form>
+<th class="bblue"><input type="submit" value="Искать">
+</th></tr>
+    </table></form>
 {% endmacro %}
 #########################################################################
 ##
@@ -54,43 +60,8 @@
 
 {% macro adminlist(data=0,pages=0,users) %}
 
-<form method="POST" action="">
+<form method="POST" name="adminlist" action="">
     <div class="pages" >{{pages}}</div>
-<table class="long thetable tahoma" >
-    <tr>
-        <th class="bblue align_left">
-        <input type="checkbox" class="glass" id="aaa" name="ff">
-        <input class="button" type="submit" name="delete" value="Удалить">
-        </th>
-<th class="bblue">статус заказа<select name="status">
-<option value="0">Все</option>
-<option value="1">Активен</option>
-<option value="2">Неактивный</option>
-<option value="3">Оплачен</option>
-</select></th>
-<th class="bblue">Способ оплаты<select name="type">
-<option value="0">все</option>
-<option value="1">Безналичный</option>
-<option value="2">Квитанция</option>
-<option value="3">Наличный</option>
-</select></th>
-<th class="bblue">Период<select name="period">
-<option value="0">все</option>
-<option value="1">неделя</option>
-<option value="2">месяц</option>
-<option value="3">год</option>
-</select></th>
-    {%if users %}
-<th class="bblue">пользователи<select name="user">
-    <option value="0">все</option>
-    {% for user in users %}
-<option value="{{user.userid}}">{{user.user|e}}</option>
-    {% endfor %}
-</select></td>
-    {% endif %}
-<th class="bblue"><input type="submit" value="Искать">
-</th>    </tr>
-</table>
 
 <div style="width:100%;height:100%;overflow:auto;">
 <table class="blue thetable tahoma size11">
@@ -116,7 +87,44 @@
             <td>{{row.user}}</td>
         </tr>
         <tr style="display: none;" >
-            <td colspam=6 >{{row.descr}}</td>
+            <td colspan=7 >{% set order =row.order %}
+                {% if order.llist %}
+                <table class="long"><td>
+             <table class="tahoma" style="text-align:left">
+					<tr>
+						<td class="first_td">№</td>
+						<td>Товар</td>
+						<td>Кол-во</td>
+						<td>Ед.</td>
+						<td>Цена</td>
+						<td>Сумма</td>
+					</tr>
+					{% for i in order.llist %}
+					<tr>
+						<td class="first_td">{{i.numb}}</td>
+						<td>{{i.name}}</td>
+						<td>{{i.cnumb}}</td>
+						<td>шт.</td>
+						<td>{{i.ccost}}</td>
+						<td>{{i.cccost}}</td>
+					</tr>
+					{% endfor %}
+					<tr>
+						<td class="first_td" colspan=5 align=right>Итого:</td>
+						<td align=left>{{order.summ}}</td>
+					</tr>
+				</table>
+                    </td><td align="right">
+                <table class="tahoma">
+                    {% if order.cust_FIO %}<tr><td>ФИО</td><td>{{order.cust_FIO}}</td></tr>{% endif %}
+                    {% if order.address %}<tr><td>Адрес</td><td>{{order.address}}</td></tr>{% endif %}
+                    {% if order.cust_PHONE %}<tr><td>Телефон</td><td>{{order.cust_PHONE}}</td></tr>{% endif %}
+                    {% if order.cust_EMAIL %}<tr><td>email</td><td>{{order.cust_EMAIL}}</td></tr>{% endif %}
+                    {% if order.cust_ORGANISATION %}<tr><td>Организация</td><td>{{order.cust_ORGANISATION}}</td></tr>{% endif %}
+                </table>
+                    </td></table>
+                {% endif %}
+            </td>
         </tr>
         </table></td></tr>
     {% endfor %}

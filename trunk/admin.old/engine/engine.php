@@ -97,8 +97,9 @@
 					$nn=$n;
 				$this->exports[$n]=LoadClass($nn,array(&$this));
 			}
-			if ($method=='')
-				return $this->exports[$n];
+			if ($method==''){
+				return  $this->exports[$n];
+            }
 			else if (method_exists($this->exports[$n],$method)){
 				$arg_list = array_slice(func_get_args(),2);
 				return call_user_func_array(array(&$this->exports[$n],$method),

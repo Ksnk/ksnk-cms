@@ -8,7 +8,7 @@
 ##
 ##  вывод списка постов форума
 ##
-{% macro forum_posts (pages,list,all_topics,user,root) %}
+{% macro forum_posts (pages,list,all_topics,user,root,topic_p) %}
 
 <div class="tahoma size11" style="padding-top:49px;">
 {{pages}}
@@ -66,11 +66,42 @@
     {% endif %}
     
 </td>
-<td style="font-size:12px;"><a href="{{all_topics}}">Показать все темы</a></td>
+<td style="font-size:12px;">
+    <a href="javascript:show_sub({{all_topics}})">Показать все темы</a>
+{#    <a href="{{all_topics}}">Показать все темы</a></td>#}
 <td></td>
 </tr>
 </table>
+    ##
+    ## показать все темы
+    ##
+    {% if topic_p %}
+    <table>
+<TBODY id="subtopic_{{all_topics}}" style="display:none;">
+<tr>
+<td colspan="2" style="height:17px;"></td>
+</tr>
+{% for topic in topic_p %}
+<tr>
+<td style="padding-left:40px;padding-bottom:8px;"><a href="{{topic.href}}">{{topic.topic}}</a></td>
+<td style="font-size:11px;color:#eb8017;">{{topic.cnt}} ответ{{topic.cnt|finnumb('','a','ов')}}</td>
+</tr>
+{% endfor %}
+<tr>
+<td style="padding-left:40px;padding-bottom:52px;font-size:14px;">
+{#
+    {% if user.id %}
 
+    <a href="{{theme.href_new}}" style="color:#000000;">Создать тему</a></td><td></td>
+
+    {% endif %}
+#}
+</tr>
+</TBODY></table>
+    ##
+    ##
+    ##
+    {% endif %}
 <a name="komment"></a>
 
     {% if user.id %}
@@ -117,7 +148,12 @@
 <tr>
 <td colspan="2" style="height:17px;"></td>
 </tr>
-{{theme.topic_p}}
+{% for topic in theme.topic_p %}
+<tr>
+<td style="padding-left:40px;padding-bottom:8px;"><a href="{{topic.href}}">{{topic.topic}}</a></td>
+<td style="font-size:11px;color:#eb8017;">{{topic.cnt}} ответ{{topic.cnt|finnumb('','a','ов')}}</td>
+</tr>
+{% endfor %}
 <tr>
 <td style="padding-left:40px;padding-bottom:52px;font-size:14px;">
 

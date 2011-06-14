@@ -67,7 +67,45 @@
         <td>{{row.cost}}</td>
     </tr>
     <tr class="{{class}}" style='display:none;'>
-        <td colspan=4 >{{row.descr}}</td>
+        <td colspan=4 >
+        {% set order =row.order %}
+                {% if order.llist %}
+                <table class="long"><td>
+             <table  style="text-align:left">
+					<tr>
+						<td class="first_td">№</td>
+						<td>Товар</td>
+						<td>Кол-во</td>
+						<td>Ед.</td>
+						<td>Цена</td>
+						<td>Сумма</td>
+					</tr>
+					{% for i in order.llist %}
+					<tr>
+						<td class="first_td">{{i.numb}}</td>
+						<td>{{i.name}}</td>
+						<td>{{i.cnumb}}</td>
+						<td>шт.</td>
+						<td>{{i.ccost}}</td>
+						<td>{{i.cccost}}</td>
+					</tr>
+					{% endfor %}
+					<tr>
+						<td class="first_td" colspan=5 align=right>Итого:</td>
+						<td align=left>{{order.summ}}</td>
+					</tr>
+				</table>
+                    </td><td align="right">
+                <table class="tahoma">
+                    {% if order.cust_FIO %}<tr><td>ФИО</td><td>{{order.cust_FIO}}</td></tr>{% endif %}
+                    {% if order.address %}<tr><td>Адрес</td><td>{{order.address}}</td></tr>{% endif %}
+                    {% if order.cust_PHONE %}<tr><td>Телефон</td><td>{{order.cust_PHONE}}</td></tr>{% endif %}
+                    {% if order.cust_EMAIL %}<tr><td>email</td><td>{{order.cust_EMAIL}}</td></tr>{% endif %}
+                    {% if order.cust_ORGANISATION %}<tr><td>Организация</td><td>{{order.cust_ORGANISATION}}</td></tr>{% endif %}
+                </table>
+                    </td></table>
+                {% endif %}
+        </td>
     </tr>
     {% endfor %}
 </table>

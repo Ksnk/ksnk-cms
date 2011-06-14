@@ -88,13 +88,14 @@ class order_history extends plugin {
      * 
      */
     function save($keys,$id=0){
+        debug($keys);
         $par=array();
         $par['descr']=serialize($keys);
 
-        $par['cost']=pps($keys['cost']);
-        $par['user']=pps($keys['username'],$this->parent->user['name']);
+        $par['cost']=pps($keys['summ']);
+        $par['user']=pps($keys['user'],$this->parent->user['name']);
         $par['type']=pps($keys['type'],'nal');
-        $par['userid']=pps($keys['user'],$this->parent->user['id']);
+        $par['userid']=ppi($keys['id'],$this->parent->user['id']);
         $par['date']=pps($keys['date'],date('Y/m/d H:i:s'));
         $par['status']='active';
         if(empty($id)){
@@ -114,37 +115,36 @@ class order_history extends plugin {
          }
          $form->scanHtml($this->parent->_tpl($tpl,'_searchform',$par));//array('users')));
 
-         if($form->handle()){
+         $form->handle();
            // debug($form->var);debug(self::$STATUS[$form->var['status']]);
-            $sql_where=array();
-             $status=array_keys(self::$STATUS);
-             $types=array_keys(self::$STATUS);
-            // изменяем критерии поиска
-            if(!empty($form->var['status']) && key_exists($form->var['status'],$status))
-                $sql_where[]='`status`="'.$status[$form->var['status']].'"';
+        $sql_where=array();
+         $status=array_keys(self::$STATUS);
+         $types=array_keys(self::$TYPES);
+        // изменяем критерии поиска
+        if(!empty($form->var['status']) && key_exists($form->var['status'],$status))
+            $sql_where[]='`status`="'.$status[$form->var['status']].'"';
 
-            if(!empty($form->var['type']) && key_exists($form->var['type'],$types))
-                $sql_where[]='`type`="'.$types[$form->var['type']].'"';
+        if(!empty($form->var['type']) && key_exists($form->var['type'],$types))
+            $sql_where[]='`type`="'.$types[$form->var['type']].'"';
 
-            if(!empty($form->var['user']))
-                $sql_where[]='`userid`="'.ppi($form->var['user']).'"';
+        if(!empty($form->var['user']))
+            $sql_where[]='`userid`="'.ppi($form->var['user']).'"';
 
-            if(!empty($form->var['period'])){
-                switch($form->var['period']){
-                    case 1: // неделя
-                                            $sql_where[]='`date`>"'.strtotime ('-1 week').'"';
-                                            break;
-                    case 2: // месяц
-                                            $sql_where[]='`date`>"'.strtotime ('-1 month').'"';
-                                            break;
-                    case 3: // год
-                                            $sql_where[]='`date`>"'.strtotime ('-1 year').'"';
-                                            break;
+        if(!empty($form->var['period'])){
+            switch($form->var['period']){
+                case 1: // неделя
+                    $sql_where[]='`date`>"'.date(DATE_ATOM,strtotime ('-1 week')).'"';
+                    break;
+                case 2: // месяц
+                    $sql_where[]='`date`>"'.date(DATE_ATOM,strtotime ('-1 month')).'"';
+                    break;
+                case 3: // год
+                    $sql_where[]='`date`>"'.date(DATE_ATOM,strtotime ('-1 year')).'"';
+                    break;
 
-                }
             }
-            $sql_where=implode(' and ',$sql_where);
-        };
+        }
+        $sql_where=implode(' and ',$sql_where);
         return $form;
     }
 
@@ -168,11 +168,12 @@ class order_history extends plugin {
         $this->parent->sessionstart();
         //проверка формы сортировки
         // запрос - условие
-        $sql_where='';
         $sql_order='date DESC';
         $form=$this->searchform($sql_where);
-        // запрос - порялодок сортировки
-
+        if(!empty($sql_where)) $sql_where.=' and ';
+        $sql_where.='`userid`='.ppi($this->parent->user['id']);
+        // запрос - порядок сортировки
+//debug($sql_where);
         // страничный сервис
         $cnt=$this->database->selectCell('select count(*) from '.$this->table_name.pp($sql_where,' where ').';');
         $page=0;
@@ -189,6 +190,10 @@ class order_history extends plugin {
         );
 
         $pages= $this->parent->calc_Pages($cnt,$this->perpage,$page,3);
+
+        foreach($result as $k=>$v){
+            $result[$k]['order']=unserialize($result[$k]['descr']);
+        }
 
         return
         $form->getHtml(' ').
@@ -222,34 +227,11 @@ class order_history extends plugin {
 
         $form=$this->searchform($sql_where,'tpl_jorderhistory');
         // обработка новой записи
-        if($form->handle()){
-            $sql_where=array();
-            if (!empty($form->var["status"])){
-                $status=array_keys(self::$STATUS);
-                $sql_where[]='`status`="'.$status[$form->var["status"]].'"';
-            }
-            if (!empty($form->var["type"])){
-                $sql_where[]='`type`="'.$types[$form->var["type"]].'"';
-            }
-            if (!empty($form->var["period"])){
-                switch ($form->var["period"]){
-                    case 1:// неделя
-                        $time=strtotime("-1 week");
-                        break;
-                    case 2:// месяц
-                        $time=strtotime("-1 month");
-                        break;
-                    case 3:// год
-                        $time=strtotime("-1 year");
-                        break;
-                }
-                $sql_where[]='`date`>"'.date(DATE_ATOM,$time).'"';
-            }
-            if(is_array($sql_where))
-               $sql_where=implode(' and ',$sql_where);
-        }
+        $form->handle();
+        
         if(!empty($_POST) ){
             $vals=$this->database->select('select id AS ARRAY_KEY, `status`, `type` from '.$this->table_name.';');
+            $changed = false;
             foreach($_POST as $k=>$v){
                 if (preg_match('/^oh_(\w+)_(\d+)$/',$k,$m)){
                     if(isset($vals[$m[2]][$m[1]]) && $vals[$m[2]][$m[1]]!=$v){
@@ -257,12 +239,14 @@ class order_history extends plugin {
                             $this->database->query('update '.$this->table_name.' set `status`=? where id=?',$v,$m[2]);
                         } elseif($m[1]=='type'){
                             $this->database->query('update '.$this->table_name.' set `type`=? where id=?',$v,$m[2]);
-                        }
+                        };
+                        $changed=true;
                     }
                 }
             }
             //$this->save(array('userid'=>$_POST['newuser'],'file'=>$_POST['newfile'],'descr'=>$_POST['newdescr']));
-            $this->parent->go($this->parent->curl());
+            if($changed)
+                $this->parent->go($this->parent->curl());
         }
 
         $this->parent->menu['head']=array('MAIN','_modules',$this->getPluginName(),get_class($this));
@@ -288,12 +272,16 @@ class order_history extends plugin {
 
         $this->parent->ajaxdata['pages']=$pages;
 
+        foreach($result as $k=>$v){
+            $result[$k]['order']=unserialize($result[$k]['descr']);
+        }
+
         return
 
         smart_template(array(ADMIN_TPL,'theheader'),array(
             'header'=>$this->getPluginName(),
-            'data'=>//$form->getHtml(' ').
-             $this->parent->_tpl('tpl_jorderhistory','_adminlist',array(
+            'data'=>$form->getHtml(' ')
+              .$this->parent->_tpl('tpl_jorderhistory','_adminlist',array(
                 'users'=>$users,
                 'data'=>$result
                 ,'pages'=>$pages
