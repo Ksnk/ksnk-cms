@@ -1462,15 +1462,20 @@ class engine extends engine_Main
 		if(isset($x)) return $x; $x='';
 		$pl=trim($this->getPar('plugin_list')).',altname';
 		if (empty($pl)) return $x='';
-		$pl=preg_split('/[,\s]+/',pps($pl));
-		if (empty($pl)) {
+		$pll=preg_split('/[,\s]+/',pps($pl));
+		if (empty($pll)) {
 			return $x='';
 		} else {
-			foreach($pl as $k=>$v)
-				$pl[$k]=array(
+            $pl=array();
+			foreach($pll as $v){
+                $plugin=$this->export($v);
+                //debug($v.' '.$plugin->modulelist);
+                if (!isset( $plugin->modulelist) || $plugin->modulelist)
+				$pl[]=array(
 					'plugin'=>$v
-					,'name'=>ppx($this->export($v,'getPluginName'),$v)
+					,'name'=>ppx($plugin->getPluginName(),$v)
 				);
+            }
 			$x=array('list'=>$pl);
 			if (!empty($_GET['adv'])){
 				$x['list'][]=array(
@@ -1802,11 +1807,7 @@ class engine extends engine_Main
 		$article=$article[0]['id'];
 		$form->scanHtml(smart_template(array(FORMS_TPL,'menuedit'),$res));
 		if($form->handle()){
-			/*/****** point plugin_control1 */
-if(!!$element->article && $form->var['alt_name_'.$element->article->v['id']]){
-   $this->export('altname','update_page',$form->var['alt_name_'.$element->article->v['id']],$element->article->v['id'],$item->v['id']);
-}/****finish point plugin_control1 *//*
-*/
+            /*<% insert_point('plugin_control1') %>*/
 			if(!!$item){
 				$item->serialize($form->var,true);
 			}
@@ -1887,14 +1888,36 @@ if(pps($_GET['debug'])){
 	if (class_exists('Debug_HackerConsole_Main') ) {
 		new Debug_HackerConsole_Main(true);
 
-		function debug($msg)
+        function backtrace(){
+            $x=debug_backtrace();
+            $z=array();
+            $y=array_shift($x);
+    //		$y=array_shift($x);
+            if($x[1]['function']=='myLogger'){
+                while (isset($x[0]) && $y['function']!='_query')
+                    $y=array_shift($x);
+            }
+
+            //for($i=0;$i<3;$i++){
+                $y=array_shift($x);
+                $z=sprintf('file:%s,line:%s,func:%s',$y['file'],$y['line'],$y['function']);
+            //}
+            return $z;
+        }
+		function debug()
 		{
-			call_user_func(array('Debug_HackerConsole_Main', 'out'),is_string($msg)?$msg:print_r($msg,true));
+            $na=func_num_args();
+            for ($i=0; $i<$na;$i++){
+                $msg=func_get_arg($i);
+                call_user_func(array('Debug_HackerConsole_Main', 'out'),is_string($msg)?$msg:print_r($msg,true));
+            }
+			call_user_func(array('Debug_HackerConsole_Main', 'out'),'>>>>>'.backtrace());
 		}
 	} else {
 		function debug($msg){
 			//var_dump($msg);
 		};
+        function backtrace(){;}
 	}
 	$engine->database->do_log=true;
 	if(!empty($_POST))

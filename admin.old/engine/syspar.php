@@ -47,15 +47,14 @@ class sysPar extends plugins {
             if (!empty($_GET['id'])) $url['id']=$_GET['id'];
         }
 
+        $x=array_merge($url,$par);
         unset($x['ajax'],$x['url'],$x['lang']);
         if($par=='do'){
             unset($x['item'],$x['user'],$x['year'],$x['pg'],$x['url'],$x['ch'],$x['plugin'],$x['cat'],$x['topic']);
         }
 
-        $x=array_merge($url,$par);
-        $url=toUrl(INDEX_PATH.'/');
-       // debug($x);
-        //debug($url);
+        $url=toUrl(INDEX_PATH);
+        debug($x,$url);
         if(!defined('IS_ADMIN') && class_exists('altname')){
             if (isset($x['do']) && $x['do']=='menu' && isset($x['id'])){
                 $url=$this->export('altname','getrealaddr',$x['id']);
@@ -1373,7 +1372,7 @@ LIMIT 100;';
 		if($par=='do'){
 			unset($x['item'],$x['user'],$x['year'],$x['pg'],$x['url'],$x['ch'],$x['plugin'],$x['cat'],$x['topic']);
 		}
-        debug($x);
+       // debug($x);
 		if (empty($x)) return'?';
 		return '?'.http_build_query($x).'&';
 	}
@@ -2033,9 +2032,13 @@ if(pps($_GET['debug'])){
 	if (class_exists('Debug_HackerConsole_Main') ) {
 		new Debug_HackerConsole_Main(true);
 
-		function debug($msg)
+		function debug()
 		{
-			call_user_func(array('Debug_HackerConsole_Main', 'out'),$msg);
+            $na=func_num_args();
+            for ($i=0; $i<$na;$i++){
+                $msg=func_get_arg($i);
+                call_user_func(array('Debug_HackerConsole_Main', 'out'),is_string($msg)?$msg:print_r($msg,true));
+            }
 			call_user_func(array('Debug_HackerConsole_Main', 'out'),'>>>>>'.backtrace());
 		}
 	} else {

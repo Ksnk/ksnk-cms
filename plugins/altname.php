@@ -15,7 +15,7 @@ $auto_plugins[]='altname';
 // обработка дополнительного поля ввода в форме администрирования статьи
 %>
 if(!!$element->article && $form->var['alt_name_'.$element->article->v['id']]){
-   $this->export('altname','update_page',$form->var['alt_name_'.$element->article->v['id']],$element->article->v['id'],$item->v['id']);
+   $this->export('altname','update_page',$form->var['alt_name_'.$element->article->v['id']],$res['name'],$item->v['id']);
 }
 <% point_start('plugin_control2')
 // обработка дополнительного поля ввода в форме администрирования статьи
@@ -44,6 +44,7 @@ class altname extends ml_plugin {
 				,'fields'=>array(
 							array('смс адрес','realadr','text_edit'),
 							array('адрес','altaddr','text_edit'),
+                            array('Раздел','name','text_edit'),
 							array('','order','win_order'),
 					)
 				,'base'=>'_altnames'
@@ -65,7 +66,7 @@ class altname extends ml_plugin {
 	 * @param $menu
 	 */
 	function getrealaddr($menu){
-		$sel_sql='select * from '.TAB_PREF.$this->base.' where `realadr`=?';
+		$sel_sql='select * from '.TAB_PREF.'_altnames'.' where `realadr`=?';
 		$res=@$this->database->selectRow($sel_sql,'?do=menu&id='.$menu);
 		if(empty($res))
 			return null;
@@ -81,7 +82,7 @@ class altname extends ml_plugin {
 		static $cache;
 		if(empty($cache)){
 			$cache=array();
-			$result=mysql_query('select * from '.TAB_PREF.$this->base);
+			$result=mysql_query('select * from '.TAB_PREF.'_altnames');
 			while($row=mysql_fetch_assoc($result)){
 				$cache[$row['realadr']]=$row['altaddr'];
 			}
@@ -117,7 +118,7 @@ class altname extends ml_plugin {
 	 * @param $page
 	 * @param $menu
 	 */
-	function update_page($addr,$page,$menu){
+	function update_page($addr,$name,$menu){
 		// try to found new record
 		$sel_sql='select * from '.TAB_PREF.$this->base.' where `realadr`=?';
 		$ins_sql='INSERT INTO '.TAB_PREF.$this->base.' (?#) VALUES(?a);';
@@ -125,6 +126,7 @@ class altname extends ml_plugin {
 
 		// select & update
 		$data=array('altaddr'=>$addr,'realadr'=>'?do=menu&id='.$menu);
+        if(!empty($name)) $data['name']=$name;
 		$res=$this->database->query($sel_sql,$data['realadr']);
 		if(empty($res)){
 			$this->database->query($ins_sql,array_keys($data),array_values($data));
@@ -140,6 +142,12 @@ class altname extends ml_plugin {
 		'data'=>parent::admin_plugin()));
 	}
 
+    function do_convert(){
+        if(!$this->parent->has_rights(right_WRITE))
+            return $this->parent->ffirst('_loginform');
+        $this->database->query('ALTER TABLE '.TAB_PREF.$this->base.' ADD `name` VARCHAR( 255 ) NOT NULL AFTER `altaddr` ;');
+    }
+
 	function do_create($killall=true){
 		if(!$this->parent->has_rights(right_WRITE))
 			return $this->parent->ffirst('_loginform');
@@ -149,10 +157,11 @@ class altname extends ml_plugin {
 		$this->database->query('CREATE TABLE '.TAB_PREF.$this->base.' (
 				`altaddr` VARCHAR( 255 ) NOT NULL ,
 				`realadr` VARCHAR( 255 ) NOT NULL ,
+				`name` VARCHAR( 255 ) NOT NULL ,
 				`order` int,
 				PRIMARY KEY ( `altaddr` ),
 				INDEX (`realadr`)
 				);');
 	}
 }
-//<% point_finish('plugin_body') %>
+<% point_finish('plugin_body') %>

@@ -239,9 +239,9 @@ class ml_plugin extends plugin {
 		
 		if($form->handle()){
 			$this->handlePost($res);
-			foreach($res as $krks => $vrks)
-				$this->handlePost($vrks['subkat'], $vrks['id']);
-			if(!empty($res))
+            if(!empty($res) && is_array($res)){
+                foreach($res as $krks => $vrks)
+                    $this->handlePost($vrks['subkat'], $vrks['id']);
 				foreach($res as $k=>$v){
 					//debug($k);
 					$this->serialize($res[$k],$_POST,true);
@@ -251,6 +251,7 @@ class ml_plugin extends plugin {
 						}
 					}
 				}
+            }
 			$key=array();
 			$key_arr = Array();
 			foreach ($_POST as $kpost => $vpost){		
@@ -441,7 +442,7 @@ class search extends ml_plugin{
 	}
 
 	function get_parameters($par){
-		$par['list'][]=array('sub'=>'Результаты поиска','title'=>'Количество результатов на страницу','name'=>'search_per_page');
+//		$par['list'][]=array('sub'=>'Результаты поиска','title'=>'Количество результатов на страницу','name'=>'search_per_page');
 	}
 
 	function admin_search(){

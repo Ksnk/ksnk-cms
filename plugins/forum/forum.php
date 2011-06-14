@@ -10,10 +10,10 @@ class forum extends ml_plugin {
 
 	function forum($parent){
 		if(pps($_GET['topic'])) {
-			$res_t = $parent->database->query('SELECT * FROM ?_forum_topics WHERE id = '.$_GET['topic'].';');
+			$res_t = $parent->database->selectRow('SELECT * FROM ?_forum_topics WHERE id = '.$_GET['topic'].';');
 			if(count($res_t) > 0) {
-				$this->parent_topic = $res_t[0]['parent'];
-				$this->topic_name = $res_t[0]['topic'];
+				$this->parent_topic = $res_t['parent'];
+				$this->topic_name = $res_t['topic'];
 			}
 			else {
 				$this->parent_topic = -1;
@@ -30,8 +30,8 @@ class forum extends ml_plugin {
 						array('комментарий','question'),
                         array('цитата','quote'),
 			)
-			,'base'=>'_forum'
-			,'orderbystr'=>' where topic = '.pps($_GET['topic']).' order by `date`'
+            ,'base'=>'_forum'
+            ,'orderbystr'=>' where topic = '.pps($_GET['topic']).' order by `date`'
 			,'prefix'=>'forum');
 
 			if(defined('FORUM_WITH_THEME')){
@@ -49,7 +49,8 @@ class forum extends ml_plugin {
 						array('','id','button'),
 			)
 			,'base'=>'_forum_topics'
-			,'orderbystr'=>' where parent="'.pps($_GET['topic']).'" order by `id`'
+            ,'modulelist'=>false
+            ,'orderbystr'=>' where parent="'.pps($_GET['topic']).'" order by `id`'
 			,'prefix'=>'forum_topics');
 
 			parent::_init($par);
@@ -57,12 +58,13 @@ class forum extends ml_plugin {
 	}
 
 	function check_data(&$upd,&$res){
+        debug('check', $upd);
 		if(pps($this->parent_topic) == 0) {
-			$upd['parent'] = pps($_GET['id']);
+			$upd['parent'] = pps($_GET['topic'],$_GET['id']);
 		}
 		else {
 			$upd['topic'] = pps($_GET['topic']); // для админки так. Для сайта topic будет в id
-			if(empty($res['user']))
+            if(empty($res['user']))
 				$upd['user'] = $_SESSION['USER_ID'];
 
 			if(empty($res['date']))
@@ -73,6 +75,7 @@ class forum extends ml_plugin {
 					$upd['date']=date('Y-m-d H:i:s');
 			}
 		}
+        debug('check', $upd);
 		if(isset($upd['question']))
 			$upd['question']=trim(preg_replace('~^\s*<br\s*/?>|<br\s*/?>\s*$~i','',$upd['question']));
 		if(isset($upd['quote']))
@@ -133,7 +136,6 @@ class forum extends ml_plugin {
  */
 	function do_forum($unAnsweredOnly=true,$tpl='forum_list',$theme=''){
 		global $engine;
-		//$engine->dop_zagl = "fdgfdg";
 		ml_plugin::setupmenu();
 
 		if(pps($_POST['action'])){
@@ -141,7 +143,7 @@ class forum extends ml_plugin {
 			if($_POST['action'] == 'newpost') {
 				if(isset($_SESSION['USER_ID']) && $engine->user['right']['*'] && $_POST['newpost']!="") {
 					$key = array(
-						'topic'=>$_GET['id'],
+						'topic'=>ppi($this->parent_topic,$_GET['id']),
 						'user'=>$_SESSION['USER_ID'],
 						'question'=>post2comment($_POST['newpost']),
 						'date'=>date('Y-m-d H:i:s'),
@@ -177,7 +179,7 @@ class forum extends ml_plugin {
 						'user'=>$_SESSION['USER_ID'],
 						'question'=>$_POST['newpost'],
 						'date'=>date('Y-m-d H:i:s')
-						);
+                    );
 					$this->database->query('INSERT INTO ?_forum (?#) VALUES(?a);',
 			   			array_keys($key),array_values($key)
 			   		);
@@ -209,7 +211,8 @@ class forum extends ml_plugin {
 							';');
 						$res_p[$k_p]['cnt'] = $res_d[0]['cnt'];
 					}
-					$res[$k]['topic_p'] = smart_template(array(FORUM_TPL,'forum_topics_p'),array('list_p' => $res_p));
+                   //debug($res_p);
+					$res[$k]['topic_p'] = $res_p;//smart_template(array(FORUM_TPL,'forum_topics_p'),array('list_p' => $res_p));
 				}
 				else {
 					$res[$k]['topic_p'] = "";
@@ -232,6 +235,7 @@ class forum extends ml_plugin {
 				}
 				$res[$k]['cnt'] = $res_d[0]['cnt'];
 			}
+            debug($res);
             return $engine->_tpl('tpl_jforum','_forum_topics',array(
                 'list'=>$res
             ));
@@ -283,26 +287,36 @@ class forum extends ml_plugin {
 			$res[$i]['year']=$s[1];
             $res[$i]['time']=substr($v['date'],-8,5);
             $res[$i]['quote']=$v['quote'];
-		/*	в связи с переходом на новый шаблон - больше не нужно
-		    if($v['quote'] != "") {
-				$res[$i]['quote_tr'] = array(0 => array('quote' => $v['quote']));
-				$res[$i]['style_str'] = "";
-			}
-			else {
-				$res[$i]['style_str'] = "background:url(img/strelka.gif) no-repeat center 24px;";
-			} */
 			if($v['sval'] == NULL)
 				$res[$i]['sval'] = $v['user'];
 			$res[$i]['info'] = $this->parent->export('MAIN','userinfo',$v['user']);
 		}
+        // найти парента
+        $res_p=$this->database->selectCell('select `parent` from ?_forum_topics '.
+					'where `id` = ? ;', $_GET['id']);
+        $res_p=$this->database->select('select * from ?_forum_topics '.
+                            'where `parent` = ? order by `id`;', $res_p);
+        debug($res_p);
+        $topic_p=0;
+        if(count($res_p) > 0) {
+            foreach($res_p  as $k_p=>$v_p) {
+                $res_p[$k_p]['href'] = $this->parent->curl('do','id')."do=forum&id=".$v_p['id'];
+                $res_d=$this->database->select('select count(id) as cnt from ?_forum '.
+                    'where `topic` = '.$v_p['id'].
+                    ';');
+                $res_p[$k_p]['cnt'] = $res_d[0]['cnt'];
+            }
+           debug($res_p);
+            $topic_p = $res_p;//smart_template(array(FORUM_TPL,'forum_topics_p'),array('list_p' => $res_p));
+        }
 
 		if(count($res) > 0) {
             return $engine->_tpl('tpl_jforum','_forum_posts',array(
                 'list'=>$res
                 , 'pages' => $pages
-                , 'all_topics' => $this->parent->curl('topic','pg')
-            ));
-//			return smart_template(array(FORUM_TPL,'forum_posts'),array('list' => $res, 'pages' => $pages, 'all_topics' => $this->parent->curl('topic','pg')));
+                , 'topic_p'=>$topic_p
+                , 'all_topics' => '1111111')
+            );
 		}
 		return "В этой теме нет сообщений";
 	}
@@ -346,9 +360,11 @@ class forum extends ml_plugin {
                 }
 				break;
 			case "ins":
-                if (isset($from['topic']))
+                debug('insert'); debug($from);
+                if (isset($from['topic'])){
 				return $this->database->query('INSERT INTO ?'.$this->base.' (?#) VALUES(?a);',
 		   			array_keys($from),array_values($from));
+                }
 		}
 	}
 }
