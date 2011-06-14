@@ -17,6 +17,7 @@
     <div> Оставлять комментарии могут только зарегистрированные пользователи.
         <a href="{{root}}onlinereg">Зарегистрируйтесь</a>, пожалуйста</div>
     {% endif %}
+    {% if list|length %}
 <table style="width:75%;margin-top:30px;">
 
     {% for post in list %}
@@ -51,6 +52,9 @@
     {% endfor %}
 
 </table>
+    {% else %}
+    В этой теме нет сообщений
+    {% endif %}
 {{pages}}
 <table style="width:75%;margin-top:42px;">
 <tr>

@@ -306,19 +306,17 @@ class forum extends ml_plugin {
                     ';');
                 $res_p[$k_p]['cnt'] = $res_d[0]['cnt'];
             }
-           debug($res_p);
+   //        debug($res_p);
             $topic_p = $res_p;//smart_template(array(FORUM_TPL,'forum_topics_p'),array('list_p' => $res_p));
         }
 
-		if(count($res) > 0) {
-            return $engine->_tpl('tpl_jforum','_forum_posts',array(
+		return $engine->_tpl('tpl_jforum','_forum_posts',array(
                 'list'=>$res
                 , 'pages' => $pages
                 , 'topic_p'=>$topic_p
                 , 'all_topics' => '1111111')
             );
-		}
-		return "В этой теме нет сообщений";
+
 	}
 
 	function data($what,$from='',$perpage=''){

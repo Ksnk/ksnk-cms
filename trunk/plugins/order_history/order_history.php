@@ -196,7 +196,7 @@ class order_history extends plugin {
         }
 
         return
-        $form->getHtml(' ').
+       // $form->getHtml(' ').
         $this->parent->_tpl('tpl_jorders','_orderlist',array(
             'data'=>$result
             ,'pages'=>$pages
