@@ -11,7 +11,7 @@
 class order_history extends plugin {
 
     static $STATUS=array(0=>'','active'=>"Активен",'closed'=>"Неактивен",'complete'=>"Оплачен") ;
-    static $TYPES=array(0=>'','bnal'=>'Безналичный расчет','kvit'=>'Квитанция','nal'=>'оплата в офисе') ;
+    static $TYPES=array(0=>'','bnal'=>'Безналичный расчет','kvit'=>'Квитанция','nal'=>'Наличные') ;
 //    static $TYPES=array('','Безналичный расчет','Квитанция','оплата в офисе') ;
 
     var $table_name='?_orders',
@@ -107,11 +107,13 @@ class order_history extends plugin {
         return $id;
     }
 
+   
     function searchform(&$sql_where,$tpl='tpl_jorders'){
          $form = new form('searchform');
          $par=array();
          if(defined ('IS_ADMIN')){
              $par['users']=$this->database->select('select distinct `userid`,`user` from '.$this->table_name);
+             $par['payment']=array_values(self::$TYPES);
          }
          $form->scanHtml($this->parent->_tpl($tpl,'_searchform',$par));//array('users')));
 

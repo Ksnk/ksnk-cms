@@ -11,7 +11,7 @@
 ##
 #########################################################################
 
-{% macro searchform(data=0,pages=0,users=0) %}
+{% macro searchform(data=0,pages=0,users=0,payment=0) %}
 ##
 ## табличка про панель управления
 ##
@@ -29,10 +29,9 @@
 <option value="3">Оплачен</option>
 </select></th>
 <th class="bblue">Способ оплаты <select name="type">
-<option value="0">все</option>
-<option value="1">Безналичный</option>
-<option value="2">Квитанция</option>
-<option value="3">Наличный</option>
+    {% for p in payment %}
+    <option value="{{loop.index0}}">{{p|default("все")}}</option>
+    {% endfor %}
 </select></th>
 <th class="bblue">Период <select name="period">
 <option value="0">все</option>
@@ -44,7 +43,9 @@
 <th class="bblue">пользователи <select name="user">
     <option value="0">все</option>
     {% for user in users %}
+    {% if user.userid %}
 <option value="{{user.userid}}">{{user.user|e}}</option>
+    {% endif %}
     {% endfor %}
 </select></th>
     {% endif %}
