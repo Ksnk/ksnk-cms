@@ -72,18 +72,13 @@ class Toyhobby_csv extends csv {
 		parent::_init(
 		array(
 		'fields'=>array(
-				array('Фото','pic_small','image','csvfields'=>array('Фото')),
 				array('Артикул','articul','csvfields'=>array('Артикул')),
 				array('Наименование','name','csvfields'=>array('Наименование')),
-				array('Краткое описание','descr','html_edit','afilter'=>5, 'csvfields'=>array('Краткое описание', 'Описание')),
-				array('Производитель','manufacturer','csvfields'=>array('Производитель')),
-				array('Налич.','ostatok','csvfields'=>array('Наличие', 'Налич.')),
-				array('Цена','cost','csvfields'=>array('Цена')),
+                array('Характеристики','the_href')),
 				array('Ед. изм.','unit','csvfields'=>array('Ед. измерения', 'Единица измерения')),
-				array('Соп. товары','soput_tov','text_edit','csvfields'=>array('Соп. товары','Сопутствующие товары')),
-				array('Скрыть','visibility','check01','csvfields'=>array('Скрыть')),
-				array('Код раздела','article','csvfields'=>array('Код раздела'))
-			))
+                array('Цена','cost','csvfields'=>array('Цена')),
+                array('Налич.','ostatok','csvfields'=>array('Наличие', 'Налич.')),
+			)
 		);
 		$this->defpattern=array(
 			'articul','name','cost'

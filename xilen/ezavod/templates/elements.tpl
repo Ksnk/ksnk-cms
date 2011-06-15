@@ -928,7 +928,7 @@ $(function(){
 				<tr class="ajaxform">
 					<td class="first_td" style="padding-right:20px">{name}</td>
 					<td style="color:#b41414; font-size:14px; font-weight:600; padding-right:30px; background:url({::index}/img/rubles.gif) 100% 51% no-repeat">{cost}</td>
-					<td>{ostatok}</td>
+					<td>{ostatok|нет(заказать)}</td>
 					<td><input type="hidden" name="id_{id}" value="{id}"><input style="border:1px solid #e0e0e0" type="text" style="width:45px;" name="item_{id}" value="{value}"></td>
 					<td style="padding-right:35px"><div><a href='#' class="submit blue"><img src="{::index}/img/basket.gif"></a></div></td>
 				</tr>

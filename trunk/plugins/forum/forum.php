@@ -27,9 +27,9 @@ class forum extends ml_plugin {
 						array('Автор','sval', 'dontedit'),
 						//array('Автор','user', 'dontedit'),
 						array('Дата','date', 'dontedit'),
-						array('комментарий','question'),
+                        array('комментарий','question'),
                         array('цитата','quote'),
-			)
+ 			)
             ,'base'=>'_forum'
             ,'orderbystr'=>' where topic = '.pps($_GET['topic']).' order by `date`'
 			,'prefix'=>'forum');
@@ -47,10 +47,11 @@ class forum extends ml_plugin {
 			,'fields'=>array(
 						array('Тема','topic','text_edit'),
 						array('','id','button'),
+                        array('','order','win_order'),
 			)
 			,'base'=>'_forum_topics'
             ,'modulelist'=>false
-            ,'orderbystr'=>' where parent="'.pps($_GET['topic']).'" order by `id`'
+            ,'orderbystr'=>' where parent="'.pps($_GET['topic']).'" order by `order`,`id`'
 			,'prefix'=>'forum_topics');
 
 			parent::_init($par);
@@ -100,6 +101,12 @@ class forum extends ml_plugin {
 		'data'=>parent::admin_plugin()));
 	}
 
+    function do_convert(){
+        if(!$this->parent->has_rights(right_WRITE))
+			return $this->parent->ffirst('_loginform');
+        $this->database->query('ALTER TABLE ?_forum_topics ADD `order` INT NOT NULL AFTER `parent`');
+    }
+
 	function do_create($killall=true){
 		if(!$this->parent->has_rights(right_WRITE))
 			return $this->parent->ffirst('_loginform');
@@ -120,9 +127,10 @@ class forum extends ml_plugin {
 			$this->database->query('DROP TABLE IF EXISTS ?_forum_topics;');
 		}
 		$this->database->query("CREATE TABLE ?_forum_topics (
-				  `id` int(11) NOT NULL auto_increment,
-				  `topic` varchar(255) character set cp1251 NOT NULL default '',
-				  `parent` int(11) NOT NULL default '0',
+				    `id` int(11) NOT NULL auto_increment,
+				    `topic` varchar(255) character set cp1251 NOT NULL default '',
+				    `parent` int(11) NOT NULL default '0',
+                    `order` int,
 					PRIMARY KEY  (`id`)
 					);");
 	}
@@ -197,12 +205,12 @@ class forum extends ml_plugin {
 		if(empty($_GET['id']) or $_GET['id']=='forum') {
 			$res=$this->database->select('select * from ?_forum_topics '.
 				'where `parent` = 0'.
-				' order by `id`;');
+				' order by `order`,`id`;');
 
 			foreach($res as $k=>$v) {
 				$res_p=$this->database->select('select * from ?_forum_topics '.
 					'where `parent` = '.$v['id'].
-					' order by `id`;');
+					' order by `order`,`id`;');
 				if(count($res_p) > 0) {
 					foreach($res_p  as $k_p=>$v_p) {
 						$res_p[$k_p]['href'] = $this->parent->curl('do','id')."do=forum&id=".$v_p['id'];
