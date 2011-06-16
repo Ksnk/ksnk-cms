@@ -673,7 +673,7 @@ class engine extends engine_Main
                 $this->go($this->curl());
             }
         }
-
+debug($x);
         $form=$this->parent->export('MAIN','SimpleForm',$x,array('ruller'=>'cust_order'));
         if(!is_string($form)) {
             $key=array();

@@ -83,7 +83,7 @@
 					{% for i in order.llist %}
 					<tr>
 						<td class="first_td">{{i.numb}}</td>
-						<td>{{i.name}}</td>
+						<td>{{i.articul}} {{i.name}}</td>
 						<td>{{i.cnumb}}</td>
 						<td>רע.</td>
 						<td>{{i.ccost}}</td>
@@ -281,7 +281,7 @@ td.table31 {
 					{% for row in order.llist %}
 					<tr>
 						<td class=table31>{{row.numb}}</td>
-						<td class=table31>{{row.name}}</td>
+						<td class=table31>{{row.articul}} {{row.name}}</td>
 						<td class=table31>{{row.cnumb}}</td>
 						<td class=table31>רע.</td>
 						<td class=table31>{{row.ccost}}</b></td>
@@ -350,7 +350,7 @@ td.table31 {
                     {% for i in order.llist %}
 					<tr>
 						<td class="first_td">{{i.numb}}</td>
-						<td>{{i.name}}</td>
+						<td>{{i.articul}} {{i.name}}</td>
 						<td>{{i.cnumb}}</td>
 						<td>רע.</td>
 						<td>{{i.ccost}}</td>
@@ -739,7 +739,7 @@ td.table31 {
 					{% for i in order.llist %}
 					<tr>
 						<td class="first_td">{{i.numb}}</td>
-						<td>{{i.name}}</td>
+						<td>{{i.articul}} {{i.name}}</td>
 						<td>{{i.cnumb}}</td>
 						<td>רע.</td>
 						<td>{{i.ccost}}</td>

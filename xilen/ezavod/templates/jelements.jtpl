@@ -136,7 +136,7 @@
 				<tr class="size11">{{table.headers}}</tr>
 
 	{% for row in table.data %}
-		<tr id="xx_{{row.id}}" class="{even??even::odd}">{{row.data}}</tr>
+		<tr id="xx_{{row.id}}" class="">{{row.data}}</tr>
 	{% endfor %}
 
 			</table>

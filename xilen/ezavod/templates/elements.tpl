@@ -2,7 +2,7 @@
 <!--begin:anchor-->
 <a name="anc_{xitem_name}"></a>
 <!--begin:header-->	
-<table><tr><td><div class="header align_{align|left}">
+<table style="width:100%;"><tr><td><div class="header align_{align|left}">
 <h1>{header}</h1>
 </div></td></tr></table>	
 <!--end:header-->
@@ -26,9 +26,9 @@ PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
 <!--  ////////////////// âûâîä ñãåíåğèğîâàííîé ñòàòüè /////////////////////// -->
 
 <!--begin:edit_table-->
-<table class="align_{align|center}" style="border-top:3px solid #e3e6ea; border-bottom:3px solid #e3e6ea; border-left:none; border-right:none; margin-top:20px; margin-bottom:20px;">
-<tr><td style="padding-top:1px; padding-bottom:1px">
-<table style="" class="table tablex">
+<table style="width:100%;margin-top:20px; margin-bottom:20px;">
+<tr><td style="padding-top:1px; padding-bottom:1px" class="align_{align|center}">
+<table class="table tablex" style="border-top:3px solid #e3e6ea; border-bottom:3px solid #e3e6ea; border-left:none; border-right:none;">
 {cols}
 <tr>{header}</tr>
 <!--begin:rows-->
