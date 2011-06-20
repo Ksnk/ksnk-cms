@@ -84,6 +84,14 @@ class Toyhobby_csv extends csv {
 			'articul','name','cost'
 		);
 	}
+    function read_line(){
+        if(!$this->handle || ($data = @fgetcsv($this->handle, 1000, "|"))===false){
+            $this->close();
+            return array();
+        } else {
+            return $data ;
+        }
+    }
 	function handle($code,&$pattern){
 		switch ($code){
 			case katalog_TMP_COMPLETE:
