@@ -21,8 +21,11 @@ define('ANCHOR_STORE',false); // сохранять ANCHORS, но не показывать их в меню
 $GLOBALS['opt_array']=array(type_NEWTEXTPIC,type_LINKS,type_TABLE,type_ANCHOR,type_GALLERY,type_GALLERY2,type_LINE);
 // 
 class airis_users extends users {
+
 	function airis_users(&$parent){
+
 		parent::users($parent);
+        
 		$this->$fields=array(
 			'name'=>'Ник пользователя',
 			'password'=>'Пароль пользователя',
@@ -70,28 +73,22 @@ class Toyhobby_csv extends csv {
 	function Toyhobby_csv(&$parent){
 		parent::ml_plugin($parent);
 		parent::_init(
-		array(
-		'fields'=>array(
-				array('Артикул','articul','csvfields'=>array('Артикул')),
-				array('Наименование','name','csvfields'=>array('Наименование')),
-                array('Характеристики','the_href')),
-				array('Ед. изм.','unit','csvfields'=>array('Ед. измерения', 'Единица измерения')),
-                array('Цена','cost','csvfields'=>array('Цена')),
-                array('Налич.','ostatok','csvfields'=>array('Наличие', 'Налич.')),
-			)
-		);
-		$this->defpattern=array(
-			'articul','name','cost'
-		);
+		    array(
+                'fields'=>array(
+                    array('Артикул','articul','csvfields'=>array('Артикул')),
+                    array('Наименование','name','csvfields'=>array('Наименование')),
+                    array('Характеристики','the_href'),
+                    array('Ед. изм.','unit','csvfields'=>array('Ед. измерения', 'Единица измерения')),
+                    array('Цена','cost','csvfields'=>array('Цена')),
+                    array('Налич.','ostatok','csvfields'=>array('Наличие', 'Налич.'))
+                )
+                ,'linedelimiter'=>'|'
+                ,'defpattern'=>
+                    array('articul','name','the_href','unit','cost','ostatok')
+  		    )
+        );
 	}
-    function read_line(){
-        if(!$this->handle || ($data = @fgetcsv($this->handle, 1000, "|"))===false){
-            $this->close();
-            return array();
-        } else {
-            return $data ;
-        }
-    }
+
 	function handle($code,&$pattern){
 		switch ($code){
 			case katalog_TMP_COMPLETE:
@@ -288,6 +285,10 @@ class Toyhobby_katalog extends katalog {
 		);
 		return $headers;
 	}
+
+    function do_convert (){
+        $this->database->select("ALTER TABLE ?_katalog CHANGE `ostatok` `ostatok` VARCHAR( 40 ) NOT NULL DEFAULT '0';");
+    }
 	
 /**
  * Список полей каталога

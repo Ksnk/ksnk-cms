@@ -432,8 +432,9 @@ class csv_reader {
 		return ftell($this->handle);
 	}	
 	
-	function csv_reader($filename){
+	function csv_reader($filename,$ld=';'){
 		$this->handle = @fopen($filename, "r+b");
+        $this->linedelimiter=$ld;
 		if($this->handle){
 			if ($this->fsize<=0 && !!$this->handle)
 				$this->fsize=filesize($filename);
@@ -450,7 +451,7 @@ class csv_reader {
 	}
 	
 	function read_line(){
-		if(!$this->handle || ($data = @fgetcsv($this->handle, 1000, ";"))===false){
+		if(!$this->handle || ($data = @fgetcsv($this->handle, 1000, $this->linedelimiter))===false){
 			$this->close();
 			return array();
 		} else {
@@ -494,8 +495,13 @@ class csv extends ml_plugin {
 		@set_time_limit(8*60);
 		$starttime=mkt();
 
-		$csv_reader=&new csv_reader($fname);
-		$data=$csv_reader->read_line();$lnum=0;
+		$csv_reader=&new csv_reader($fname,$this->linedelimiter);
+		if(isset($this->headerline))
+            $data=$this->headerline;
+        else
+            $data=$csv_reader->read_line();
+
+        $lnum=0;
 		
 		$pattern=array(); $havedata=false;$havepic=false;$havearticle=false;
 	// анализ заголовков

@@ -10,6 +10,11 @@
 </div>
 <!--end:qathanks-->
 
+<!--begin:mail-->Сообщение: {question}<br>
+Дата: {date}<br>
+Подпись: {user}<br>
+Адрес: {address}<!--end:mail-->
+
 <!--begin:qaform-->
 <form action="" method="POST" name="qaform">
 <style>

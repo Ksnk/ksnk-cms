@@ -1805,7 +1805,7 @@ LIMIT 100;';
 		// проверка обязательных полей		
 			$error=false;
 			$encoding=false;
-            debug($fields);
+            //debug($fields);
 			foreach($fields as $k=>$v){
 				if($encoding || detectUTF8($form->var[$v[0]])){
 					$encoding=true;	
