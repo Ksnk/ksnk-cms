@@ -94,7 +94,11 @@ class order_history extends plugin {
 
         $par['cost']=pps($keys['summ']);
         $par['user']=pps($keys['user'],$this->parent->user['name']);
-        $par['type']=pps($keys['type'],'nal');
+        $types=self::$TYPES;
+        if (isset($keys['cust_order']) and isset($types[$keys['cust_order']]))
+            $par['type']=$types[$keys['cust_order']];
+        else
+            $par['type']='nal';
         $par['userid']=ppi($keys['id'],$this->parent->user['id']);
         $par['date']=pps($keys['date'],date('Y/m/d H:i:s'));
         $par['status']='active';
@@ -195,6 +199,16 @@ class order_history extends plugin {
 
         foreach($result as $k=>$v){
             $result[$k]['order']=unserialize($result[$k]['descr']);
+            if(isset(self::$TYPES[$v['type']])) {
+                $result[$k]['type']=self::$TYPES[$v['type']];
+            } else {
+                $result[$k]['type']='';
+            }
+            if(isset(self::$STATUS[$v['status']])) {
+                $result[$k]['status']=self::$STATUS[$v['status']];
+            } else {
+                $result[$k]['status']='"'.$v['status'].'"';
+            }
         }
 
         return

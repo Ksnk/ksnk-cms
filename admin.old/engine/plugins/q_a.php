@@ -337,7 +337,7 @@ class writeus extends ml_plugin {
 					,'result'=>$this->parent->export('qa','mail',$key))) ;
 	   		$form->var["question"]="";
 	   		$form->storevalues();
-	   		$this->parent->go($this->parent->curl());
+	   		//$this->parent->go($this->parent->curl());
 	   		$x=$_SESSION['qa_Message'];
 	   		unset($_SESSION['qa_Message']);
 			return $x; // ajax only
