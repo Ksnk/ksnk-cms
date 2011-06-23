@@ -127,6 +127,24 @@ $EXPORTS['basket']='Toyhobby_basket';
 
 
 class xToyhobbyKatalogue extends xKatalogue {
+
+    /**
+     * нужно скопировать и товары тоже
+     * @param  $data
+     * @return
+     */
+    function pasteData(&$data){
+		global $engine;
+		if(empty($data)) return;
+		//print_r($data);echo -$this->node().';'.$this->v['id'];
+//		if ($data[0]['level']>1)
+//			$engine->error('Ќельз€ вставить такой элемент');
+//		else if	($data[0]['level']==1){
+			// вставл€ем как сиблинга
+			$i=0;
+			ajax::insertPage(-$this->node(),1,$data,$i);
+//		}
+	}
 	
 	function getText(&$keys,$ids=0,$button_val='',$tpl='xcatalogue'){
 		global $engine;
