@@ -142,7 +142,32 @@ class xToyhobbyKatalogue extends xKatalogue {
 //		else if	($data[0]['level']==1){
 			// вставляем как сиблинга
 			$i=0;
-			ajax::insertPage(-$this->node(),1,$data,$i);
+            // рисуем и добавляем товары
+//debug($data);
+// собираем в кучку все записи нового раздела
+// состряпаем временную таблицу - кусочек каталога
+            $engine->database->selectRow('drop table if exists ?_temp;');
+            $sql=$engine->database->selectRow('show create table ?_katalog');
+            $sql=
+                preg_replace('/,\s*primary.*$/is',');',$sql['Create Table']);
+            $sql=
+                preg_replace('/table\s+`?'.TAB_PREF.'_katalog`?/i'
+                    ,(empty($_GET['csv'])?''/*TEMPORARY'*/:'').' table '.TAB_PREF.'_temp',$sql);
+            $sql=
+                preg_replace('/`id`.*?,\s*?/i','',$sql);
+            $sql=str_replace(');',',`article` varchar(255) default NULL);',$sql);
+            preg_match_all('/  `(\w+)`/',$sql,$insert);
+            $insert=$insert[1];
+//        debug($insert);
+            $engine->database->query($sql);
+// вставляем туда все записи, из прошлого раздела
+            $engine->database->query('insert into ?_temp select * from ?_katalog where xarticle=?',$data[0]['id']);
+// вставляем запись
+			$id=ajax::insertPage(-$this->node(),1,$data,$i);
+// обновляем раздел
+            $engine->database->query('update ?_temp set xarticle=?',$id);
+// добавляем товары
+            $engine->database->query('insert into ?_katalog ('.implode(',',$insert).') select '.implode(',',$insert).' from ?_temp;');
 //		}
 	}
 	

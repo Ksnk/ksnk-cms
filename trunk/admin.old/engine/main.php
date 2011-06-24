@@ -656,7 +656,7 @@ $tpl=array("alpina58.gif",
 			$this->parent->error('Нужно авторизоваться!!!!!');
 			return ' ';
 		}
-		if(empty($_REQUEST['x']) || empty($_REQUEST['id']))
+        if(empty($_REQUEST['x']) || empty($_REQUEST['id']))
 			$this->parent->error('Ошибка в параметрах(0)!!!!!');
 		else {
 			if( !empty($_SESSION['clipboard'])
