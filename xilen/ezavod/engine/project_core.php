@@ -148,26 +148,39 @@ class xToyhobbyKatalogue extends xKatalogue {
 // состряпаем временную таблицу - кусочек каталога
             $engine->database->selectRow('drop table if exists ?_temp;');
             $sql=$engine->database->selectRow('show create table ?_katalog');
-            $sql=
-                preg_replace('/,\s*primary.*$/is',');',$sql['Create Table']);
+            $sql=$sql['Create Table'];//
+           // $sql=preg_replace('/,\s*primary.*$/is',');',$sql);
             $sql=
                 preg_replace('/table\s+`?'.TAB_PREF.'_katalog`?/i'
                     ,(empty($_GET['csv'])?''/*TEMPORARY'*/:'').' table '.TAB_PREF.'_temp',$sql);
-            $sql=
-                preg_replace('/`id`.*?,\s*?/i','',$sql);
+          //  $sql=               preg_replace('/`id`.*?,\s*?/i','',$sql);
             $sql=str_replace(');',',`article` varchar(255) default NULL);',$sql);
             preg_match_all('/  `(\w+)`/',$sql,$insert);
             $insert=$insert[1];
 //        debug($insert);
             $engine->database->query($sql);
 // вставляем туда все записи, из прошлого раздела
-            $engine->database->query('insert into ?_temp select * from ?_katalog where xarticle=?',$data[0]['id']);
+            $engine->database->query('insert into ?_temp ('.implode(',',$insert).') select '.implode(',',$insert)
+                                     .' from ?_katalog where xarticle=?',$data[0]['id']);
 // вставляем запись
 			$id=ajax::insertPage(-$this->node(),1,$data,$i);
+            $res=$engine->nodeGetInfo($id);
+            if(!empty($res))
+                $id=$res['page'];
+            else
+                return 'fail!';
+            $insert=array_diff($insert,array('id'));
 // обновляем раздел
             $engine->database->query('update ?_temp set xarticle=?',$id);
-// добавляем товары
-            $engine->database->query('insert into ?_katalog ('.implode(',',$insert).') select '.implode(',',$insert).' from ?_temp;');
+// добавляем корневые товары
+            $res=$engine->database->select('select id from ?_temp where parent_id=0;');
+            foreach($res as $v){
+                $id=$engine->database->query('insert into ?_katalog ('.implode(',',$insert)
+                                             .') select '.implode(',',$insert).' from ?_temp where `id`=?;',$v['id']);
+                $engine->database->query('update ?_temp set parent_id=? where parent_id=?',$id,$v['id']);
+
+            }
+            $engine->database->query('insert into ?_katalog ('.implode(',',$insert).') select '.implode(',',$insert).' from ?_temp where parent_id<>0;');
 //		}
 	}
 	
