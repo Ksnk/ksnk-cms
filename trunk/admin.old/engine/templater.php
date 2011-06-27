@@ -71,7 +71,7 @@ class tpl {
 	}
 	
 	function _html($par){
-		return htmlspecialchars($par);
+		return str_replace('|','<br>',htmlspecialchars($par));
 	}
 	function _striptags($par){
 		//debug($par);

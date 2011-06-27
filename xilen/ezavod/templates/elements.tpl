@@ -109,7 +109,7 @@ PLUGINSPAGE="http://www.macromedia.com/go/getflashplayer">
 										</td></tr>
 								</table>
 	
-                            <p style="text-align: center;margin-bottom:16px;">{comment>>html}</p>{::tpl:admin:imgpost}	
+                            <p style="text-align: center;margin-bottom:16px;">{comment>>html}</p>{::tpl:admin:imgpost}
 						<!--end:pict-->
                    	</div>
 				<!--end:row-->
