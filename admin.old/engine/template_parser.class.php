@@ -6,6 +6,7 @@
  * Ver : 0.8(beta), Rev: 1376, Modified: 2010/12/02 17:07:47$
  * ----------------------------------------------------------------------------
  * License GNU/LGPL - Serge Koriakin - october 2010
+ * documentation mostly same as http://jinja.pocoo.org/docs/templates/
  * ----------------------------------------------------------------------------
  */
 
