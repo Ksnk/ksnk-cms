@@ -1,0 +1,51 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1251">
+<title>Insert title here</title>
+<script type="text/javascript" src="un-serial.js"></script>
+<script >
+//модель
+//массив исключительно для стартовой инициализации 
+var villages=[
+  {race:0,production:[20,30,11,123]}
+]
+var players={
+	'Вася.ру':{village:villages[3]}	
+}
+
+var map={
+'-29|384':{terrain:0,village:villages[1]},
+'-29|384':{terrain:0,village:villages[2]}
+}
+
+var goals=[
+   {goal:'explore',map:map['-29|384']},
+   {goal:'farm',map:map['-29|384']},
+]
+
+//for
+//serialize.mark(map)
+function test(){
+	alert(serialize(a));
+}
+function test2(){
+	b=unserialize(serialize(a));
+}
+</script>
+</head>
+<body>
+<div id='dynamic_header' style="height:100px;"></div>
+<input type="text" id="hello"> - вот сюда будем заполнять значение и менять его каждые 30 секунд
+
+
+<button id="проверка сериалайза"
+onclick="test();"
+
+>Сериалайз</button>
+<button id="проверка сериалайза"
+onclick="test2();"
+
+>UnСериалайз</button>
+</body>
+</html>
