@@ -2723,15 +2723,12 @@ class yGallery extends xCommon {
 			$x=array('pict'=>$row) ;$x['pictcom']=$row ;$x['row1']=&$x;$x['row2']=&$x;
  			$rows[]=$x ;
 		}
- 		//debug($rows);
- 		if($engine->par['show_news'])
- 			$gallery = "gallery_mp";
- 		else
- 			$gallery = "gallery";
- 		return smart_template(array(ELEMENTS_TPL,'katalog'),
+ 		return $engine->_tpl('tpl_jelements','_el_gallery',
+//                              smart_template(array(ELEMENTS_TPL,'katalog'),
  			array(
- 			$gallery=>array(
+ 			'gallery'=>array(
  				'align'=>$this->aligns(ppi($this->v['item_align'])),
+//                'variant'=>ppi($engine->par['show_news']),
  				'row'=>$rows,
  				'id'=>$this->v['id'],
  				'w_width'=>$w_width,

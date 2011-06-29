@@ -4,6 +4,51 @@
 ##
 ##################################################################
 
+
+##################################################################
+##
+##  элемент - галлерея
+##
+{% macro el_gallery (gallery=0,root=0) %}
+<table style="border-spacing:0;width: 100%; margin: 0px 0 10px 0;">
+	<tr>
+		<td class="box gallery tahoma ctext size11" >
+		<input type="hidden" id="w_{{gallery.id}}" name="w_{{gallery.id}}" value="{{gallery.w_width}}">
+		<input type="hidden" id="h_{{gallery.id}}" name="h_{{gallery.id}}" value="{{gallery.w_height}}">
+		<div class="align_{{gallery.align}}">
+		<div class="wideable scroll_gal">
+            {% for row in gallery.row %}
+		<table class="align_center">
+			<tr>
+                {% for pict in row.pict %}
+				<td  style="vertical-align:bottom;padding:0 25px 5px 0;">
+{{callex('tpl','admin','imgpre'}}
+				<table><tr><td class="picture_box">
+                    <a rel="g{{pict.pid}}" href="{{pict.xhref|default('#')}}" {% if pict.comment %}title="{{pict.comment|e}}"{%endif%}>
+                    <img src="{{root}}/{{pict.small_pict}}" {% if pict.comment %}alt="{{pict.comment|e}}" {%endif-%}
+                        {{callex('','brd',pict.border)}} class="text_picture">
+                    </a></td></tr></table>
+				</td>
+	 		    {% endfor %}
+			</tr>
+			<tr>
+                {% for comm in row.pictcom %}
+							<!--begin:pictcom-->
+				<td style="vertical-align:top;padding:0 25px 20px 0;">
+					<p style="text-align: {{gallery.align|default('center')}};">{{comm.comment|e}}</p>
+{{callex('tpl','admin','imgpost'}}
+				</td>
+                {% endfor %}
+	 		</tr>		</table>
+		{% endfor %}
+        </div>
+		</div>
+		</td>
+	</tr>
+</table>
+{% endmacro %}
+
+
 ##################################################################
 ##
 ##  nfirst
