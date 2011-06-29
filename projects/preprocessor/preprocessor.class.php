@@ -48,9 +48,8 @@ class preprocessor{
 				$cfg_time=max($cfg_time,filemtime ($n));
 			else
 				$cfg_time=max($cfg_time,$n);
-		} else {
-			return $cfg_time;
-		}	
+		}
+		return $cfg_time;
 	}
 	
 	/**
