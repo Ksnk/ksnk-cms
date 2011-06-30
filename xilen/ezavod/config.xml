@@ -52,12 +52,6 @@
         <file>compiler.class.php</file>
         <file>compiler.php.php</file>
     </files>
-    <!-- копируем файлы шаблонизатора - шаблоны -->
-        <files  dstdir="$dst/admin/engine" dir="templater">
-            <file>compiler.class.php</file>
-            <file>compiler.php.php</file>
-            <file>template_parser.class.php</file>
-        </files>
     <!-- копируем файлы шаблонизатора - сайт шаблоны -->
         <files  dstdir="$dst/templates" dir="templater/templates">
             <file>tpl_base.php</file>
