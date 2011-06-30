@@ -52,6 +52,10 @@
         <file>compiler.class.php</file>
         <file>compiler.php.php</file>
     </files>
+    <!-- копируем файлы шаблонизатора - core -->
+        <files  dstdir="$dst/admin/engine" dir="nat2php">
+            <file>nat2php.class.php</file>
+        </files>
     <!-- копируем файлы шаблонизатора - сайт шаблоны -->
         <files  dstdir="$dst/templates" dir="templater/templates">
             <file>tpl_base.php</file>
