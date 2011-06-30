@@ -1432,8 +1432,11 @@ class xKatalogue  extends xCommon {
                     $data[$k]['even']=(($x=1-$x)==0);
                     $data[$k]['sdescr2']=strip_tags(pps($v['descr2'],$v['descr']));
 //XXX: корзинко
-                    if (!empty($basket[ppi($v['xid'])]))
-                        $data[$k]['value']=$basket[ppi($v['xid'])]['n'];
+                    if (!empty($basket[ppi($v['xid'])])){
+                        $ii=ppi($v['xid']);
+                        $data[$k]['value']=$basket[$ii]['n'];
+                        $data[$k]['p_name']=pps($basket[$ii]['p_name']);
+                    }
 
                 }
                 $this->havedata=true;
@@ -1449,7 +1452,7 @@ class xKatalogue  extends xCommon {
 					)
 					,array('name'=>$v['name']));
 			}
-			
+			//debug($headers);
 			if(!empty($data))
 			foreach($data as $k=>$vv){
 				$d='';
@@ -1470,9 +1473,14 @@ class xKatalogue  extends xCommon {
 						//echo "<br><br><br>";
 						//print_r($data);
 						//echo $v['tpl'];
-						$keys['value'] = $keys['cnt'];
-						$keys['id'] = $keys['xid'];
-					$d.=smart_template(array(ELEMENTS_TPL,'table_parts_'.$v['tpl']),$keys);				
+                        $keys['value'] = $keys['cnt'];
+						if ($v['name']=='Название'){
+                          //  debug($vv);
+                            $keys['text']=pps($vv['p_name']).' '.$keys['text'];
+                        }
+                        $keys['id'] = $keys['xid'];
+                        $d.=smart_template(array(ELEMENTS_TPL,'table_parts_'.$v['tpl']),$keys);
+
 				}
 				$data[$k]['data']=$d;
 			}
@@ -1493,7 +1501,7 @@ class xKatalogue  extends xCommon {
 //		debug($key);	
 		if(!empty($button_val))
 			$key['button_val']=$button_val;
-        debug($key);
+        //debug($key);
 		return $engine->_tpl('tpl_jelements','_catalogue',$key);
         //return smart_template(array(ELEMENTS_TPL,'catalogue'),$key);
 	}

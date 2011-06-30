@@ -332,7 +332,7 @@ class Toyhobby_katalog extends katalog {
  */	
 	function get_headers_from($xx,$subcat,$_item=false,$cat=''){
 		$headers=array(
-			array('name'=>'Артикул','tpl'=>'td_border','var'=>array('text'=>'articul')),
+			//array('name'=>'Артикул','tpl'=>'td_border','var'=>array('text'=>'articul')),
 			array('name'=>'Название','tpl'=>'td_border','var'=>array('text'=>'name')),
 			array('name'=>'Производитель','tpl'=>'td_border','var'=>array('text'=>'manufacturer')),
 			array('name'=>'Корзина','tpl'=>'td_input','var'=>array('disabled','xid','cnt')),

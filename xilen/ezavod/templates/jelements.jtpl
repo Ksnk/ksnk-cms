@@ -22,7 +22,7 @@
 			<tr>
                 {% for pict in row.pict %}
 				<td  style="vertical-align:bottom;padding:0 25px 5px 0;">
-{{callex('tpl','admin','imgpre'}}
+{{callex('MAIN','tpl','admin','imgpre')}}
 				<table><tr><td class="picture_box">
                     <a rel="g{{pict.pid}}" href="{{pict.xhref|default('#')}}" {% if pict.comment %}title="{{pict.comment|e}}"{%endif%}>
                     <img src="{{root}}/{{pict.small_pict}}" {% if pict.comment %}alt="{{pict.comment|e}}" {%endif-%}
@@ -36,7 +36,7 @@
 							<!--begin:pictcom-->
 				<td style="vertical-align:top;padding:0 25px 20px 0;">
 					<p style="text-align: {{gallery.align|default('center')}};">{{comm.comment|e}}</p>
-{{callex('tpl','admin','imgpost'}}
+{{callex('MAIN','tpl','admin','imgpost')}}
 				</td>
                 {% endfor %}
 	 		</tr>		</table>
