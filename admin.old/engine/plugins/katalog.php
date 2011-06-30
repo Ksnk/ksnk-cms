@@ -230,11 +230,6 @@ class basket extends ml_plugin {
 
 	function addItem($id,$numb=1,$par=''){
 		$info=$this->parent->export('katalog','itemInfo',$id);
-        if (!empty($info['parent_id'])){
-            $parentInfo=$this->parent->export('katalog','itemInfo',$info['parent_id']);
-            $itemInfo['p_name']=$parentInfo['name'];
-            $itemInfo['p_descr']=$parentInfo['descr'];
-        }
 
 		if(!empty($par)){
 			ksort($par);
@@ -254,7 +249,12 @@ class basket extends ml_plugin {
 				'pic_big'=>pps($info['pic_big']),
 				'subcat'=>ppi($info['subcat'])
 			);
-			$good['xcost']=	number_format(
+            if (!empty($info['parent_id'])){
+                $parentInfo=$this->parent->export('katalog','itemInfo',$info['parent_id']);
+                $good['p_name']=$parentInfo['name'];
+                $good['p_descr']=$parentInfo['descr'];
+            }
+            $good['xcost']=	number_format(
 				$numb*$good['cost']/100, 2, ',', ''
 			);
 			if(!empty($par))
