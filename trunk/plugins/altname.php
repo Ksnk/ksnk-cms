@@ -102,7 +102,7 @@ class altname extends ml_plugin {
 	 */
 	function getaddr($addr){
 		$sel_sql='select * from '.TAB_PREF.$this->base.' where `altaddr`=?';
-		$res=$this->database->selectRow($sel_sql,$addr);
+		$res=@$this->database->selectRow($sel_sql,$addr);
 		if(empty($res))
 			return null;
 		else {
