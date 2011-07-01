@@ -226,7 +226,9 @@ class xToyhobbyKatalogue extends xKatalogue {
 			}
 			$theaders='';$i=1;
 			
-			$hh=array('Упаковка'=>'edism','Оптическая сила'=>'descr1',
+			$hh=array(
+                'Упаковка'=>'edism',
+                'Оптическая сила'=>'descr1',
 				'Радиус кривизны'=>'descr2',
 				'Диаметр'=>'descr3',
 				'Ось'=>'descr4',
