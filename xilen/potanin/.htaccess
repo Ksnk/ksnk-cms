@@ -20,6 +20,6 @@ ErrorDocument 500 /500.html
 
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{SCRIPT_FILENAME} !/admin
-RewriteRule ^([a-zA-Z_0-9/]+)$ /test/ezavod/index.php?url=$1 [L,QSA]
+RewriteRule ^([a-zA-Z_0-9/]+)$ /index.php?url=$1 [L,QSA]
 
 </ifModule>
