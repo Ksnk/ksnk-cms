@@ -1,6 +1,6 @@
 <?
 
-define('TAB_PREF','ez'); // префикс базы данных
+define('TAB_PREF','ptn'); // префикс базы данных
 
 /*
 $basename="rosin";
@@ -13,7 +13,7 @@ $the_login="dbu_xilen_4";/**/
 
 //*
 
-$basename="db_xilen_11";
+$basename="ksnk";
 $the_host="localhost";
 
 $the_pass="";
