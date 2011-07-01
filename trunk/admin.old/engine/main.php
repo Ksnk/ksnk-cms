@@ -16,8 +16,6 @@ $cache->clean();
 
 define ('IS_ADMIN', true);
 
-include_once('../basefolder.php');
-
 include_once('templater.php');
 include_once('engine.php');
 include_once('syspar.php');
