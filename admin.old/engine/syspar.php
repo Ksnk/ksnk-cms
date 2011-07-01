@@ -138,7 +138,7 @@ class sysPar extends plugins {
 				$node_id
 			);
 		} else {
-			return $this->database->selectRow(
+			return @$this->database->selectRow(
 				'SELECT * FROM '.TAB_PREF.'_tree WHERE level=0 and name=?;',
 				$node_id
 			);
