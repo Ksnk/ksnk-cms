@@ -30,4 +30,3 @@ define('NOCACHE',true);
 include_once('func.php');
 include_once('main.php');
 
-?>

@@ -24,7 +24,7 @@ mkt(true);
 include_once(ROOT_PATH.'/engine/hosts.php');
 
 $connect="mysql://$the_login:$the_pass@$the_host/$the_db";
-$db_setup='set NAMES "cp1251";';
+if(!defined('DB_SETUP')) define ('DB_SETUP','set NAMES "cp1251";');
 if(!defined('TEMPLATE_PATH')){
 	define("TEMPLATE_PATH",ROOT_PATH.DIRECTORY_SEPARATOR.'templates');
 	define('ELEMENTS_TPL','tpl_elements');
@@ -94,14 +94,14 @@ function myLogger($db, $sql)
   }
 }
 function DATABASE(){
-	global $DATABASE,$connect,$db_setup;
+	global $DATABASE,$connect;
 	if(isset($DATABASE)) return $DATABASE;
 	//echox 'test1';//$connect; //mysql://dbu_xilen_7:Ivnsqk0eCru@mysql.xilen.z8.ru
 	$DATABASE = DbSimple_Generic::connect($connect);
 	$DATABASE->setIdentPrefix(TAB_PREF.'_');
 	$DATABASE->setErrorHandler('databaseErrorHandler');
 	$DATABASE->setLogger('myLogger');
-	$DATABASE->select($db_setup);// High  magic!!!!!!!!!!!!!!!!!
+	$DATABASE->select(DB_SETUP);// High  magic!!!!!!!!!!!!!!!!!
 	//echo 'test2';
 	return $DATABASE;
 }
