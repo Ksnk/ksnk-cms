@@ -570,6 +570,22 @@ class engine extends engine_Main
 			return $res;
 	}
 
+    function do_menu($id=0){
+        if((string)$id == 'main'){
+            $res=$this->database->select('select ?_forum_topics.id, ?_forum_topics.topic, max(?_forum.date) as maxdate, count(?_forum.id) as cnt from ?_forum_topics '.
+                    'INNER JOIN ?_forum ON ?_forum_topics.id = ?_forum.topic '.
+                       'GROUP BY topic ORDER BY maxdate DESC LIMIT 6;');
+               foreach($res as $k=>$v) {
+                   $res[$k]['maxdate'] = toRusDate($v['maxdate'], "j.m.Y ã.");
+               }
+               $res_l['line'] = $res;
+            $this->parent->par['anons_forum'] = smart_template(array(FORUM_TPL,'anons'), $res_l);
+        }
+        else
+            $this->parent->par['anons_forum'] = "";
+        return parent::do_menu($id);
+    }
+
     function do_login(){
         $form=new form('login');
         $form->scanHtml($this->_tpl('tpl_jusers','_login',array(
