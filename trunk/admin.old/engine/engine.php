@@ -23,7 +23,22 @@
 	}
 	
 	$EXPORTS = array();
-	
+
+/**
+ * общие параметры
+ */
+class OPTIONS {
+    private static $_par;
+    static function par($name,$val=null){
+        if(is_null($val))
+            if(isset(self::$_par[$name]))
+                return self::$_par[$name];
+            else return null;
+        else
+            self::$_par[$name]=$val;
+    }
+}
+
 /**
  *  Base plugin-manager class
  */

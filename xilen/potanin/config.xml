@@ -32,7 +32,7 @@
 		<file>.htaccess</file>
 		<copy>*.swf</copy>
 		<copy>*.ico</copy>
-		<copy>*.css</copy>
+		<copy>style/*.css</copy>
 		<file>admin/*.php</file>
 		<file>admin/css/*.*</file>
 		<file>admin/engine/*.php</file>
@@ -42,7 +42,7 @@
 		<file>admin/templates/*.*</file>
 		<copy>style/*.*</copy>
 		<file>engine/*.*</file>
-		<copy>img/*.*</copy>
+		<copy>images/*.*</copy>
 		<file>js/*.*</file>
 		<file>templates/*.*</file>
 	</files>

@@ -1056,18 +1056,6 @@ function flash2($par='',$par2='',$par3=''){
 			$article=$element->article;
 			$element->article->serialize($keys);
          //echo(FORUM_TPL);
-         if((string)$id == 'main'){
-         	$res=$this->database->select('select ?_forum_topics.id, ?_forum_topics.topic, max(?_forum.date) as maxdate, count(?_forum.id) as cnt from ?_forum_topics '.
-         			'INNER JOIN ?_forum ON ?_forum_topics.id = ?_forum.topic '.
-						'GROUP BY topic ORDER BY maxdate DESC LIMIT 6;');
-				foreach($res as $k=>$v) {
-					$res[$k]['maxdate'] = toRusDate($v['maxdate'], "j.m.Y ã.");
-				}
-				$res_l['line'] = $res;
-         	$this->parent->par['anons_forum'] = smart_template(array(FORUM_TPL,'anons'), $res_l);
-         }
-         else
-         	$this->parent->par['anons_forum'] = "";
          //$this->parent->par['left_col_w']=1;
          $this->parent->par['right_col_w']=77;
 			$this->parent->par['desc_words']=htmlspecialchars(strip_tags(pps($keys['article_descr_'.$article->v['id']])));
@@ -1336,7 +1324,13 @@ LIMIT 100;';
 				,$this->req_cnt>>1
 				,mkt());
 			echo php2js($result);
-		} else
+		} elseif (OPTIONS::par('jinja2')){
+            //if($this->_tpl==MAIN_TPL)
+                echo $this->_tpl ('tpl_jmain','_main',array_merge($this->par,array('param'=>$this->parent->parameters)));
+           // else
+          //      echo $this->_tpl ('tpl_jmain','_second',array('param'=>$this->parent->par));
+            //else echo '3-th temlate not supported';
+        } else
 			$this->template();
 		unset($_SESSION['errormsg']);
 	}

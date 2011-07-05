@@ -26,4 +26,3 @@ ini_set('include_path',
 include_once('func.php');
 include_once('main.php');
 //echo $_GET['id'];
-?>

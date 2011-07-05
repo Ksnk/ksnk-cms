@@ -1,6 +1,7 @@
 <?php
 if(!defined('INTERNAL')){
-	header('Content-type: text/html; charset=windows-1251');
+    if(!defined('CHARSET')) define('CHARSET','windows-1251');
+	header('Content-type: text/html; charset='.CHARSET);
 }
 
 include_once('templater.php');
@@ -20,7 +21,7 @@ require_once('nestedsets.class.php');
 require_once('sendmail.php');
 
 include_once('project_core.php');
-include_once('db_session.php');
+//include_once('db_session.php');
 
 /*/****** point site_includes */
 include_once 'compiler.class.php';
@@ -775,6 +776,9 @@ class engine extends engine_Main
 	}
 }
 $engine=&new engine('Auth','sitemap','news','altname');
+DATABASE();
+$engine->setPar('charset',CHARSET);
+OPTIONS::par('jinja2',true);
 //echo $engine->tpl;
 $_GLOBALS['engine']=&$engine;
 DO_IT_ALL();
