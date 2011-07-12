@@ -1541,8 +1541,8 @@ class engine extends engine_Main
 			if($v['type']=='button'){$buttons[$v['function']]=$v['plugin'];}
 			$res['list'][$k][$v['type']]=array($res['list'][$k]); 
 			//debug($res);
-			if ($v['type1']=='radio'){$v['type1']='radio';}else{$v['type1']='text';}
-			if ($v['name']==$v['value']) $v['type2']='CHECKED';
+			if (pps($v['type1'])=='radio'){$v['type1']='radio';}else{$v['type1']='text';}
+			if (pps($v['name'])==pps($v['value'])) $v['type2']='CHECKED';
 			if (isset($v['sub']))
 				$res['list'][$k]['subx']=array('sub'=>$v['sub']);
 			
