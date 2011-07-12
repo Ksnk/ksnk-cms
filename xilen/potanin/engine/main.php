@@ -296,38 +296,19 @@ class engine extends engine_Main
 	}
 
 	function menu_1(){
-		$sm=$xx=$this->ffirst('getSiteMap','main');//,'menu002','ulmenu',false
- 		$li='';$i=1;$id=0;
-		$index1=$this->index();
+        // менюшка линейная с картиками вместо названий
+		$sm=$xx=$this->ffirst('getSiteMap','main');
+        $data = array();
 		foreach($sm->el as $k=>$v){
 			if(isset($v->v['skipit'])) continue;
-			$id=$id+1;
-			$num_b='b'.$id;
-			//if($v->v['type']==15) continue;
-			$txt=pps($v->v['descr'],pps($v->v['name'],'root'));
-			$class=(!empty($v->v['current'])?'current':'');
-			if($k==(count($sm->el)-1))
-				$class.=' last';
-			$txt=pps($v->v['descr'],pps($v->v['name'],'root'));	
-			$str1='';
-			$ul='';
-            if($v->v['url']!="qa")
-			foreach($v->el as $vv){ $ul.=$vv->getUlLi(1,true,0);}
-			if(!empty($ul))
-				{
-					$ul='<div style="position:relative; float:none; background:none;"><ul>'.$ul.'</ul></div>';
-				}else{$str1='href="'.$v->getUrl().'"';}
-
-			$li.='<li class="'.pp($class,'','').'"><div><a title="'.htmlspecialchars($txt).'" href="'.$index1.$v->getUrl().'" class="'.$num_b.'"><img alt="'.htmlspecialchars($txt).'" src="'.$index1.'/uploaded/'.translit($txt).'.gif"  onmouseover="show_block(\''.$num_b.'\');" onmouseout="hide_block(\''.$num_b.'\');"></a></div>'.$ul.'</li>';
-			
-				
+			$data[]=$v->v;
 		}
-		return '<ul id="first_menu">'.$li.'</ul>';
-		
+        debug($data);
+		return  $this->_tpl('tpl_jmain','_main_menu',array('menu'=>$data));
 	}
 
 	
-		function menu_2(){
+    function menu_2(){
 		$sm=$xx=$this->ffirst('getSiteMap','main');//,'menu002','ulmenu',false
  		$li='';$i=1;$id=0;
 		foreach($sm->el as $k=>$v){
@@ -480,10 +461,9 @@ class engine extends engine_Main
 	 * Генерация главного окна приложения
 	 */
 	function do_Default(){
-		$this->cur_menu=$this->getPar('first_menu');
+		//$this->cur_menu=$this->getPar('first_menu');
 		//$this->parent->par['anaons_forum'] = "123";
-		return $this->do_menu('main');
-		//return $this->ffirst("news_b"); //"Content какой-то";
+		return $this->do_menu(16);
 	}
 	/**
 	 * Генерация раздела Статьи

@@ -239,7 +239,7 @@ class parser {
 	 * Создание новой операции. 
 	 */	
 	protected function operat($value,$prio=10,$pos=0){
-		$op=$this->oper($value,'TYPE_NONE',pos);
+		$op=$this->oper($value,'TYPE_NONE',$pos);
 		$op->prio=$prio;
 		return $op;
 	}	

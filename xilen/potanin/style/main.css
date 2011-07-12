@@ -8,10 +8,6 @@ html, body {
 }
 
 
-body {
-	background: url(../img/bg1.gif) repeat;
-
-}
 
 * html #container {
    height:100%;
