@@ -1033,8 +1033,9 @@ function flash2($par='',$par2='',$par3=''){
 		static $recursion; if(!isset($recursion))$recursion=0;
 		$x=$this->getPar('first_menu',1);
 		$rsd=pps($id,pps($_GET['id'],$x));
+        //debug($rsd);
 		$this->parent->cur_menu=$rsd;
-		$sm=$this->parent->export('sitemap','getSiteMap');
+		$sm=$this->parent->export('sitemap','getSiteMap',$rsd);
 		// запомним в параметрах 0-й элемент меню.
 	 	if($sm->el[0]->v['id']!=$rsd)
 	 		$this->parent->setPar('first_menu',$sm->el[0]->v['id']);
@@ -1298,10 +1299,12 @@ LIMIT 100;';
 		if($this->is_ajax){
 			ob_start();
 		}
-		if ($act)
+        if ($act)
 			$this->par['data']=$this->export($act,'do_'.$do);
-		elseif ($x=$this->ffirst('do_'.pps($do,'Default')))
-			$this->par['data']=$x;
+		elseif ($x=$this->ffirst('do_'.pps($do,'Default'))){
+ 			$this->par['data']=$x;
+            debug($x);
+        }
 		elseif($x=$this->ffirst('do_error'))
 			$this->par['data']=' '.$x;
 		else
