@@ -303,7 +303,7 @@ class engine extends engine_Main
 			if(isset($v->v['skipit'])) continue;
 			$data[]=$v->v;
 		}
-        debug($data);
+     //   debug($data);
 		return  $this->_tpl('tpl_jmain','_main_menu',array('menu'=>$data));
 	}
 
@@ -461,8 +461,9 @@ class engine extends engine_Main
 	 * Генерация главного окна приложения
 	 */
 	function do_Default(){
-		//$this->cur_menu=$this->getPar('first_menu');
+		$this->cur_menu=$this->getPar('first_menu');
 		//$this->parent->par['anaons_forum'] = "123";
+        debug('default');
 		return $this->do_menu(16);
 	}
 	/**
