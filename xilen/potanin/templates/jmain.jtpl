@@ -1,0 +1,74 @@
+##################################################################
+##
+## линейная менюшка  
+##
+##################################################################
+{% macro main_menu (menu=0,root=0) %}
+    <ul id="menu">
+        {% for l in menu %}
+        {% set url=l.url|default(root~'?do=menu&id='~l.id) %}
+        <li><a href="{{url}}"><img src="{{root}}images/x_{{l.name|translit}}{% if l.current%}_act{% endif%}.png" alt="{{l.name|e}}" /></a></li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
+##################################################################
+##
+##  основной шаблон сайта
+##
+##################################################################
+{% macro main (data=0,user=0,root=0,param=0) %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset={{param.charset|default('utf-8')}}" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+    <base href="{{root}}">
+
+<link href="{{root}}style/style.css" rel="stylesheet" type="text/css" />
+<link href="{{root}}style/layout.css" rel="stylesheet" type="text/css" />
+<!--[if IE]><link href="{{root}}style/ie.css" rel="stylesheet" type="text/css" /><![endif]-->
+<style type="text/css">
+<!--
+#page2 #main-tail #main #content .line-ver .wrapper .col-1 .container .title br {
+	font-size: 9px;
+}
+#page2 #main-tail #main #content .line-ver .wrapper .col-1 .container p {
+	color: #006;
+}
+#page2 #main-tail #main #content .line-ver .wrapper .col-2 .container br {
+	color: #003;
+}
+-->
+</style>
+</head>
+<body id="page2">
+<div id="main-tail">
+  <div id="main">
+
+    <!-- content -->
+    <div id="content">{{data}}
+
+        {{callex('MAIN','menu_1')}}
+{#
+      <ul id="menu">
+        <li><a href="index-1.html"><img src="images/m1-act.png" alt="" /></a></li>
+        <li><a href="index-2.html"><img src="images/m2.png" alt="" /></a></li>
+
+        <li><a href="index-3.html"><img src="images/m3.png" alt="" /></a></li>
+        <li><a href="index-4.html"><img src="images/m4.png" alt="" /></a></li>
+
+        <li><a href="index-5.html"><img src="images/m5.png" alt="" /></a></li>
+      </ul>
+    </div>
+    <!-- footer -->#}
+    <div id="footer">
+        <a href="index.html"><img src="images/logo1.jpg" id="logo" alt="" /></a>
+     <p><span>UK Sors © 2009-210 Юридическая компания &quot;Сорс&quot; (495) 697-57-11, 222-70-18</span> | <a href="flash/index.html">FLASH</a> | Разработка ORIS-IT</p>
+
+    </div>
+  </div>
+</div>
+</body>
+</html>
+{% endmacro %}
