@@ -1313,7 +1313,8 @@ class xPlugin  extends xCommon {
 	}
 	function getText(){
 		global $engine;
-		return $engine->export(pps($this->v['name'],'MAIN'),$this->v['item_text'],pps($this->v['param']));	
+        debug($this->v);
+		return $engine->export(pps($this->v['item_name'],'MAIN'),$this->v['item_text'],pps($this->v['param']));
 	}
 }
 

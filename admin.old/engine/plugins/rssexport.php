@@ -20,20 +20,20 @@ class rssexport extends ml_plugin {
 			$file=$this->parent->getPar('rss_addr');
 			if(!empty($file)){
 				$file=file_get_contents($file);
-				if(preg_match_all('~<item.*?>.*?</item>~is',$file,$m)){
-					$maxnews=ppi($this->parent->getPar('rssfeed_newsnum'),3);
+               if(preg_match_all('~<item.*?>.*?</item>~is',$file,$m)){
+ 					$maxnews=ppi($this->parent->getPar('rssfeed_newsnum'),3);
 					$result=array();
+                    debug($m);
 					for($i=0;$i<$maxnews;$i++){
-						if(preg_match('~<description>(.*?)</description>.*?<pubDate>(.*?)</pubDate>~',$m[0][$i],$mm)){
-							if(detectUTF8($mm[1])){
-								$mm[1]=iconv('utf-8','cp1251//IGNORE',$mm[1]);
-								$mm[2]=iconv('utf-8','cp1251//IGNORE',$mm[2]);
-							}
-						}
-						if(!empty($mm[1]) && !empty($mm[2]))
-							$result[]=array('date'=>$mm[2],'news'=>$mm[1]);
+                        $par=array();
+                        foreach(array('link'=>'link','title'=>'title','date'=>'pubDate','news'=>'description') as $kk=>$vv){
+                            if(preg_match('~<'.$vv.'>(.*?)</'.$vv.'>~ms',$m[0][$i],$mm)){
+                                $par[$kk]=str_replace('<![CDATA[','',str_replace(']]>','',$mm[1]));
+                            }
+                        }
+                        if(!empty($par))
+							$result[]=$par;
 					};
-					
 				};
 			}
 			$this->parent->setPar('rssfeed_lastresult',$result);
@@ -49,6 +49,11 @@ class rssexport extends ml_plugin {
 		return 	'RSS-экспорт';
 	}
 	
+    function show($cnt){
+        debug('111');
+        return 	$this->parent->_tpl('tpl_jmain','_rssexport',array('cnt'=>$cnt,'data'=>$this->get()));
+    }
+
 	function get_parameters($par){
 		$par['list'][]=array('sub'=>'RSS','title'=>'Адрес канала для экспорта','name'=>'rss_addr');
 		$par['list'][]=array('title'=>'Количество новостей','name'=>'rssfeed_newsnum');

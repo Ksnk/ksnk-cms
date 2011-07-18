@@ -755,9 +755,10 @@ onchange="tabLook(this);" onpaste="tabLook(this);"></textarea>
 					<td><img src="img/table.gif" onMouseOver="this.src='img/table_a.gif'" onMouseOut="this.src='img/table.gif'" onMouseDown="this.src='img/table_n.gif'" onMouseUp="this.src='img/table_a.gif'" onClick="add_elm(6)"/></td>
 					<td><img src="img/line.gif" onMouseOver="this.src='img/line_a.gif'" onMouseOut="this.src='img/line.gif'" onMouseDown="this.src='img/line_n.gif'" onMouseUp="this.src='img/line_a.gif'" onClick="add_elm(27)"/></td>
 					<td><img src="img/col.gif" onMouseOver="this.src='img/col_a.gif'" onMouseOut="this.src='img/col.gif'" onMouseDown="this.src='img/col_n.gif'" onMouseUp="this.src='img/col_a.gif'" onClick="add_elm(19)"/></td>
-					<td><img src="img/price.gif" onMouseOver="this.src='img/price_a.gif'" onMouseOut="this.src='img/price.gif'" onMouseDown="this.src='img/price_n.gif'" onMouseUp="this.src='img/price_a.gif'" onClick="add_elm(28)"/></td>
+                    <td><img src="img/price.gif" onMouseOver="this.src='img/price_a.gif'" onMouseOut="this.src='img/price.gif'" onMouseDown="this.src='img/price_n.gif'" onMouseUp="this.src='img/price_a.gif'" onClick="add_elm(17)"/></td>
+<!--					<td><img src="img/price.gif" onMouseOver="this.src='img/price_a.gif'" onMouseOut="this.src='img/price.gif'" onMouseDown="this.src='img/price_n.gif'" onMouseUp="this.src='img/price_a.gif'" onClick="add_elm(28)"/></td>
 					<td><img src="img/csv.gif" onMouseOver="this.src='img/csv_a.gif'" onMouseOut="this.src='img/csv.gif'" onMouseDown="this.src='img/csv_n.gif'" onMouseUp="this.src='img/csv_a.gif'" onClick="add_elm(8)"/></td>
-					<td><img src="img/kom.gif" onMouseOver="this.src='img/kom_a.gif'" onMouseOut="this.src='img/kom.gif'" onMouseDown="this.src='img/kom_n.gif'" onMouseUp="this.src='img/kom_a.gif'" onClick="add_elm(29)"/></td>
+					<td><img src="img/kom.gif" onMouseOver="this.src='img/kom_a.gif'" onMouseOut="this.src='img/kom.gif'" onMouseDown="this.src='img/kom_n.gif'" onMouseUp="this.src='img/kom_a.gif'" onClick="add_elm(29)"/></td> -->
 					<td><img src="img/save_d.gif" onMouseOver="save_over()" onMouseOut="save_out()" onClick="save_act()" onMouseDown="save_doun()" onMouseUp="save_up()" id="save_btn"/></td>
 				</tr>
 			</table>

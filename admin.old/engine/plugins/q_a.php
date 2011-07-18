@@ -327,7 +327,7 @@ class writeus extends ml_plugin {
 			}
 			debug('xxx');
 			if(empty($key['theme'])) 
-				$key['theme']=$_SESSION['theme'];
+				$key['theme']=pps($_SESSION['theme']);
 			$key['date']=date('Y/m/d H:i:s');
 			$this->database->query('INSERT INTO ?_qa (?#) VALUES(?a);',
 	   			array_keys($key),array_values($key)
