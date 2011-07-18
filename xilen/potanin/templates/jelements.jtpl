@@ -82,7 +82,7 @@
 {% if par.item_columns %} {{par.item_columns}}<br>{% else %}Комментарии{% endif %}
 - {{data|length}} ответ{{data|finnumb('','а','ов')}}</a></div>
 <div id="komment_{{par.id}}" class="tahoma size11" style="padding-top:25px;display:none;">
-{% if pages %}{{pages}}{% endif %} 
+{% if pages %}{{pages}}{% endif %}
 <table style="width:75%;margin-top:30px;">
 {% for comment in data %}
 <tr style="color:#9eafc3;">
@@ -113,7 +113,7 @@
 </tr>
 {% endfor %}
 </table>
-{% if pages %}{{pages}}{% endif %} 
+{% if pages %}{{pages}}{% endif %}
 <table style="width:75%;margin-top:42px;">
 <tr>
 <td>
@@ -272,16 +272,16 @@
 <form style="padding:0; margin:0" action="" method="POST" name="callback">
 <style>
 .table td.pad10 {
-    padding-top:10px;
-    padding-bottom:10px;
+    padding-top:5px;
+    padding-bottom:5px;
 }
 .table .input {
 	border:1px solid rgb(127,157,185);
-	width:310px;
+	width:210px;
 
 }
 .table textarea.input {
-	height:100px;
+	height:80px;
 }
 
 .table span.comment {

@@ -15,8 +15,8 @@ $cache = new FileCache(array(
 $cache->clean();
 
 define ('IS_ADMIN', true);
+require_once('templater.php');
 
-include_once('templater.php');
 include_once('engine.php');
 include_once('syspar.php');
 include_once('rights.php');

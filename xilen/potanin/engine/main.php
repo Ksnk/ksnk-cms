@@ -66,6 +66,31 @@ class engine extends engine_Main
 			));
 	}
 
+    function do_menu($id=0){
+        $id=ppi($id,$_GET['id']);
+        switch($id){
+            case 18:
+                $this->par('color','gray');
+                break;
+            case 17:
+            case 62:
+                $this->par('color','dgreen');
+                break;
+            case 16:
+                 $this->par('color','magenta');
+                 break;
+            case 15:
+                 $this->par('color','violet');
+                 break;
+            case 14:
+                $this->par('color','rose');
+                break;
+            default:
+                $this->par('color','green');
+        }
+        return parent::do_menu($id);
+    }
+
     function do_orderlist (){
         $this->sessionstart();
         $this->sessionstart();
@@ -462,9 +487,7 @@ class engine extends engine_Main
 	 */
 	function do_Default(){
 		$this->cur_menu=$this->getPar('first_menu');
-		//$this->parent->par['anaons_forum'] = "123";
-        debug('default');
-		return $this->do_menu(16);
+		return $this->do_menu(4);
 	}
 	/**
 	 * Генерация раздела Статьи

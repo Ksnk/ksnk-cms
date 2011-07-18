@@ -17,6 +17,8 @@ function pps(&$x,$default=''){if(empty($x))return $default; else return $x;}
 }
 
 class template_compiler {
+
+    static $filename='';
 	
 	static function do_prepare(){
 		static $done;
@@ -44,7 +46,7 @@ class template_compiler {
 			$result=$calc->tplcalc($name);
 		} catch(Exception $e){
 			echo $e->getMessage();
-			echo '<pre>';print_r($calc);echo'</pre>';
+			echo '<pre> filename:'.self::$filename.'<br>';print_r($calc);echo'</pre>';
 			return null;
 		}
 		//execute it
@@ -76,7 +78,7 @@ class template_compiler {
 						require_once 'template_parser.class.php' ;
 						require_once 'compiler.php.php' ;
 					}
-					
+					self::$filename=$v;
 					$x=self::compile_tpl(file_get_contents($v),$name);
 					if(!!$x)
 						file_put_contents(TEMPLATE_PATH.DIRECTORY_SEPARATOR.$phpn.'.php'

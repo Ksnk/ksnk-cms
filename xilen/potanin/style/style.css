@@ -3,9 +3,13 @@
 	padding: 0;
 }
 .wrapper {
-	width: 100%;
-	overflow: hidden;
+    color: #000000;
+    height: 346px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    width: 750px;
 }
+.hidden { display:none;}
 .clear {
 	clear: both;
 	font-size: 0%;
@@ -22,7 +26,7 @@ img {
 	text-align: left;
 	font-size: 14px;
 }
-ul, ol {
+ul {
 	list-style: none;
 }
 object {
@@ -41,42 +45,7 @@ body {
 	line-height: 1em;
 	color: #ffffff;
 }
-#page1 #main-tail {
-	background: #94afa2 url(/images/body-tail.gif) repeat-x 0% 0%;
-	width: 980px;
-	margin: 0 auto;
-	color: #FFF;
-}
-#page2 #main-tail {
-	background: #7c9a9d url(/images/body-tail1.gif) repeat-x 0% 0%;
-	width: 980px;
-	margin: 0 auto;
-}
-#page3 #main-tail {
-	background: #9d7f7c url(/images/body-tail2.gif) repeat-x 0% 0%;
-	width: 980px;
-	margin: 0 auto;
-}
-#page4 #main-tail {
-	background: #8c7c9d url(/images/body-tail3.gif) repeat-x 0% 0%;
-	width: 980px;
-	margin: 0 auto;
-}
-#page5 #main-tail {
-	background: #8c9d7c url(/images/body-tail4.gif) repeat-x 0% 0%;
-	width: 980px;
-	margin: 0 auto;
-}
-#page6 #main-tail {
-	background: #8c8c8c url(/images/body-tail5.gif) repeat-x 0% 0%;
-	width: 980px;
-	margin: 0 auto;
-}
-#page7 #main-tail {
-	background: #7c9a9d url(/images/body-tail6.gif) repeat-x 0% 0%;
-	width: 980px;
-	margin: 0 auto;
-}
+
 h2 {
 	padding: 0 0 7px 2px;
 	word-spacing: 1px;
@@ -111,28 +80,9 @@ img.fleft {
 	width: 980px;
 	margin: 0 auto;
 	font-size: 0.75em;
+    position: relative;
 }
-#page1 #main {
-	background: url(/images/main-bg.jpg) no-repeat 0% 297px;
-}
-#page2 #main {
-	background: url(/images/main-bg1.jpg) no-repeat 0% 547px;
-}
-#page3 #main {
-	background: url(/images/main-bg2.jpg) no-repeat 0% 547px;
-}
-#page4 #main {
-	background: url(/images/main-bg3.jpg) no-repeat 0% 547px;
-}
-#page5 #main {
-	background: url(/images/main-bg4.jpg) no-repeat 0% 547px;
-}
-#page6 #main {
-	background: url(/images/main-bg5.jpg) no-repeat 0% 547px;
-}
-#page7 #main {
-	background: url(/images/main-bg6.jpg) no-repeat 0% 547px;
-}
+
 #page1 #content {
 	background: none;
 }
@@ -142,11 +92,17 @@ img.fleft {
 	height: 346px;
 	padding: 89px 94px 320px 108px;
 }
-#content p {
-	padding: 0 0 21px 1px;
-	line-height: 1.333em;
+#content p, #content ul {
+	padding: 0 0 5px 1px;
+	line-height: 1.222em;
 	color: #000000;
-	font-size: 14px;
+	font-size: 12px;
+}
+#content ul{
+    list-style: disc;
+}
+#content ol, #content ul{
+    margin-left: 30px;
 }
 #content p em {
 	float: right;
@@ -165,7 +121,7 @@ img.fleft {
 	z-index: 2;
 }
 #menu {
-	width: 857px;
+	width: 957px;
 	overflow: hidden;
 }
 #menu li {
@@ -359,11 +315,9 @@ img.fleft {
 }
 #footer p {
     font-size: 1em;
-    border-top: 1px solid #88a3a6;
     margin: 39px auto 0 auto;
     text-align:center;
 	padding: 12px 0 0 0;
-	color: #f8f8f8;
 }
 #footer p span {
 	margin: 0 3px 0 0;

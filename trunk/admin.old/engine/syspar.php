@@ -1303,7 +1303,7 @@ LIMIT 100;';
 			$this->par['data']=$this->export($act,'do_'.$do);
 		elseif ($x=$this->ffirst('do_'.pps($do,'Default'))){
  			$this->par['data']=$x;
-            debug($x);
+   //         debug($x);
         }
 		elseif($x=$this->ffirst('do_error'))
 			$this->par['data']=' '.$x;
