@@ -1045,7 +1045,8 @@ function flash2($par='',$par2='',$par3=''){
 	 	$keys=array();
 	 	
 	 	if (defined('SECOND_TPL') && ($this->tpl==MAIN_TPL) &&
-			($this->cur_menu!="main")){
+			($this->cur_menu!="main") && ($this->cur_menu!=4)){
+                //debug($this->cur_menu);
 				$this->tpl=SECOND_TPL;
 			}
 	 	if(!empty($element)){
@@ -1328,10 +1329,11 @@ LIMIT 100;';
 				,mkt());
 			echo php2js($result);
 		} elseif (OPTIONS::par('jinja2')){
-            //if($this->_tpl==MAIN_TPL)
+            debug('tpl',$this->tpl,MAIN_TPL);
+            if($this->tpl==MAIN_TPL)
                 echo $this->_tpl ('tpl_jmain','_main',array_merge($this->par,array('param'=>$this->parent->parameters)));
-           // else
-          //      echo $this->_tpl ('tpl_jmain','_second',array('param'=>$this->parent->par));
+            else
+                echo $this->_tpl ('tpl_jmain','_second',array('param'=>$this->parent->par));
             //else echo '3-th temlate not supported';
         } else
 			$this->template();
