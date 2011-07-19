@@ -646,6 +646,7 @@ order by `id` LIMIT 50;';
  */
 		static $x=array(); if(isset($x[$tpl])) return $x[$tpl] ;
 		$sm='';
+            debug('news');
 		ml_plugin::setupmenu();
 		if($tpl=='') $tpl='newslist';
 		$cnt=0;
@@ -699,8 +700,12 @@ order by `id` LIMIT 50;';
 	//*--*/echo '<!-- ';print_r($pages);print_r(debug_backtrace());echo ' -->';
 	//debug($pages);
 	//debug($news);
+   // debug($news2);
 	//debug(array(NEWS_TPL,''.$tpl));
-		return $x[$tpl]=smart_template(array(NEWS_TPL,''.$tpl),array('news'=>$news,'news2'=>$news2,'pages'=>$pages,'years'=>$years));
+        if (OPTIONS::par('jinja2'))
+            return $x[$tpl]=$this->parent->_tpl('tpl_news','_'.$tpl,array('news'=>$news,'news2'=>$news2,'pages'=>$pages,'years'=>$years));
+        else
+		    return $x[$tpl]=smart_template(array(NEWS_TPL,''.$tpl),array('news'=>$news,'news2'=>$news2,'pages'=>$pages,'years'=>$years));
 	}
 
 	function getData(&$v,$tpl){

@@ -111,17 +111,6 @@ class engine extends engine_Main
         }
     }
 
-    /**
-     * подмена гостевой на форум
-     */
-    function do_qa(){
-        if (defined('SECOND_TPL')){
-            $this->tpl=SECOND_TPL;
-        }
-        return $this->export('forum','do_forum');
-    }
-
-
 	function do_ch(){
 		$this->handle('katalog');	
 		if(!empty($_POST))
@@ -409,15 +398,6 @@ class engine extends engine_Main
 		return smart_template(array(ELEMENTS_TPL,'shortspec'),array());
 	}
 
-	function handle($h){
-//		debug(1111); debug('2222'. $h);
-		if($h=="katalog"){
-			$this->tpl='tpl_second';
-			$this->menu['spec']=array('MAIN','_short');
-			unset($this->menu['right']);
-		}
-	}
-
 	function _first(){
 		static $x;
 		if(isset($x))return $x;
@@ -448,45 +428,12 @@ class engine extends engine_Main
 			return $x='<div style="padding-top:35px;"></div>';
 	}
 	
-	function zagl(){
-		static $x;
-		global $forum_zagl;
-		//echo $this->qwerty;
-		if(isset($x))return $x;
-		if ($this->cur_menu == 'main')
-			return '';
-		if ($this->cur_menu!=$this->getPar('first_menu')){
-			// подкаткегория...
-			$x=$this->ffirst('_getCurList');
-			array_shift($x);
-			$y=array_shift($x);
-			if($x[0]['name']=='catalogue')
-				array_shift($x);
-		   if(!isset($this->nopoplast))
-				$y=array_pop($x);
-			else
-				$y=array('name'=>$this->nopoplast);
-			if (empty($x)) $x='';
-            else {
-                foreach($x as $k=>$v){
-
-                }
-            }
-			//var_dump(debug_backtrace());
-			
-			//Замена заголовка для темы форума
-			if(!empty($this->dop_zagl))
-				$y['name'] = $this->dop_zagl;
-			return $x=smart_template(array(ELEMENTS_TPL,'nfirst2'),
-				array('sub'=>$y['name'],'list'=>$x));
-		} else
-			return $x='<div style="padding-top:35px;"></div>';
-	}
 	/**
 	 * Генерация главного окна приложения
 	 */
 	function do_Default(){
 		$this->cur_menu=$this->getPar('first_menu');
+        //$this->tpl=SECOND_TPL;
 		return $this->do_menu(4);
 	}
 	/**
@@ -510,70 +457,6 @@ class engine extends engine_Main
 		return smart_template(array(ELEMENTS_TPL,'ermess'),' ');
 	}
 
-    /**
-     * @param  $tpl
-     * @return mixed|string|void
-     */
-	function get_basketData(){
-
-			$res=$this->user;
-
-			foreach($this->parameters as $k=>$v){
-				if (preg_match('/^spec_/',$k)){
-					$res[$k]=trim($this->parameters[$k]);
-				}
-			}
-
-			$pages=array();
-			$data=array();
-			$par=array('pages'=>&$pages,
-				'data'=>&$data);
-			$res['ordernum']=$this->getPar('ordernum');
-			$res['Date']=date('d. m. Y');
-			$res['Time']=date("H:i:s");
-			$res['user']=$this->user['name'];
-
-			$i=1;
-			$summ=0;
-			$inum=0;
-			$bdata=$this->export('basket','basket_data');
-			$res['llist']=array();
-            $_SERVER['REQUEST_METHOD']='';
-
-			foreach($bdata as $bas=>$v){
-				$this->parent->export('katalog','get_category',$bas,$par);
-				if(!empty($data))
-                    $basket=basket::getStore()->get();
-				foreach($data as $k=>$v){
-					if (!empty($basket[ppi($v['xid'])])){
-						$data[$k]['numb']=$i++;
-						$data[$k]['cnumb']=$basket[pps($v['xid'])]['n'];
-						$inum+=$data[$k]['cnumb'];
-						$ccost=$basket[pps($v['xid'])]['cost']/100;
-						$data[$k]['ccost']=number_format($ccost, 2, ',', '');
-						$data[$k]['cccost']=number_format($ccost*$data[$k]['cnumb'], 2, ',', '');
-						$summ+=$ccost*$data[$k]['cnumb'];
-					/*
-						$data[$k]['numb']=$i++;
-						$data[$k]['cnumb']=$_SESSION['basket'][ppi($v['id'])]['n'];
-						$inum+=$data[$k]['cnumb'];
-						$data[$k]['ccost']=$_SESSION['basket'][ppi($v['id'])]['cost']/100;
-						$data[$k]['cccost']=$data[$k]['ccost']*$data[$k]['cnumb'];
-						$summ+=$data[$k]['cccost'];
-**/
-						$res['llist'][]=$data[$k];
-					}
-				}
-			}
-			$bas=$this->export('basket','recalc');
-			$res['summ']=number_format($summ, 2, ',', '');
-			$res['nds']=number_format(round($bas['cost']*18)/100, 2, ',', '');
-			$prop = &new prop();
-			$res['inumb']=$bas['pos'].' '.$bas['tovar'];
-			$res['summprop']=$prop->num2str($summ,prop::prep("рубл|ь|я|ей","+копе|йка|йки|ек"));
-			debug($res);
-			return $res;
-	}
 
     function do_login(){
         $form=new form('login');
@@ -585,200 +468,7 @@ class engine extends engine_Main
         return $form->getHtml(' ');
     }
 
-	/**
-	 * Оформление договоров по корзине.
-     * В зависимости от выбора способа оплаты, выбираем поля для вывода в форме
-	 */
-    /**
-     * Оформление договоров по корзине.
-     * В зависимости от выбора способа оплаты, выбираем поля для вывода в форме
-     */
-    function do_ordersave(){
-        $this->step=1;
-        return $this->do_order();
-    }
-    
-    function do_orderdisplay(){
-        $this->sessionstart();
-        $this->tpl=array(ELEMENTS_TPL,'ajax');
-        return $this->export('order_history','order_print',$_SESSION['order_id']) ;
-    }
-    
-    function do_order(){
-        $this->sessionstart();
-      /*  if(!isset($_SESSION['USER_ID'])){
-            return $this->do_login();
-        } */
-       if (defined('SECOND_TPL')){
-            $this->tpl=SECOND_TPL;
-        }
-        /**
-         * выставляем заголовок оформлялки.
-         * Только для случая, если оно не включено в меню сайта
-         */
-        ml_plugin::setupmenu('Оформление заказа');
-
-        /**
-         * tpl_printbody - простой шаблон вывода списка товаров в виде таблицы
-         */
-
-        $tpl='tpl_printbody';
-        $basketdata=$this->get_basketData();
-        /**
-         *  список полей для заполнения, в зависимости от способа выбора формы оплаты
-         */
-        $x=array(
-            'Форма оплаты'=>array("cust_order","radio",//"Безналичный расчет (для юр. лиц)|Оплата квитанцией Сбербанка|Наличный расчет (в офисе компании)",
-                      "Безналичный расчет (для юр. лиц)|" //1
-                      ."Оплата квитанцией Сбербанка|"    //2
-                      ."Наличный расчет (в офисе компании)", //3
-               'onchange'=>'submitform(this);',
-               'default'=>ppi($this->parent->user['cust_order'],2)
-            ),
-            "Ф.И.О."=>array('cust_FIO','require'=>true),
-            "адрес"=>array('address','require'=>true,"rule"=>'r2 r3'),
-            "телефон"=>array('cust_PHONE','require'=>true),
-            "E-mail"=>array('cust_EMAIL','validate'=>'email','require'=>true),
-
-            array("Информация для выставления счета",'text',"rule"=>'r1','noprint'=>true),
-            "Название организации"=>array('cust_ORGANISATION','require'=>true,"rule"=>'r1'),
-            "Юридический адрес"=>array('cust_ADDRESS','require'=>true,"rule"=>'r1'),
-            array("Счет","text","rule"=>'r1'),
-            "ИНН"=>array("cust_BANK_INN",'require'=>true,"rule"=>'r1'),
-            "КПП"=>array("cust_BANK_KPP",'require'=>true,"rule"=>'r1'),
-            array("Расчётный счёт","text","rule"=>'r1'),
-            "Название банка"=>array("cust_BANK",'require'=>true,"rule"=>'r1'),
-            "ИНН банка"=>array("cust_BANK_INN",'require'=>true,"rule"=>'r1'),
-            "КПП банка"=>array("cust_BANK_KPP",'require'=>true,"rule"=>'r1'),
-            "БИК банка"=>array('cust_BANK_BIK','require'=>true,"rule"=>'r1'),
-            "№ счета"=>array('cust_BANK_OKG','require'=>true,"rule"=>'r1'),
-            "№ Корр. счета"=>array('cust_BANK_OKG','require'=>true,"rule"=>'r1'),
-            "Ваш заказ",
-            array($this->export('order_history','order_print',$basketdata,'web'),'scrolltext'),
-        );
-// варианты оформления счета
-
-        if ($this->step==1){
-            $err=$this->error();
-            basket::getStore()->clear();
-            return '<div class="link" style="padding-top:30px;">
-                '.pp($err,'<div class="red">','</div>'
-                    ,'Ваш заказ отправлен на указанный Вами e-mail. <br>').
-                '<a class="blue tahoma" href="'.$this->curl('do','step').'do=orderdisplay" target="order">
-                Печатать квитанцию</a></div>';
-        }
-
-        if(!isset($_SESSION['USER_ID'])){
-            $x=array_merge(array(
-                 "Логин"=>array('newlogin','require'=>true),
-                 "Пароль"=>array('newpassword','password','require'=>true),
-                 "Подтверждение пароля"=>array('newpassword0','password'
-                 ,'validate'=>'if($var["newpassword"]!=$var["newpassword0"]) return "Не совпадают пароли<br>";'
-                 ,'require'=>true),
-
-                           )
-                ,$x);
-        }
-        // проверка входа в систему по первым полям
-        if(isset($_POST['newlogin']) && isset($_POST['newpassword'])){
-            if( $this->export('Auth','auth_check',$_POST['newlogin'],$_POST['newpassword']) ){
-                $this->go($this->curl());
-            }
-        }
-//debug($x);
-        $form=$this->parent->export('MAIN','SimpleForm',$x,array('ruller'=>'cust_order'));
-        if(!is_string($form)) {
-            $key=array();
-            if(!isset($_SESSION['USER_ID'])){
-                $_SESSION['USER_ID']=$this->parent->writeRecord(array('record'=>'user'
-                    ,'name'=>$form->var['newlogin']
-                    ,'password'=>$form->var['newpassword']
-                    ,'right'=>array('*'=>(right_READ))));
-                $this->parent->user=$this->readRecord(array('id'=>$_SESSION['USER_ID']));
-            }
-            //изменяем для зарегистрированного юзера
-            if(isset($_SESSION['USER_ID'])){
-                //debug($this->user);
-                $user_fields=$this->export('users')->fields;
-                $changed=false;
-                foreach($form->var as $k=>$v){
-                    if (isset($user_fields[$k]) && pps($this->user[$k])!=$v){
-                        $this->user[$k]=$form->var[$k];
-                        $changed=true;
-                    }
-                }
-                // сохранить юзера
-                if($changed){
-                    $this->writeRecord($this->user);
-                }
-            }
-            foreach($x as $v){
-                $key[$v[0]]=$form->var[$v[0]];
-            }
-
-            $_SESSION['zakaz']=smart_template(array('tpl_admin','mail_callback'),array('list'=>$this->SimpleFormPrint($x)));//$this->createTpl($tpl,$key);
-
-            $_SESSION['orderprint']=
-                    $this->_tpl('tpl_jorders','_print'.ppi($form->var['cust_order'],1),array('order'=>array_merge($this->user,$form->var),2));
-            //оформление заказа и пресылка по почте
-            //
-            $to=pps($this->getPar('mail_admin'),'art@xilen.ru');
-            $subj='Заказ с сайта "'.$_SERVER['SERVER_NAME'].'"';
-            $from=pps($key['cust_EMAIL']);
-            $headers=html_mime_mail::mail_header('From: ',$from,$fio).
-                html_mime_mail::mail_header('Cc: ',$from,$fio);
-            $cto=pps($this->getPar('mail_admin2'));
-            if(!empty($cto)){
-                $headers.=html_mime_mail::mail_header('Cc: ',$cto);
-            };
-
-            $_SESSION['order_id']=$this->parent->export('order_history','save',array_merge($key,$basketdata));//);
-            //$fio=pps($key['cust_FIO']);
-            $mail=new html_mime_mail(
-                $headers.
-                pp($to,'Reply-To: ',"\r\n").
-                   'X-Mailer: PHP/' . trim(phpversion())."\r\n"
-            );
-            $mail->add_html('Вами был сделан заказ на сайте '.$_SERVER['SERVER_NAME']
-                ."\n<hr>"	);
-            //$mail->add_html($_SESSION['zakaz']);
-            if($_GET['id']=='kvit')
-                $mail->add_new_html('Квитанция.html',$this->export('order_history','print_order',$_SESSION['order_id']));
-            $mail->add_html($_SESSION['zakaz']);
-                $mail->build_message('win');
-            if($mail->send(  $to, $subj)){
-                $msg="";
-            }
-            else {
-                $this->error("К сожалению не удалось отослать Ваше письмо.");
-            }
-            $this->parent->go($this->parent->curl('do').'do=ordersave');
-        }
-
-        return $form.
-'<script type="text/javascript">$(function(){
-         $("form[name=callback] input:checked").trigger("change");
-})</script>';
-    }
-	
-	function do_add(){
-		$this->sessionstart();
-		foreach($_POST as $k=>$v){
-			$_POST[$k]=iconv('utf-8','cp1251//IGNORE',$_POST[$k]);
-		}
-		$par=$_POST;
-		$cnt=ppi($_POST['item'],1);
-		unset($par['item'],$par['id']);
-		$this->export('basket','addItem',pps($_POST['id']),$cnt,$par);
-
-		if($this->is_ajax){
-			$this->parent->ajaxdata['basket']=$this->export('basket','_basket');
-			return 'Ok';		
-		} else { // Это не ajax
-			$this->go(pps($_SERVER['HTTP_REFERER'],toUrl(INDEX_PATH)));
-		}
-	}
-}
+ }
 $engine=&new engine('Auth','sitemap','news','altname');
 DATABASE();
 $engine->setPar('charset',CHARSET);

@@ -28,7 +28,7 @@
 ##  основной шаблон сайта
 ##
 ##################################################################
-{% macro main (data=0,user=0,root=0,param=0,color=0) %}
+{% macro second (data=0,user=0,root=0,param=0,color=0) %}
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
@@ -170,4 +170,78 @@
 </div>
 </body>
 </html>
+{% endmacro %}
+
+##################################################################
+##
+##  основной шаблон сайта
+##
+##################################################################
+{% macro main (data=0,user=0,root=0,param=0,color=0) %}
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+<title></title>
+<meta http-equiv="Content-Type" content="text/html; charset={{param.charset|default('utf-8')}}" />
+<meta http-equiv="Content-Style-Type" content="text/css" />
+    <base href="{{root}}">
+
+<link href="{{root}}style/style.css" rel="stylesheet" type="text/css" />
+<link href="{{root}}style/layout.css" rel="stylesheet" type="text/css" />
+<!--[if IE]><link href="{{root}}style/ie.css" rel="stylesheet" type="text/css" /><![endif]-->
+<style type="text/css">
+<!--
+#page2 #main-tail #main #content .line-ver .wrapper .col-1 .container .title br {
+	font-size: 9px;
+}
+#page2 #main-tail #main #content .line-ver .wrapper .col-1 .container p {
+	color: #006;
+}
+#page2 #main-tail #main #content .line-ver .wrapper .col-2 .container br {
+	color: #003;
+}
+
+{%- if color=='green'%}
+#page2 #main {
+	background: url(/images/main-bg.jpg) no-repeat 0% 297px;
+}
+#footer p {
+    border-top: 1px solid #A1BCAF;
+	color: #f8f8f8;
+}
+#page2 #main-tail {
+	background: #94AFA2 url(/images/body-tail.gif) repeat-x 0% 0%;
+	width: 980px;
+	margin: 0 auto;
+}
+#content {
+    padding: 89px 94px 260px 108px;
+}
+#page2 #menu {
+	top: 245px;
+}
+#page2 #content {
+    background: none repeat scroll 0 0 transparent;
+}
+{% endif -%}
+-->
+</style>
+</head>
+<body id="page2">
+<div id="main-tail">
+  <div id="main">
+    <!-- content -->
+    <div id="content">
+
+      {{callex('MAIN','menu_1')}}
+      <a href="index.html"><img src="images/logo.jpg" id="logo" alt="" /></a> </div>
+
+    <!-- footer -->
+    <div id="footer">
+        <p><span>LC Sors ltd. © 2008-2011 Юридическая компания &quot;Сорс&quot; (495) 697-57-11, 222-70-18</span> | <a href="flash/index.html">FLASH</a></p>
+    </div>
+
+  </div>
+</div>
+</body>
 {% endmacro %}
