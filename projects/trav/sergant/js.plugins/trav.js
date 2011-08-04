@@ -52,14 +52,38 @@ function plugin_FarmFactory(engine){
 	});
 }
 
+function plugin_SoundAlarm(engine){
+    var self= { name: 'soundAlarm'
+        ,init:function(engine){
+			this.engine=engine;
+		}
+        ,clear: function(){
+            if (self.mpdiv){
+                document.body.removeChild(self.mpdiv);
+                self.mpdiv=null;
+            }
+        }
+        ,start_alarm : function(snd){
+            self.clear();
+            if (!self.mpdiv){
+                var mpdiv=document.createElement('div');
+                if (!snd) snd='http://fck.me/trav/ELPHRG01.WAV';
+                mpdiv.innerHTML="<embed id='snd' src='"+snd+"' autostart=true height=42 loop=false controller=true hidden=true></embed>";
+                self.mpdiv=document.body.appendChild(mpdiv);
+            }
+        }
+    };
+    return self;
+}
+
 /**
  * main function
  */
 function main() {
 	engine.init();
 	engine.plugin([
-	    plugin_FarmingMachine
-	//    ,plugin_SoundAlarm
+	//    plugin_FarmingMachine
+	    ,plugin_SoundAlarm
 	    ,plugin_MainMenu
 	]);
 	engine.log(9,'main- finish ');

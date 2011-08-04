@@ -4,7 +4,7 @@
 <!-- ****   сборка файла                                            *** -->
 <!-- ****************************************************************** -->
 	<files dstdir="$dst" dir='sergant'>
-		<file>*.js</file>
+		<file force="1">browser_automation.user.js</file>
 	</files>
 
 </config>
