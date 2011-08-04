@@ -65,7 +65,7 @@ class preprocessor{
 	 */	
     public function newpair($src,$dst='',$act='eval',$par=''){
         if(empty($par))$par=array();
-        print_r($par);
+        //print_r($par);
         $this->store[]=array($src,$dst,$act,$par);
     }
 
@@ -184,19 +184,23 @@ class preprocessor{
                 foreach ($files->children() as $file){
 					$dst=$this->path(array((string)$file['dstdir'],(string)$files['dstdir']));
 					if(!empty($dst)) $dst=$this->path($dst,dirname((string)$file));
+                    $attributes=array();
+                    foreach($file->attributes() as $k=>$v){
+                        $attributes[$k]=(string)$v;
+                    }
 					if ($file->getName()=='echo'){
                         $this->newpair(
 							(string)$file,
 							!empty($dst)?$this->path($dst,(string)$file['name']):'',
 							$file->getName()
-                            ,$file->attributes());
+                            ,$attributes);
 					} else
 					foreach(glob($this->path(array((string)$file['dir'],(string)$files['dir']),(string)$file)) as $a){
 						$this->newpair(
 							realpath ($a),
 							!empty($dst)?$this->path($dst,array((string)$file['name'],basename($a))):'',
 							$file->getName()
-                            ,$file->attributes());
+                            ,$attributes);
 					}
 				}
 			}
@@ -309,19 +313,18 @@ class preprocessor{
                     $filemtime=0;
                     if(is_file($srcfile))
                         $filemtime=filemtime ($srcfile);
-                   // echo "111";print_r($___m[3]);
                     if(!empty($___m[3]))
                         if(!empty($___m[3]['force']))
-                            $filemtime=0;
-					$___s=$this->prep_file($srcfile,$___m[2]!='echo');
+                            $filemtime=time();
+                    $___s=$this->prep_file($srcfile,$___m[2]!='echo');
 					if ($___m[2]=='echo')
 						$srcfile='';
 					if(!is_null($___s)){
 						eval($___s);
 						if (empty($dstfile)){
 							$this->cfg_time($filemtime);
-						} 
-						if($this->post_process($dstfile,$filemtime)){
+						}
+                        if($this->post_process($dstfile,$filemtime)){
 							echo "e>$srcfile-->$dstfile";
 							$___total_cnt++;
 						}
