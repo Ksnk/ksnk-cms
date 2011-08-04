@@ -63,10 +63,12 @@ class preprocessor{
 	 * @param $dst - to 
 	 * @param $act - what to do (eval||copy)
 	 */	
-	public function newpair($src,$dst='',$act='eval'){
-		$this->store[]=array($src,$dst,$act);
-	}
-	
+    public function newpair($src,$dst='',$act='eval',$par=''){
+        if(empty($par))$par=array();
+        print_r($par);
+        $this->store[]=array($src,$dst,$act,$par);
+    }
+
 	/**
 	 * store getter
 	 */
@@ -179,20 +181,22 @@ class preprocessor{
 				call_user_func_array(array($this,$name),array(&$files));
 			} else
 			if ($files->getName()=='files'){
-				foreach ($files->children() as $file){
+                foreach ($files->children() as $file){
 					$dst=$this->path(array((string)$file['dstdir'],(string)$files['dstdir']));
 					if(!empty($dst)) $dst=$this->path($dst,dirname((string)$file));
 					if ($file->getName()=='echo'){
-						$this->newpair(
+                        $this->newpair(
 							(string)$file,
 							!empty($dst)?$this->path($dst,(string)$file['name']):'',
-							$file->getName());
+							$file->getName()
+                            ,$file->attributes());
 					} else
 					foreach(glob($this->path(array((string)$file['dir'],(string)$files['dir']),(string)$file)) as $a){
 						$this->newpair(
 							realpath ($a),
 							!empty($dst)?$this->path($dst,array((string)$file['name'],basename($a))):'',
-							$file->getName());
+							$file->getName()
+                            ,$file->attributes());
 					}
 				}
 			}
@@ -302,7 +306,13 @@ class preprocessor{
 				case 'eval':
 				case 'file':
 				case 'echo':
-					$filemtime=is_file($srcfile)?filemtime ($srcfile):0;
+                    $filemtime=0;
+                    if(is_file($srcfile))
+                        $filemtime=filemtime ($srcfile);
+                   // echo "111";print_r($___m[3]);
+                    if(!empty($___m[3]))
+                        if(!empty($___m[3]['force']))
+                            $filemtime=0;
 					$___s=$this->prep_file($srcfile,$___m[2]!='echo');
 					if ($___m[2]=='echo')
 						$srcfile='';
