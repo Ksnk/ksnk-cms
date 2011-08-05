@@ -1,4 +1,7 @@
 <%
+$version="1.0";
+$server="http://fck.me/trav";
+
 define("SERGANT","sergant/js.plugins/");
 include SERGANT."header.txt" ;
 %>

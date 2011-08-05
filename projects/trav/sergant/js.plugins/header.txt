@@ -2,11 +2,13 @@
 // @name 		Browser automation
 // @author		ksnk
 // @namespace 	Automaition
-// @version 	${version}
+// @version 	<?=$version?>
+
 // @description	Just automate some actions
-// @source 		http://fck.me/trav
-// @identifier 	http://fck.me/trav/trav.user.js
-// @include 	http://fck.me/trav/*.*
+// @source      http://<?=$server?>
+
+// @identifier 	http://<?=$server?>/trav.user.js
+// @include 	http://<?=$server?>/*.*
 // @include 	http://*.travian.*/*
 // @exclude 	*.css
 // @exclude 	manual.php

@@ -6,7 +6,7 @@ var
 	logLevel = 10,
 	server = location.hostname,
 	rootPath = "http://" + server + "/",
-	suffixLocal, suffixGlobal,
+//	suffixLocal, suffixGlobal,
 	last_but_notleast=0;
 
 function FM_log(level, text) {
@@ -52,24 +52,30 @@ function plugin_FarmFactory(engine){
 	});
 }
 
-function plugin_SoundAlarm(engine){
-    var self= { name: 'soundAlarm'
-        ,init:function(engine){
-			this.engine=engine;
-		}
-        ,clear: function(){
-            if (self.mpdiv){
+function plugin_SoundAlarm(engine) {
+    var self = { name: 'soundAlarm'
+        ,init:function(engine) {
+            this.engine = engine;
+        }
+        ,evt_page_loaded:function(par) {
+            engine.trigger('addMenu', {line:'Sound',
+                self:self,
+                handler:self.start_alarm
+            });
+        }
+        ,clear: function() {
+            if (self.mpdiv) {
                 document.body.removeChild(self.mpdiv);
-                self.mpdiv=null;
+                self.mpdiv = false;
             }
         }
-        ,start_alarm : function(snd){
+        ,start_alarm : function(snd) {
             self.clear();
-            if (!self.mpdiv){
-                var mpdiv=document.createElement('div');
-                if (!snd) snd='http://fck.me/trav/ELPHRG01.WAV';
-                mpdiv.innerHTML="<embed id='snd' src='"+snd+"' autostart=true height=42 loop=false controller=true hidden=true></embed>";
-                self.mpdiv=document.body.appendChild(mpdiv);
+            if (!self.mpdiv) {
+                var mpdiv = document.createElement('div');
+                if (!snd) snd = 'http://ksnk.dpb.ru/ELPHRG01.WAV';
+                mpdiv.innerHTML = "<embed id='snd' src='" + snd + "' autostart=true height=42 loop=false controller=true hidden=true></embed>";
+                self.mpdiv = document.body.appendChild(mpdiv);
             }
         }
     };
@@ -82,13 +88,13 @@ function plugin_SoundAlarm(engine){
 function main() {
 	engine.init();
 	engine.plugin([
-	//    plugin_FarmingMachine
+        plugin_MainMenu
+	//    ,plugin_FarmingMachine
 	    ,plugin_SoundAlarm
-	    ,plugin_MainMenu
 	]);
 	engine.log(9,'main- finish ');
-	
-	engine.trigger('page_loaded');
+
+	engine.trigger('page_loaded',null);
 	engine.style('',true); // apply all styles;
 	
 	// let's do all goals

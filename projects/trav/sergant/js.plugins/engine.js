@@ -8,6 +8,7 @@ var engine={
 	__handler:{},
 	__store:{},
 	__goals:[],
+    __plugins:[],
 	id:  12345 ,
 	/** init function */
 	init:function(){
@@ -73,9 +74,11 @@ var engine={
 			return;
 		}
 		if(typeof(plugins)=='function'){
-			plugins(this);
+            var plugin=plugins(this);
+			this.__plugins.push(plugin);
+            plugin.init(this);
 		} else {
-			FM_log(0,'Abnormal parameters');
+			engine.log(0,'Abnormal parameters '+typeof(plugins));
 		}
 	},
 	/**
@@ -101,24 +104,68 @@ var engine={
 		if(!this.__handler[evt]) this.__handler[evt]=[];
 		this.__handler[evt].push([func,clsr]);
 	},
+    __flags:0,
+
+    event_queue:[],
+
+    /**
+     * непосредственное исполнение события
+     * @param evt
+     * @param par
+     */
+    __event:function(){
+       // engine.log(9,'__event "@" '+this.__flags+' '+this.__plugins.length+' '+this.id);
+        if(!(this.__flags & 1)){
+            this.__flags |=1;
+            var event=this.event_queue.shift(),
+                evt=event.evt,
+                par=event.par;
+            if(this.__handler && this.__handler[evt] && this.__handler[evt].length){
+                for(var i=0,j=this.__handler[evt];i<j.length;i++){
+                    if(typeof(j[i][0])!='function') {
+                        FM_log(9,evt+' '+i+' fail '+j[i][0].toString());
+                    } else {
+                        if(j[i][0].call(j[i][1]||null,par)===false){
+                            FM_log(9,evt+' '+i+' false '+j[i][0].toString());
+                            break;
+                        }
+                    }
+                }
+            }
+            for(var i in this.__plugins){
+                var plugin=this.__plugins[i];
+                if(plugin && plugin['evt_'+evt]){
+                    engine.log(9,'__event "'+evt+'" '+i+' '+typeof(plugin['evt_'+evt])+' '+plugin.name+' '+this.id);
+                    if(plugin['evt_'+evt].call(plugin,par)===false) {
+                        //break;
+                    }
+                }
+            }
+           // engine.log(9,'__event "'+evt+'" '+this.__flags+' '+this.__plugins.length+' '+this.id);
+            this.__flags &=0xFFFE;
+            if(this.event_queue.length>0){
+                this.__event();
+            }
+        }
+    },
+    
 	trigger:function(evt,par){
 		FM_log(9,'triggered '+evt+' '+this.id);
-		if(this.__handler && this.__handler[evt] && this.__handler[evt].length){
-			FM_log(9,evt+' found '+this.id);
-			for(var i=0,j=this.__handler[evt];i<j.length;i++){
-				if(typeof(j[i][0])!='function') {
-					FM_log(9,evt+' '+i+' fail '+j[i][0].toString());
-				} else {
-					if(j[i][0].call(j[i][1]||null,par)===false)
-						break;
-				}
-			}
-		}
-	},
+        engine.event_queue.unshift({evt:evt,par:par});
+        engine.__event.call(engine);
+    },
+
+    queue:function(evt,par){
+        FM_log(9,'queued '+evt+' '+this.id);
+        engine.event_queue.push({evt:evt,par:par});
+        engine.__event.call(engine);
+    },
+
 	__clear:function(){
 		FM_log(9,'called clear'+this.id);
 		this.__handler=null;
 	},
+
 	/**
 	 * send a request to server and manage a result.
 	 */
