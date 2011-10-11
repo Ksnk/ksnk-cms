@@ -1335,8 +1335,10 @@ LIMIT 100;';
             else
                 echo $this->_tpl ('tpl_jmain','_second',array('param'=>$this->parent->par));
             //else echo '3-th temlate not supported';
-        } else
+        } else {
+            debug('tplx',$this->tpl,MAIN_TPL);
 			$this->template();
+        }
 		unset($_SESSION['errormsg']);
 	}
 

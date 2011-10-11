@@ -1313,7 +1313,7 @@ class xPlugin  extends xCommon {
 	}
 	function getText(){
 		global $engine;
-        debug($this->v);
+     //   debug($this->v);
 		return $engine->export(pps($this->v['item_name'],'MAIN'),$this->v['item_text'],pps($this->v['param']));
 	}
 }
@@ -2531,10 +2531,10 @@ class xCommon extends xElement{
 		$par['item_name']=pps($this->v['item_name'],nameByType($this->v['type']));
 		$par['minmax']=$this->v['type']==type_KATALOG || !isset($this->param['inner']);
 		// Блокировка удаления модуля
-		if($this->v['type'] == type_PLUGIN) {
+	/*	if($this->v['type'] == type_PLUGIN) {
 			$par['lock1'] = "<!--";
 			$par['lock2'] = "-->";
-		}
+		}*/
 			
 		if(!empty($cols))
 			$par['cols']=$cols;
