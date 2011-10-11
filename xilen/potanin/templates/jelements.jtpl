@@ -280,6 +280,11 @@
 	width:210px;
 
 }
+.table .input2 {
+	border:1px solid rgb(127,157,185);
+	width:100px;
+
+}
 .table textarea.input {
 	height:80px;
 }
@@ -349,7 +354,8 @@
 	</td>
     {% endif %}
     {% if el.type=='captcha' %}
-<td class="pad10 text align_right" >¬ведите номер, изображенный на картинке:<br></td><td class="text" style="vertical-align:middle; padding-left:10px"><input class="input2"  type="text" name="captcha" /></td>
+<td class="pad10 text align_right" >¬ведите номер, изображенный на картинке:<br></td>
+<td class="text"><input class="input2"  type="text" name="captcha" /></td>
 <td><img src="{{root}}captcha.php" alt="" />
 </td>
     {% endif %}

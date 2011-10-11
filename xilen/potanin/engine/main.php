@@ -88,6 +88,9 @@ class engine extends engine_Main
             default:
                 $this->par('color','green');
         }
+        if($id!=4)
+            $this->tpl==SECOND_TPL;
+        debug($id);
         return parent::do_menu($id);
     }
 
@@ -316,7 +319,7 @@ class engine extends engine_Main
 		foreach($sm->el as $k=>$v){
 			if(isset($v->v['skipit'])) continue;
 			$data[]=$v->v;
-		}
+		} 
      //   debug($data);
 		return  $this->_tpl('tpl_jmain','_main_menu',array('menu'=>$data));
 	}
