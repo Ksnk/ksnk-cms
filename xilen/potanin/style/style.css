@@ -174,7 +174,7 @@ img.fleft {
 	background: url(/images/line-ver.gif) repeat-y;
 }
 .container {
-	height: 326px;
+/*	height: 326px; */
 	padding: 0 10px 0 0;
 	overflow: auto;
 }

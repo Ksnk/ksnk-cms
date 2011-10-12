@@ -14,6 +14,7 @@
     </files>
     <files>
         <file>plugins/altname.php</file>
+ <!--       <file>plugins/elements/header/header.php</file>-->
     </files>
 <!-- ****************************************************************** -->
 <!-- ****   копируем общие файлы из common на место                 *** -->
