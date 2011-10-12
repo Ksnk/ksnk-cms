@@ -380,3 +380,57 @@
 </div></td></tr></table>
         {%- endif -%}
 {% endmacro %}
+
+##################################################################
+##
+##  запчасти элементов : ссылки!
+##
+{% macro katalogx (align,rows) %}
+<table  style="border-spacing:0;">
+	<tr>
+        {% for row in rows %}
+        {% for l in row.link %}
+		<td style='padding:5px 10px;' class="tahoma ctext link align_left">
+		<a {{l.target}} href="{{l.url}}" class="strelka">{{l.text|default('xxx')}}</a>
+		</td>
+        {% endfor %}
+        {% endfor %}
+	</tr>
+</table>
+
+{% endmacro %}
+##
+##################################################################
+##
+##  запчасти элементов : text+фото!
+##
+{% macro textpic (align,row,the_text) %}
+		<div class="text textpict tahoma">
+                {% for r in row %}
+        			<div class="float_{{align}}  gallery" >
+                        {% for pict in row.pict %}
+                        <td  style="vertical-align:bottom;padding:0 25px 5px 0;">
+        {{callex('MAIN','tpl','admin','imgpre')}}
+                        <table><tr><td class="picture_box">
+                            <a rel="g{{pict.pid}}" href="{{pict.xhref|default('#')}}" {% if pict.comment %}title="{{pict.comment|e}}"{%endif%}>
+                            <img src="{{root}}/{{pict.small_pict}}" {% if pict.comment %}alt="{{pict.comment|e}}" {%endif-%}
+                                {{callex('','brd',pict.border)}} class="text_picture">
+                            </a></td></tr></table>
+                        </td>
+                         {% endfor %}
+                   	</div>
+                {% endfor %}
+
+			<div style="padding-right:20px;">{{the_text}}</div>
+{#
+				<!--begin:articles-->
+					<!--begin:links-->
+                    <br><a title="{item_text>>striptags}" href="javascript:show_opisanie('{id}');" class="link1">{item_text>>striptags}</a>
+                    <span id="opisanie_btn_{id}" class="skryt"><a href="javascript:hide_opisanie('{id}');">(Скрыть)</a></span>
+					<div id="opisanie_{id}" style="display:none;">{opisanie}</div>
+					<!--end:links-->
+				<!--end:articles-->
+#}
+        	</div>
+{% endmacro %}
+##
