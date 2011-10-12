@@ -1,0 +1,55 @@
+########################################################################
+##
+##                   плагин Новости
+##
+########################################################################
+########################################################################
+##
+##    news_b - маленький список новостей в углу сайта, 
+##		разбит на 2 колонки
+##
+{%- macro news_b(news,newscnt=3) %}
+## заголовок "новости" размещаем поверх блока новостей, смещаясь вниз
+
+## тело блока с 2-мя новостями
+{% for n in news %}
+	<table style="margin:30px;table-layout:fixed;" >
+	<col width="30px"><col>
+	<tr>
+	<td style="font-size:12px;">{{n.news_date|date('d')}}
+	</td><td rowspan=2 style="padding:0 26px 30px 16px;font-size:12px;line-height:1.4em;">
+	<a class="newslink" href="?do=newslist&id={{n.id}}">{{n.text|truncate(100)}}</a>
+	</td></tr><tr>
+	<td colspan=2 style="text-align:right;padding-top:9px;color:rgb(87,101,115);font-size:11px;">{{n.news_date|date('m/Y')}}</td>
+	</tr>
+	</table>
+{% endfor %}
+{#
+<div style="clear:both;margin:30px 0 10px 38px;">
+<span class="size12 ">Архив новостей
+{% for y in years %}
+<a href="?do=newslist&year={{y.year}}">11{{y.year}}</a> г. {%if not loop.last %}/{% endif %}
+{% endfor %}</span></div> #}
+{% endmacro %}
+########################################################################
+
+########################################################################
+##
+##    news_b - маленький список новостей в углу сайта,
+##		разбит на 2 колонки
+##
+{%- macro NEWSLIST(news,pages=0) %}
+<div class="tahoma ctext" style="margin-top:15px;">
+    {% for n in news %}
+<div style="clear:both;">
+<b>{{n.date}}</b>
+<b>{{n.title}}</b><br>
+{% if n.img %} {% set pic=n.img %}
+<div class="float_left" style="margin-top:15px;">
+	{{pic.pict}}
+</div>
+{% endif %}<p>{{n.text}}</p></div>
+{% endfor %}
+{{pages}}
+</div>
+{% endmacro %}
