@@ -379,8 +379,7 @@ class xANCHOR extends xCommon {
 		else
 			$header='';
 		//debug($header);
-        el_anchor
-		return smart_template(array(ELEMENTS_TPL,'anchor'),array(
+        return smart_template(array(ELEMENTS_TPL,'anchor'),array(
 			'xitem_name'=>$this->v['id'],
 			'header'=>$header));
 	}
@@ -2118,11 +2117,7 @@ class xNewTextPic extends xCommon {
 		
 
  		//debug($param);	
- 		return smart_template(array(ELEMENTS_TPL,pps($engine->tpl_elements,'katalog')),
- 			array('last'=>!$nlast,pps($this->tpl,'textpic')=>$param)
-					
-					
- 		);
+         return $engine->_tpl('tpl_jelements','_textpic',$param);
 	}
 } 
 
@@ -2648,11 +2643,13 @@ class xTP extends xCommon {
  		}
  		//debug($param);
  		//echo pps($engine->tpl_elements,'katalog');
- 		return smart_template(array(ELEMENTS_TPL,pps($engine->tpl_elements,'katalog')),
+         return $engine->_tpl('tpl_jelements','_textpic',$param);
+/* 		return smart_template(array(ELEMENTS_TPL,pps($engine->tpl_elements,'katalog')),
  			array('last'=>!$nlast,
  			'ajax'=>!!$engine->is_ajax,
  			'textpic'=>$param)
- 		);
+ 		);*/
+
  	}
 		
 	function xTP(){
@@ -2787,7 +2784,7 @@ class xLinks extends xCommon {
                     ,'class'=>'url_page'
                     ,'text'=>$v->v['item_text']
                     ,'id'=>$v->v['id']
-//                    ,'opisanie'=>$engine->ffirst('do_page', $v->v['id'])
+                    ,'opisanie'=>$engine->ffirst('do_page', $v->v['id'])
                 );
                 else
                      $x='';
@@ -2830,8 +2827,8 @@ class xLinks extends xCommon {
  		}
  		
  		if(!empty($rows))
- 		$par.=smart_template(array(ELEMENTS_TPL,'katalogx'),
- 				array('align'=>$_align,$base=>$rows)
+            return $par.$engine->_tpl('tpl_jelements','_katalogx',
+                array('align'=>$_align,'rows'=>$rows)
  			);
   		return $par;
 	}
