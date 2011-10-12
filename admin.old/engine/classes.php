@@ -363,11 +363,11 @@ class xANCHOR extends xCommon {
 				'item_text'=>array('title'=>'“екст заголовка') // верхний заголовок
 			//,'item_sub'=>array('title'=>'заголовок2')
 			)
-			,'align'=>true 
-		) 
+			,'align'=>true
+		)
 		);
-	}	
-	
+	}
+
 	function getText(&$keys){
 		//global $engine;
 		//$engine->anchor_cnt++;
@@ -377,13 +377,14 @@ class xANCHOR extends xCommon {
 				'header'=>$this->v['item_text']
 			);
 		else
-			$header='';	
-		//debug($header);	
+			$header='';
+		//debug($header);
+        el_anchor
 		return smart_template(array(ELEMENTS_TPL,'anchor'),array(
 			'xitem_name'=>$this->v['id'],
 			'header'=>$header));
 	}
-	
+
 }
 
 class x_GALLERY extends xCommon {
@@ -2779,12 +2780,17 @@ class xLinks extends xCommon {
  		foreach($this->el as $v){
  			$iid=$v->v['id'];
  			if($v->v['type']==type_ARTICLE) {
- 			$x=array(
- 				 'url'=>'javascript:show_opisanie(\''.$v->v['id'].'\');'
- 				,'class'=>'url_page'
- 				,'text'=>$v->v['item_text']
- 				,'id'=>$v->v['id']
- 				,'opisanie'=>$engine->ffirst('do_page', $v->v['id']));
+                $txt=trim($v->v['item_text']);
+                if($txt)
+                $x=array(
+                     'url'=>'javascript:show_opisanie(\''.$v->v['id'].'\');'
+                    ,'class'=>'url_page'
+                    ,'text'=>$v->v['item_text']
+                    ,'id'=>$v->v['id']
+//                    ,'opisanie'=>$engine->ffirst('do_page', $v->v['id'])
+                );
+                else
+                     $x='';
  			} else {
  				$url=TO_URL($v->v['url']);
  				$x=array(
