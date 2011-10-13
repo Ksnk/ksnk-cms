@@ -1329,7 +1329,7 @@ LIMIT 100;';
 				,mkt());
 			echo php2js($result);
 		} elseif (OPTIONS::par('jinja2')){
-            debug('tpl',$this->tpl,MAIN_TPL);
+           // debug('tpl',$this->tpl,MAIN_TPL);
             if($this->tpl==MAIN_TPL)
                 echo $this->_tpl ('tpl_jmain','_main',array_merge($this->par,array('param'=>$this->parent->parameters)));
             else
@@ -2010,7 +2010,16 @@ if(!defined('INTERNAL')&& empty($_GET['noconvert'])){
 }
 
 error_reporting(E_ALL ||E_STRICT);
-if(pps($_GET['debug'])){
+if(isset($_GET['debug'])) {
+    if($_GET['debug'] && !isset($_COOKIE['debug'])){
+        setcookie('debug',$_GET['debug'],time()+10*60);
+    } else {
+        setcookie ("debug", "", time() - 3600);
+    }
+}
+$engine->debug=pps($_GET['debug'])|| pps($_COOKIE['debug']);
+
+if($engine->debug){
 	function backtrace(){
 		$x=debug_backtrace();
 		$z=array();

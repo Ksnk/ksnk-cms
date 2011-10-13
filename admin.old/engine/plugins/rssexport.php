@@ -23,7 +23,7 @@ class rssexport extends ml_plugin {
                if(preg_match_all('~<item.*?>.*?</item>~is',$file,$m)){
  					$maxnews=ppi($this->parent->getPar('rssfeed_newsnum'),3);
 					$result=array();
-                    debug($m);
+                    //debug($m);
 					for($i=0;$i<$maxnews;$i++){
                         $par=array();
                         foreach(array('link'=>'link','title'=>'title','date'=>'pubDate','news'=>'description') as $kk=>$vv){
@@ -50,7 +50,6 @@ class rssexport extends ml_plugin {
 	}
 	
     function show($cnt){
-        debug('111');
         return 	$this->parent->_tpl('tpl_jmain','_rssexport',array('cnt'=>$cnt,'data'=>$this->get()));
     }
 

@@ -445,8 +445,10 @@ function smart_template($idx=null,$par=null,$contents='') {
 	$template->resolve($idx,$contents);
 	if (!is_null($par) && is_callable($idx))
 		return call_user_func ($idx,$par);
-	else 
+	else {
+        debug('unknown tamplate '.$idx[0].' '.$idx[1]);
 		return '';
+    }
 }
 
 smart_template(); // force_compile templates
