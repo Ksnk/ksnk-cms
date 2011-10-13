@@ -372,12 +372,12 @@
 ##
 ##  элемент - заголовок
 ##
-{% macro el_anchor (xitem_name,align,header) %}
+{% macro anchor (xitem_name,align,header) %}
 <a name="anc_{{xitem_name}}"></a>
 {%-if header -%}
-<table style="width:100%;"><tr><td><div class="header align_{{align|default('left')}}">
+<div class="header title-1 align_{{align|default('left')}}">
 <h3>{{header}}</h3>
-</div></td></tr></table>
+</div>
         {%- endif -%}
 {% endmacro %}
 

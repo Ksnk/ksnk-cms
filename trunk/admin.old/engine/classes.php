@@ -369,18 +369,16 @@ class xANCHOR extends xCommon {
 	}
 
 	function getText(&$keys){
-		//global $engine;
-		//$engine->anchor_cnt++;
+        global $engine;
+		        
 		if (!empty($this->v['item_text']))
-			$header=array(
-				'align'=>$this->aligns($this->v['item_align']),
-				'header'=>$this->v['item_text']
-			);
+			$header=$this->v['item_text'];
 		else
 			$header='';
 		//debug($header);
-        return smart_template(array(ELEMENTS_TPL,'anchor'),array(
+        return $engine->_tpl('tpl_jelements','_anchor',array(
 			'xitem_name'=>$this->v['id'],
+            'align'=>$this->aligns($this->v['item_align']),
 			'header'=>$header));
 	}
 

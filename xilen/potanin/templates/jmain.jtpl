@@ -54,14 +54,14 @@
 
 {% if color=='rose'%}
 #page2 #main {
-	background: url(/images/main-bg2.jpg) no-repeat 0% 547px;
+	background: url({{root}}images/main-bg2.jpg) no-repeat 0% 547px;
 }
 #footer p {
     border-top: 1px solid #A98E8B;
 	color: #F8F8F8;
 }
 #page2 #main-tail {
-	background: #9d7f7c url(/images/body-tail2.gif) repeat-x 0% 0%;
+	background: #9d7f7c url({{root}}images/body-tail2.gif) repeat-x 0% 0%;
 	width: 980px;
 	margin: 0 auto;
 }
@@ -69,14 +69,14 @@
 
 {%- if color=='magenta'%}
 #page2 #main {
-	background: url(/images/main-bg1.jpg) no-repeat 0% 547px;
+	background: url({{root}}images/main-bg1.jpg) no-repeat 0% 547px;
 }
 #footer p {
     border-top: 1px solid #88a3a6;
 	color: #f8f8f8;
 }
 #page2 #main-tail {
-	background: #7c9a9d url(/images/body-tail1.gif) repeat-x 0% 0%;
+	background: #7c9a9d url({{root}}images/body-tail1.gif) repeat-x 0% 0%;
 	width: 980px;
 	margin: 0 auto;
 }
@@ -84,14 +84,14 @@
 
 {%- if color=='gray'%}
 #page2 #main {
-	background: url(/images/main-bg5.jpg) no-repeat 0% 547px;
+	background: url({{root}}images/main-bg5.jpg) no-repeat 0% 547px;
 }
 #footer p {
     border-top: 1px solid #9A9A9A;
 	color: #f8f8f8;
 }
 #page2 #main-tail {
-	background: #8C8C8C url(/images/body-tail5.gif) repeat-x 0% 0%;
+	background: #8C8C8C url({{root}}images/body-tail5.gif) repeat-x 0% 0%;
 	width: 980px;
 	margin: 0 auto;
 }
@@ -99,14 +99,14 @@
 
 {%- if color=='dgreen'%}
 #page2 #main {
-	background: url(/images/main-bg4.jpg) no-repeat 0% 547px;
+	background: url({{root}}images/main-bg4.jpg) no-repeat 0% 547px;
 }
 #footer p {
     border-top: 1px solid #9AA98B;
 	color: #f8f8f8;
 }
 #page2 #main-tail {
-	background: #8C9D7C; url(/images/body-tail1.gif) repeat-x 0% 0%;
+	background: #8C9D7C; url({{root}}images/body-tail1.gif) repeat-x 0% 0%;
 	width: 980px;
 	margin: 0 auto;
 }
@@ -114,14 +114,14 @@
 
 {%- if color=='violet'%}
 #page2 #main {
-	background: url(/images/main-bg3.jpg) no-repeat 0% 547px;
+	background: url({{root}}images/main-bg3.jpg) no-repeat 0% 547px;
 }
 #footer p {
     border-top: 1px solid #9a8ba9;
 	color: #f8f8f8;
 }
 #page2 #main-tail {
-    background: #8c7c9d url(/images/body-tail3.gif) repeat-x 0% 0%;
+    background: #8c7c9d url({{root}}images/body-tail3.gif) repeat-x 0% 0%;
 	width: 980px;
 	margin: 0 auto;
 }
@@ -129,14 +129,14 @@
 
 {%- if color=='green'%}
 #page2 #main {
-	background: url(/images/main-bg.jpg) no-repeat 0% 297px;
+	background: url({{root}}images/main-bg.jpg) no-repeat 0% 297px;
 }
 #footer p {
     border-top: 1px solid #A1BCAF;
 	color: #f8f8f8;
 }
 #page2 #main-tail {
-	background: #94AFA2 url(/images/body-tail.gif) repeat-x 0% 0%;
+	background: #94AFA2 url({{root}}images/body-tail.gif) repeat-x 0% 0%;
 	width: 980px;
 	margin: 0 auto;
 }
@@ -162,7 +162,7 @@
     {{callex('MAIN','menu_1')}}
 
     <div id="footer">
-        <a href="index.html"><img src="images/logo_{{color}}.jpg" id="logo" alt="" /></a>
+        <a href="{{root}}"><img src="{{root}}images/logo_{{color}}.jpg" id="logo" alt="" /></a>
      <p><span>LC Sors ltd. © 2008-2011 Юридическая компания &quot;Сорс&quot; (495) 697-57-11, 222-70-18</span> | <a href="flash/index.html">FLASH</a></p>
 
     </div>
@@ -211,7 +211,7 @@
 }
 
 #page2 #main {
-	background: url(/images/main-bg.jpg) no-repeat 0% 297px;
+	background: url({{root}}images/main-bg.jpg) no-repeat 0% 297px;
     position :relative;
 }
 
@@ -230,7 +230,7 @@
 	color: #f8f8f8;
 }
 #page2 #main-tail {
-	background: #94AFA2 url(/images/body-tail.gif) repeat-x 0% 0%;
+	background: #94AFA2 url({{root}}images/body-tail.gif) repeat-x 0% 0%;
 	width: 980px;
 	margin: 0 auto;
 }
@@ -250,7 +250,7 @@
 <div id="main-tail">
   <div id="main">
     <!-- content -->
-    <a href="index.html" id="logo"><img src="images/logo.png" alt="" /></a>
+    <a href="{{root}}" id="logo"><img src="images/logo.png" alt="" /></a>
       <div id="content">
 
       {{callex('MAIN','menu_1')}}
@@ -258,7 +258,7 @@
 
     <!-- footer -->
     <div id="footer">
-        <a href="index.html"><img src="images/logo_green.jpg" style="position: absolute; z-index:1;top: -250px;left: 183px;" alt="" /></a>
+        <a href="{{root}}"><img src="images/logo_green.jpg" style="position: absolute; z-index:1;top: -250px;left: 183px;" alt="" /></a>
         <p><span>LC Sors ltd. © 2008-2011 Юридическая компания &quot;Сорс&quot; (495) 697-57-11, 222-70-18</span> | <a href="flash/index.html">FLASH</a></p>
     </div>
 

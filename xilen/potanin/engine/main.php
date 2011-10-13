@@ -90,7 +90,7 @@ class engine extends engine_Main
         }
         if($id!=4)
             $this->tpl==SECOND_TPL;
-        debug($id);
+       // debug($id);
         return parent::do_menu($id);
     }
 

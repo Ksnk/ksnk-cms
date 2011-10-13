@@ -54,6 +54,12 @@ h2 {
 	font-size: 1em;
 	color: #000000;
 }
+
+.header {
+	padding-right: 65px;
+	padding-bottom: 10px;
+}
+
 h3 {
 	padding: 0 0 6px 0;
 	line-height: 1.5em;
@@ -190,7 +196,6 @@ img.fleft {
 	min-height: 35px;
 	height: auto !important;
 	height: 35px;
-	padding: 0 0 3px 0;
 	font-size: large;
 }
 .title-2 {
