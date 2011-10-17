@@ -312,16 +312,17 @@ class engine extends engine_Main
 		return "56";
 	}
 
-	function menu_1(){
+	function menu_1($tpl=''){
         // ìåíşøêà ëèíåéíàÿ ñ êàğòèêàìè âìåñòî íàçâàíèé
-		$sm=$xx=$this->ffirst('getSiteMap','main');
+        if(!$tpl) $tpl='main_menu';
+		$sm=$this->ffirst('getSiteMap','main');
         $data = array();
-		foreach($sm->el as $k=>$v){
+		foreach($sm->el as $v){
 			if(isset($v->v['skipit'])) continue;
 			$data[]=$v->v;
 		} 
-     //   debug($data);
-		return  $this->_tpl('tpl_jmain','_main_menu',array('menu'=>$data));
+        debug($tpl);
+		return  $this->_tpl('tpl_jmain','_'.$tpl,array('menu'=>$data));
 	}
 
 	

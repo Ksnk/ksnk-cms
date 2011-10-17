@@ -22,7 +22,19 @@
         {% endfor %}
     </ul>
 {% endmacro %}
-        
+##################################################################
+##
+## линейная менюшка
+##
+##################################################################
+{% macro main_menu2 (menu=0,root=0) %}
+    <ul id="menu">
+        {% for l in menu %}
+        {% set url=l.url|default(root~'?do=menu&id='~l.id) %}
+        <li><a href="{{url}}"><img src="{{root}}images/x_{{l.name|translit}}_act.png" alt="{{l.name|e}}" /></a></li>
+        {% endfor %}
+    </ul>
+{% endmacro %}
 ##################################################################
 ##
 ##  основной шаблон сайта
@@ -200,7 +212,9 @@
 #page2 #main-tail #main #content .line-ver .wrapper .col-2 .container br {
 	color: #003;
 }
-
+ul#menu {
+    list-style: none;
+}
 #page2 #logo {
 	position: absolute;
     width:100%;
@@ -253,7 +267,7 @@
     <a href="{{root}}" id="logo"><img src="images/logo.png" alt="" /></a>
       <div id="content">
 
-      {{callex('MAIN','menu_1')}}
+      {{callex('MAIN','menu_1','main_menu2')}}
       </div>
 
     <!-- footer -->
