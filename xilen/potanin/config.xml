@@ -10,9 +10,6 @@
 		<file>plugins/captcha/captcha.ezavod.php</file>
 	</files> 
     <files>
-        <file>plugins/order_history/orders.ezavod.php</file>
-    </files>
-    <files>
         <file>plugins/altname.php</file>
  <!--       <file>plugins/elements/header/header.php</file>-->
     </files>

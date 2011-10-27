@@ -14,11 +14,15 @@
 ## линейная менюшка  
 ##
 ##################################################################
-{% macro main_menu (menu=0,root=0) %}
+{% macro main_menu (menu=0,root=0,color=0) %}
     <ul id="menu">
         {% for l in menu %}
         {% set url=l.url|default(root~'?do=menu&id='~l.id) %}
-        <li><a href="{{url}}"><img src="{{root}}images/x_{{l.name|translit}}{% if l.current%}_act{% endif%}.png" alt="{{l.name|e}}" /></a></li>
+        <li><a href="{{url}}"><img src="{{root}}images/x_{{l.name|translit}}.png" alt="{{l.name|e}}">
+            {%- if l.current%}<br>
+            <img src="{{root}}images/{{color}}_circle.png" alt="#" />
+            {% endif-%}
+            </a></li>
         {% endfor %}
     </ul>
 {% endmacro %}
@@ -31,7 +35,12 @@
     <ul id="menu">
         {% for l in menu %}
         {% set url=l.url|default(root~'?do=menu&id='~l.id) %}
-        <li><a href="{{url}}"><img src="{{root}}images/x_{{l.name|translit}}_act.png" alt="{{l.name|e}}" /></a></li>
+        {% set color=loop.cycle('magenta','rose','violet','dgreen','gray') %}
+
+        <li><a href="{{url}}"><img src="{{root}}images/x_{{l.name|translit}}.png" alt="{{l.name|e}}" />
+            <br>
+            <img src="{{root}}images/{{color}}_circle.png" alt="#" /></a>
+        </li>
         {% endfor %}
     </ul>
 {% endmacro %}
@@ -171,7 +180,7 @@
 
     <!-- content -->
     <div id="content"><div class="wrapper">{{data}}</div></div>
-    {{callex('MAIN','menu_1')}}
+    {{callex('MAIN','menu_1','',color)}}
 
     <div id="footer">
         <a href="{{root}}"><img src="{{root}}images/logo_{{color}}.jpg" id="logo" alt="" /></a>
@@ -252,7 +261,7 @@ ul#menu {
     padding: 89px 94px 260px 108px;
 }
 #page2 #menu {
-	top: 245px;
+	top: 257px;
 }
 #page2 #content {
     background: none repeat scroll 0 0 transparent;
@@ -267,7 +276,7 @@ ul#menu {
     <a href="{{root}}" id="logo"><img src="images/logo.png" alt="" /></a>
       <div id="content">
 
-      {{callex('MAIN','menu_1','main_menu2')}}
+      {{callex('MAIN','menu_1','main_menu2',color)}}
       </div>
 
     <!-- footer -->

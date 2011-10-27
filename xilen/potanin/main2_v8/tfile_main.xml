@@ -1,0 +1,591 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<content>
+	<!-- general vars -->
+	<section name="settings">
+		<item name="textSelectable">true</item>
+		<item name="copyright"><![CDATA[
+UK Sors © 2009-2010 Юридическая компания "Сорс" (495) 697-57-11, 222-70-18<br><a href="asfunction:_root.more_click_func, privacyPolicy"><u></u></a>
+		]]></item>
+		<item name="companyName"><![CDATA[Sors]]></item>
+		<item name="slogan"><![CDATA[Юридическая компания]]></item>
+		<item name="slogan2"><![CDATA[
+		E-mail: <a href="#"> <font color="#000000"><u>companyname@ourmail.com</u></font></a>
+		]]></item>
+	</section>
+
+
+	
+	<section name="global_text">
+
+<texts><![CDATA[
+vogue
+]]></texts>
+
+<texts><![CDATA[
+glamour
+]]></texts>
+
+<texts><![CDATA[
+classic
+]]></texts>
+
+</section>
+
+<section name="global_img">
+
+		<image imageUrl="_pic0.png" link="#"/>
+		
+		
+</section>
+	
+	<!-- menu -->
+<section name="menu">
+
+<link systemOrder="1"><![CDATA[
+Главная
+]]></link>
+
+
+<link systemOrder="2"><![CDATA[
+Услуги
+]]></link>
+
+<link systemOrder="3"><![CDATA[
+Цены
+]]></link>
+
+
+<link systemOrder="4"><![CDATA[
+Партнеры
+]]></link>
+
+<link systemOrder="5"><![CDATA[
+Контакты
+]]></link>
+
+
+</section>
+	
+	<!-- pages -->
+	<section name="pages">
+		
+		
+<page name="main page">
+
+<image imageUrl="_pic1.png"link="#"/>
+<image imageUrl="_pic2.png"link="#"/>
+
+<texts>
+
+<pageText><![CDATA[
+Добро пожаловать на сайт 
+]]></pageText>
+
+0<pageText><![CDATA[
+Юридической Компании "Сорс"
+]]></pageText>
+
+1<pageText><![CDATA[
+<b>  «Сорс» - это консалтинговая группа, предоставляющая комплекс юридических услуг более 7 лет.</b>
+]]></pageText>
+
+2<pageText><![CDATA[
+<br>
+<br>
+
+<font size="20"><br></font>
+<font color="#acc4c7">
+<a href="#">+ <u>Судебной помощи</u></a>       <a href="#">+ <u>Со страховыми компаниями и ГИБДД</u></a><br>
+<font size="4"><br></font>
+<a href="#">+ <u>Семейного права</u></a>       	 <a href="#">+ <u>Работы с объектами недвижимости</u></a><br>
+<font size="4"><br></font>
+<a href="#">+ <u>Наследования</u></a>              <a href="#">+ <u>Абонентского обслуживание предприятий</u></a><br>
+<font size="4"><br></font>
+<a href="#">+ <u>Трудового права</u></a>          <a href="#">+ <u>Бухгалтерского обслуживание предприятий</u></a><br>
+<font size="4"><br></font>
+<a href="asfunction:_root.more_click_func,0">+ <u>и многих других вопросах</u></a>
+</font>
+]]></pageText>
+
+4<pageText><![CDATA[
+company profile
+]]></pageText>
+
+5<pageText><![CDATA[
+Наши Специалисты всегда помогут Вам в вопросах:
+]]></pageText>
+
+6<pageText><![CDATA[
+Регистрацию фирм, ликвидацию, юридические услуги для физических и юридических лиц,<br>
+бухгалтерское обслуживание, полное планирование Вашего бизнеса. Мы всегда  рады Вам помочь… <br>
+Главный принцип нашей работы - это индивидуальный подход к каждому клиенту. Мы считаем, что нет незначительных дел.
+ Не важно, кто Вы - крупная международная компания, индивидуальный предприниматель или физическое лицо - в любом случае, Ваш вопрос 
+будет изучен подробно и в кратчайшие сроки.]]></pageText>
+
+</texts>
+
+<link linkType="readMoreLink">
+<item name="title"><![CDATA[
+.
+]]></item>
+
+<item name="linkText"><![CDATA[
+<font color="#6c8c9c"><b><u>Услуги компании "Сорс"</u></b><br></font><br>
+Страница на стадии заполнения, приносим свои извинения. По всем вопросом просьба обращаться по телефону (495)222-70-18<br>
+<br>
+
+
+]]></item>
+</link>
+
+<link linkType="readMoreLink">
+<item name="title"><![CDATA[
+
+]]></item>
+
+<item name="linkText"><![CDATA[
+<font color="#6c8c9c"><b><u>.</u></b><br></font><br>
+Страница на стадии заполнения, приносим свои извинения. По всем вопросом просьба обращаться по телефону (495)222-70-18
+]]></item>
+</link>
+
+<link linkType="readMoreLink">
+<item name="title"><![CDATA[
+
+]]></item>
+
+<item name="linkText"><![CDATA[
+<font color="#6c8c9c"><b><u>.</u></b><br></font><br>
+Страница на стадии заполнения, приносим свои извинения. По всем вопросом просьба обращаться по телефонам (495)222-70-18
+]]></item>
+</link>
+
+
+</page>
+
+
+
+
+<page name="about us">
+
+
+<texts>
+
+<pageText><![CDATA[
+Услуги
+]]></pageText>
+
+<pageText><![CDATA[
+Юридическая компания «Сорс» предлагает полный спектр юридических услуг.
+  Мы всегда готовы оказать помощь в вопросах:<br>
+- Досудебного урегулирования конфликтов<br>
+- Судебной помощи<br>
+- Семейного права<br>
+- Наследования<br>
+- Трудового права<br>
+- Работы с объектами недвижимости<br>
+- Со страховыми компаниями и ГИБДД<br>
+- Абонентского обслуживания предприятий<br>
+- Бухгалтерского обслуживания предприятий<br>
+- Составления и анализа договоров<br>
+- Помощи в получении лицензий МЧС
+]]></pageText>
+
+<pageText><![CDATA[
+
+<font color="#acc4c7"><a href="asfunction:_root.more_click_func,0">+ <u>Полный перечень услуг</u></a></font>
+]]></pageText>
+
+<pageText><![CDATA[
+Лицензии МЧС
+]]></pageText>
+
+<pageText><![CDATA[
+FUSCE FEUGIAT MALUAS SNAES
+]]></pageText>
+
+<pageText><![CDATA[
+На протяжении всего периода деятельности нашей компании мы оказываем правовую помощь в получении лицензии МЧС, а именно:<br>
+<br>
+1.Готовим полный пакет необходимых документов<br>
+2.Подаем документы в Управление государственного пожарного надзора ГУ МЧС России по городу Москве <br>
+3.Консультируем Клиента по всем этапам прохождения проверок<br>
+4.Информируем Клиента о результатах прохождения Комиссии<br>
+5.Получаем документы Клиента<br>
+<font size="20"><br></font>
+<font color="#aac9cd">
+
+<font size="23"><br></font>
+<font color="#acc4c7">
+<a href="asfunction:_root.more_click_func,1">+ <u>Читать далее...</u></a>
+</font>
+]]></pageText>
+
+<pageText><![CDATA[
+TESTIMONIALS
+]]></pageText>
+
+<pageText><![CDATA[
+
+]]></pageText>
+
+<pageText><![CDATA[
+<a href="asfunction:_root.more_click_func,1"><font color="#FF9600">*</font>.</a><br>
+]]></pageText>
+
+</texts>
+
+<link linkType="readMoreLink">
+<item name="title"><![CDATA[
+Перечень услул ЮК "Сорс"
+]]></item>
+
+<item name="linkText"><![CDATA[
+<font color="#6c8c9c"><b><u>Страница на стадии заполнения, приносим свои извинения.</u></b><br></font><br>
+О полном перечне услуг Вы можете узнать по телефона (495) 222-70-18, 697-57-11.
+]]></item>
+</link>
+
+<link linkType="readMoreLink">
+<item name="title"><![CDATA[
+Лицензии МЧС
+]]></item>
+
+<item name="linkText"><![CDATA[
+<font color="#6c8c9c"><b><u></u></b><br></font><br>
+  На протяжении всего периода деятельности нашей компании мы оказываем правовую помощь в получении лицензии МЧС, а именно:<br>
+1. Готовим полный пакет необходимых документов<br>
+2. Подаем документы в Управление государственного пожарного надзора ГУ МЧС России по городу Москве <br>
+3. Консультируем Клиента по всем этапам прохождения проверок<br>
+4. Информируем Клиента о результатах прохождения Комиссии<br>
+5. Получаем документы Клиента<br>
+  Лицензии МЧС выдаются с 1995 года. Последние уточнения предусмотрены Приказом "Об утверждении Административного регламента Министерства Российской Федерации по делам гражданской обороны, чрезвычайным ситуациям и ликвидации последствий стихийных бедствий по исполнению государственной функции по лицензированию деятельности в области пожарной безопасности" от 20 декабря 2008г. № 627 (зарегистрирован в Минюсте РФ 2 декабря 2008г., регистрационный № 12784). <br>
+  <font color="#6c8c9c"><b><u> </u></b><br></font><br>
+   Лицензии МЧС необходимы организациям, оказывающим услуги на рынке работ по монтажу, ремонту и обслуживанию средств обеспечения пожарной безопасности зданий и сооружений. Отсутствие лицензии рассматривается как административное правонарушение, а при получении дохода в крупных размерах, рассматривается как уголовное преступление, предусмотренное ст.171 УК РФ - незаконное предпринимательство, то есть осуществление деятельности без специального разрешения (лицензии).<br>
+СРОК ПОЛУЧЕНИЯ:  около 2 месяцев<br>
+СРОК ДЕЙСТВИЯ: 5 лет <br>
+Стоимость работ зависит от наличия у Клиента всех необходимых документов.<br>
+По всем вопросам просим Вас обращаться по телефонам: (495) 2227018, 6975711.<br>
+Перечень документов необходимых для подготовки и для получения лицензии МЧС:<br>
+•	Свидетельство ОГРН (нотариально заверенная копия) <br>
+•	Устав и учредительный договор (при его наличии) (нотариально заверенные копии) <br>
+•	Свидетельство о присвоении ИНН (нотариально заверенная копия) <br>
+•	Справка Госкомстата о кодах ОКВЭД (нотариально заверенная копия) <br>
+•	Решение (протокол) о создании (копия, заверенная печатью организации) <br>
+•	Приказ и решение (протокол) о назначении генерального директора (копии, заверенные печатью организации) <br>
+•	Свидетельства о регистрации изменений (нотариально заверенные копии) при наличии изменений в учредительных документах или генерального директора <br>
+•	Действующий договор аренды <br>
+•	Дипломы о специальном образовании директора и специалистов (нотариально заверенные копии) (в случае наличия)<br>
+•	Трудовые книжки сотрудников (нотариально заверенные копии)<br>
+
+]]></item>
+</link>
+
+</page>
+
+
+
+<page name="services">
+
+<texts>
+
+<pageText><![CDATA[
+Цены на услуги компании "Сорс"
+]]></pageText>
+
+<pageText><![CDATA[
+
+]]></pageText>
+
+<pageText><![CDATA[
+<font size="6"><br></font>
+Юридическая компания «Сорс» старается найти индивидуальный подход к каждому клиенту и найти оптимальное решение для Вас.<br>
+Поэтому порядок цен тоже индивидуален для каждого клиента.<br>
+<br>
+<br>
+<a href="http://uksors.ru/price_UKSORS.xls"><u>Скачать прайс на услуги юридической компании "Сорс" .xls</u></a><br>
+
+<font size="18"><br></font>
+<a href="asfunction:_root.more_click_func,0"><font color="#acc4c7"><u>
+
+</u></a></font>
+]]></pageText> 
+
+<pageText><![CDATA[
+Услуги компании
+]]></pageText>
+
+<pageText><![CDATA[
+<a href="#">+ <u>Досудебное урегулирование конфликтов</u></a><br>
+<a href="#">+ <u>Судебная помощь</u></a><br>
+<a href="#">+ <u>Семейное право</u></a><br>
+<a href="#">+ <u>Наследование</u></a><br>
+<a href="#">+ <u>Трудовое право	</u></a><br>
+<a href="#">+ <u>Работы с объектами недвижимости</u></a><br>
+<a href="#">+ <u>Работы со страховыми компаниями и ГИБДД</u></a><br>
+<a href="#">+ <u>Абонентское обслуживание предприятий</u></a><br>
+<a href="#">+ <u>Составление и анализ договоров</u></a><br>
+<a href="#">+ <u>Помощь в получение лицензий МЧС</u></a><br>
+<a href="asfunction:_root.more_click_func,1"><font color="#acc4c7">+ <u>полный список услуг</u></a></font>
+]]></pageText>
+
+
+</texts>
+
+<link linkType="readMoreLink">
+<item name="title"><![CDATA[
+Цены на услуги компании "Сорс"
+]]></item>
+
+<item name="linkText"><![CDATA[
+<font color="#6c8c9c"><b><u>.</u></b><br></font><br>
+Страница на стадии заполнения, приносим свои извинения. По всем вопросом просьба обращаться по телефонам (495)222-70-18
+]]></item>
+</link>
+
+<link linkType="readMoreLink">
+<item name="title"><![CDATA[
+Перечень услуг ЮК "Сорс"
+]]></item>
+
+<item name="linkText"><![CDATA[
+<font color="#6c8c9c"><b><u>Страница на стадии заполнения, приносим свои извинения.</u></b><br></font><br>
+О полном перечне услуг Вы можете узнать по телефона (495) 222-70-18, 697-57-11
+]]></item>
+</link>
+
+
+</page>
+
+<page name="partners">
+
+<image imageUrl="_pic4.png"link="#"/>
+<image imageUrl="_pic3.png"link="#"/>
+<image imageUrl="_pic5.png"link="#"/>
+
+<texts>
+
+<pageText><![CDATA[
+Партнеры ЮК "Сорс"
+]]></pageText>
+
+<pageText><![CDATA[
+
+]]></pageText>
+
+<pageText><![CDATA[
+<b>На протяжение многих лет у нас сложились деловые отношения с рядом компаний, которые нам доверяют.</b><br>
+<font size="6"><br></font>
+Мы стремимся сделать все, что бы Вы стали нашим партнером. 
+подробности по телефонам (495)222-70-18]]></pageText>
+
+<pageText><![CDATA[
+
+]]></pageText>
+
+<pageText><![CDATA[
+<a href="asfunction:_root.more_click_func,0"><font color="#acc4c7"> <u>.</u></a></font>
+]]></pageText>
+
+<pageText><![CDATA[
+Наши Партнеры
+]]></pageText>
+
+<pageText><![CDATA[
+<a href="http://www.ice-nut.ru/info/info03406.htm"><font color="#6c8c9c"><u><b>1. Туристическая компания «Айс Нат»</b></u></a></font><br>
+<a href="#"><font color="#6c8c9c"><u><b>2. ООО «Александер»</b></u></a></font><br>
+<a href="http://www.artstroygroup.ru/"><font color="#6c8c9c"><u><b>3. ООО «АртСтройГрупп»</b></u></a></font><br>
+<a href="#"><font color="#6c8c9c"><u><b>4. ООО «Аршин»</b></u></a></font><br>
+<a href="#"><font color="#6c8c9c"><u><b>5. ООО «Видеолоцман»</b></u></a></font><br>
+<a href="#"><font color="#6c8c9c"><u><b>6. ООО «Вентстудио»</b></u></a></font><br>
+<a href="#"><font color="#6c8c9c"><u><b>7. ООО «Голливуд»</b></u></a></font><br>
+<a href="#"><font color="#6c8c9c"><u><b>8. ООО «ЕвроТрансЛогистик»</b></u></a></font><br>
+<a href="#"><font color="#6c8c9c"><u><b>9. Крестьянское хозяйство «Колоc»</b></u></a></font><br>
+<font size="4"><br></font>
+<br>
+<font size="12"><br></font>
+<a href="asfunction:_root.more_click_func,1"><font color="#acc4c7"><u>Все Партнеры</u></a></font><br>
+]]></pageText>
+
+
+<pageText><![CDATA[
+<a href="#"><font color="#6c8c9c"><u><b></b></u></a></font><br>
+<font size="4"><br></font>
+
+<font size="12"><br></font>
+<a href="asfunction:_root.more_click_func,2"><font color="#acc4c7">+ <u>.</u></a></font><br>
+]]></pageText>
+
+</texts>
+
+<link linkType="readMoreLink">
+<item name="title"><![CDATA[
+.
+]]></item>
+
+<item name="linkText"><![CDATA[
+<font color="#6c8c9c"><b><u>Страница на стадии заполнения, приносим свои извинения.</u></b><br></font><br>
+.
+]]></item>
+</link>
+
+<link linkType="readMoreLink">
+<item name="title"><![CDATA[
+Партнеры юридической компании Сорс
+]]></item>
+
+<item name="linkText"><![CDATA[
+<font color="#6c8c9c"><b><u>На протяжение многих лет у нас сложились деловые отношения с рядом компаний, которые нам доверяют.</u></b><br></font><br>
+1. Туристическая компания «Айс Нат»<br>
+2. ООО «Александер»<br>
+3. ООО «АртСтройГрупп»<br>
+4. ООО «Аршин»<br>
+5. ООО «Видеолоцман»<br>
+6. ООО «Вентстудио»<br>
+7. ООО «Голливуд»<br>
+8. ООО «ЕвроТрансЛогистик»<br>
+9. Крестьянское хозяйство «Колоc»<br>
+10. Индивидуальный предприниматель Ярошев И.И.<br>
+11. ООО «Инжтеплосервис-МЭФ»<br>
+12. ООО «СиМакс»<br>
+13. ООО «МИКСЭЛ»<br>
+14. ООО «Карго-Сервис»<br>
+15. ООО «Ламина»<br>
+16. ООО «Юналс»<br>
+17. ООО «Транс-Никас»<br>
+18. ООО «Логистик-Альянс»<br>
+19. ООО «Медведково-Авто»<br>
+20. ООО «Новая Производственная Инициатива»<br>
+21. Общероссийская Ассоциация Независимых Кинологических Общественных Объединений<br>
+22. ООО «Овертом»<br>
+23. ООО «ОргСервисМ»<br>
+24. ООО «Транспортно-коммерческая производственная фирма «Ориент»<br>
+25. ООО «Проект-Недвижимость»<br>
+26. ООО «Профи Эталон»<br>
+27. ООО «Ртрейд»<br>
+28. ООО «Сервис-Транс-Групп»<br>
+29. ООО «Спутник»<br>
+30. ООО «Техстройцентр»<br>
+31. ООО «Эковентстройсервис»<br>
+32. ООО «Тирос»<br>
+33. Общероссийская ассоциация Клуб Любителей Животных «КЛЖ – ФАУНА»<br>
+34. Фонд «Центр Новых Образовательных Проектов»<br>
+35. ООО «Чыран»<br>
+36. Общероссийская общественная организация «Кинологический центр «Элита» <br>
+37. ООО «ЭМ АЙ ТИ Компани»<br>
+38. ООО «Янтарь»<br>
+
+]]></item>
+</link>
+
+
+
+</page>
+
+
+
+<page name="contact us">
+
+<image imageUrl="_pic6.png" link="#"/>
+<image imageUrl="_pic7.png" link="#"/>
+
+
+<texts>
+
+<pageText><![CDATA[
+Написать письмо
+]]></pageText>
+
+<pageText><![CDATA[
+Ваше имя:<br>
+<font size="9"><br></font>
+E-mail:<br>
+<font size="9"><br></font>
+Сообщение:<br>
+]]></pageText>
+
+<pageText><![CDATA[
+<font color="#acc4c7">+ <u>Отправить</u>        + <u>Сбросить</u></font>
+]]></pageText>
+
+<pageText><![CDATA[
+Контакты
+]]></pageText>
+
+<pageText><![CDATA[
+<a href="#"><font color="#6c8c9c"><u><b>Юридическая компания "Сорс"</b></u></font></a><br>
+<font size="4"><br></font>
+Адрес<br>
+123104 г.Москва, ул. Малая Бронная д 2, офис 409<br>
+Телефон:       +7 (495) 222-70-18<br>
+Факс:              +7 (495) 697-57-11<br>
+<font size="12"><br></font>
+E-mail: <a href="#"><font color="#acc4c7"><u>uksors@mail.ru</u></font></a><br>
+]]></pageText>
+
+
+<pageText><![CDATA[
+.
+]]></pageText>
+
+
+</texts>
+
+</page>
+
+
+</section>
+
+
+<!-- privacy policy -->
+<section name="privacyPolicy">
+<item name="pageTitle"><![CDATA[
+privacy policy
+]]></item>
+<item name="pageText"><![CDATA[
+<font color="#6c8c9c"><b><u>.</u></b><br></font><br>
+Страница на стадии заполнения, приносим свои извинения. По всем вопросом просьба обращаться по телефонам (495)222-70-18<br>
+<br>
+E-mail: <a href="#"><font color="#acc4c7"><u>#</u></font></a><br>
+]]></item>
+</section>
+<!-- privacy policy -->
+
+
+<!-- terms of use -->
+<section name="termsOfUse">
+<item name="pageTitle"><![CDATA[
+terms of use
+]]></item>
+<item name="pageText"><![CDATA[
+]]></item>
+</section>
+<!-- terms of use -->
+
+
+	
+<!-- contact form -->
+<section name="contactForm">
+		<texts>
+		<pageText><![CDATA[
+Your name:
+]]></pageText>
+        <pageText><![CDATA[
+E-mail:
+]]></pageText>
+        <pageText><![CDATA[
+Message:
+]]></pageText>
+        <pageText><![CDATA[
+<font color="#2a4e5b"><b>&#8250; clear</b></font>
+]]></pageText>
+        <pageText><![CDATA[
+<font color="#2a4e5b"><b>&#8250; submit</b></font>
+]]></pageText>
+		</texts>
+<item name="serverOption">php</item>
+<item name="recipient">#</item>
+
+</section>
+<!-- contact form -->
+</content>

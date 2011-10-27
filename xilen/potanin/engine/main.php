@@ -312,7 +312,7 @@ class engine extends engine_Main
 		return "56";
 	}
 
-	function menu_1($tpl=''){
+	function menu_1($tpl='',$color='gray'){
         // менюшка линейная с картиками вместо названий
         if(!$tpl) $tpl='main_menu';
 		$sm=$this->ffirst('getSiteMap','main');
@@ -321,8 +321,7 @@ class engine extends engine_Main
 			if(isset($v->v['skipit'])) continue;
 			$data[]=$v->v;
 		} 
-        debug($tpl);
-		return  $this->_tpl('tpl_jmain','_'.$tpl,array('menu'=>$data));
+  		return  $this->_tpl('tpl_jmain','_'.$tpl,array('menu'=>$data,'color'=>$color));
 	}
 
 	
