@@ -23,7 +23,8 @@ function betouch($file, $time, $offset = 0){
 }
  
 class preprocessor{
-	
+	var $obcnt=0,
+        $debug_str='';
 	/**
 	 * error handling. donow what to do with them ;(
 	 */
@@ -156,7 +157,39 @@ class preprocessor{
 		if ((string)$files['name']=='') 
 			$this->error('XML: there is no NAME parameter of IMPORT tag.') ; // faked variable
 		$this->xml_read((string)$files['name']);
-	} 
+	}
+
+    private function obend (){
+        ob_end_clean();
+        $this->obcnt--;
+        $this->debug();
+    }
+
+    private function obstart (){
+        $this->obcnt++;
+        ob_start();
+    }
+
+    public function debug (){
+        $na=func_num_args();
+        if($na>1){
+            for ($i=0; $i<$na;$i++){
+                $this->debug(func_get_arg($i));
+            }
+        } else {
+            if ($na==1){
+                if ($this->obcnt){
+                    $this->debug_str.= "\n".func_get_arg(0);
+                } else {
+                    echo ''.func_get_arg(0);
+                }
+            } else {
+                echo $this->debug_str;
+                $this->debug_str='';
+            }
+        }
+    }
+
 	
 	/**
 	 * read xml file and parse information. 
@@ -164,9 +197,10 @@ class preprocessor{
 	 * @param $xml
 	 */
 	public function xml_read($xml,$insertbefore=false){
+        //$this->debug('xml_read:',getcwd());
 		$oldcwd= getcwd() ;
 		if (is_file($xml)){
-			chdir(dirname($xml));
+			chdir(dirname($xml));//$this->debug('xml_read:',getcwd());
 			$this->cfg_time($xml);
 			$config=simplexml_load_file($xml);
 		} else {
@@ -208,6 +242,7 @@ class preprocessor{
 		if($insertbefore){
 			$this->store=array_merge(sav,$this->store);
 		}
+        //$this->debug(print_r($this,true));
 		chdir($oldcwd);
 	}
 	/**
@@ -237,7 +272,7 @@ class preprocessor{
 			array('<?','?>','<'.'%=','<'.'%','%'.'>'),
 			array('<@','@>','<'.'?php echo ','<'.'?php ','?'.'>'),$s
 		);
-		ob_start();
+		$this->obstart();
 		return '?'.'>'.$s;
 	}
 	
@@ -247,14 +282,14 @@ class preprocessor{
 	 */
 	private function post_process($dst='',$time=0){
 		$s=ob_get_contents();
-		$s=str_replace( // + финальная коректировка перевода строк
-		// заменяем обычные переводы на интел, 
-		// если были маковские - меняем на интеловксие
-		// интеловские меняем на виндовые, а то у меня смотрелка глючит :(
+		$s=str_replace( // + final linefeed correcion
+		// replace LF with intel LF,
+		// all MAC's LF replaced on Intel
+		// Replace Intel LF with Windows LF for my editor glitched with different  :(
 			array('<@','@>','%/>','</%', "\r\n","\r","\n"),
 			array('<?','?'.'>','<'.'%','%'.'>',"\n","\n","\r\n"),$s
 		);
-		ob_end_clean();
+		$this->obend();
 		if(!empty($dst)){
 			$x=pathinfo($dst);
 			if(!is_dir($x['dirname']))mkdir($x['dirname'], 0777 ,true);
@@ -266,7 +301,8 @@ class preprocessor{
 		}
 		return false;
 	}
-	
+
+
 	public function _handleNotice($errno, $errstr, $errfile, $errline)
     {
     	if(error_reporting()) return ;
@@ -320,7 +356,11 @@ class preprocessor{
 					if ($___m[2]=='echo')
 						$srcfile='';
 					if(!is_null($___s)){
-						eval($___s);
+                        $oldcwd= getcwd() ;
+                        if (is_file($srcfile))
+                            chdir(dirname($srcfile));//$this->debug('xml_read:',getcwd());
+                        eval($___s);
+                        chdir($oldcwd)  ;
 						if (empty($dstfile)){
 							$this->cfg_time($filemtime);
 						}

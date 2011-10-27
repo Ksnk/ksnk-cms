@@ -32,6 +32,5 @@ XML;
 		exit;
 	}
 }
-
 $paths->process();
 ?>
