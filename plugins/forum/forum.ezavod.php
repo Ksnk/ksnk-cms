@@ -7,7 +7,7 @@
 ##    вкюлчить javascript в site.js
 ##
 point_start('js_body');
-include("plugins/forum/forum.js");
+include("forum.js");
 point_finish('js_body');
 point_start('js_main');%>
 
@@ -38,10 +38,10 @@ point_start('js_main');%>
 ##<?php
 	$this->xml_read('
 <config>
-	<files dir="plugins/forum" dstdir="$dst/admin/engine/plugins">
+	<files dstdir="$dst/admin/engine/plugins">
 		<file>forum.php</file>
 	</files>
-	<files dir="plugins/forum" dstdir="$dst/templates">
+	<files dstdir="$dst/templates">
 		<file>jforum.jtpl</file>
 	</files>
 </config>
