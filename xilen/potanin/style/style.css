@@ -58,13 +58,16 @@ h2 {
 .header {
 	padding-right: 65px;
 	padding-bottom: 10px;
+    font-color:#8eaeb2;
+    line-height: 1.5em;
+	font-size: 1em;
 }
 
 h3 {
 	padding: 0 0 6px 0;
 	line-height: 1.5em;
 	font-size: 1em;
-	color: #000000;
+
 }
 h3 a {
 	color: #000000;
@@ -193,10 +196,13 @@ img.fleft {
 	color: #003;
 }
 .title-1 {
-	min-height: 35px;
+	min-height: 40px;
 	height: auto !important;
-	height: 35px;
+	height: 40px;
 	font-size: large;
+    color:#8eaeb2;
+    line-height: 1.5em;
+    font-family: Tahoma;
 }
 .title-2 {
 	min-height: 35px;

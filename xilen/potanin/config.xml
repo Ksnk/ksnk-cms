@@ -20,12 +20,15 @@
 		<copy>Comic_Sans_MS.ttf</copy>
 	</files>
 	<files  dstdir="$dst">
-		<copy>Debug/HackerConsole/*.*</copy>
+		<copy>Debug/HackerConsole/*
+
+            .*</copy>
 	</files>
 <!-- ****************************************************************** -->
 <!-- ****   копируем файлы отсюда на место                          *** -->
 <!-- ****************************************************************** -->
 	<files dstdir="$dst">
+
 		<file>*.php</file>
 		<file>.htaccess</file>
 		<copy>*.swf</copy>
@@ -75,5 +78,10 @@
 		<file>admin/templates/jfiles.jtpl</file>
 		<file>admin/templates/jusers.jtpl</file>
  		<file>admin/engine/engine.php</file>  
-	</files>-->	
+	</files>-->
+<!-- копируем части от FLESH -->
+    <files dstdir="$dst/flash" dir="main2_v8">
+        <file>tfile_main.xml</file>
+        <file>index.html</file>
+    </files>
 </config>
