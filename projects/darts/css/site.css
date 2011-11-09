@@ -1,0 +1,108 @@
+@CHARSET "UTF-8";
+<% // определение цветов  
+	$gray_color = 'gray';
+	$lgreen="#f0ffff";
+	$orange="moccasin";
+	$deepblue="navy";
+	$white="white";
+	$light_gray="#EEE";
+	
+	// цвета по сайту	
+	$placeholder_color=$gray_color;
+	$header_bg=$light_gray;
+	
+	$form_background=$lgreen;
+	
+	$ligthbackground=$orange;
+	$onligthbackground=$deepblue;
+	
+	$darkbackground=$deepblue;
+	$ondarkbackground=$white;
+	
+	include "/xilen/common/common.css"	;
+%>
+html, body { 
+	font-family: Verdana; 
+	font-size:12px;
+	height: 100%; margin:0;padding:0;
+}
+	
+p{margin:0 10px 10px;}
+
+input, textarea, select {
+font-family: Verdana, sans-serif;
+}
+
+.orangebg {
+background-color: <%=$ligthbackground%>;
+color: <%=$onligthbackground%>;
+}
+.bluebg {
+background-color: navy;
+color: white;
+}
+
+#header h1{
+	color: #79B30B;
+	margin:0.7em 30px;
+}
+
+#content, #extra ,#navigation {padding:10px 30px 10px 10px;line-height:1.4em;}
+#navigation, #content, #extra {vertical-align:top;}
+/* личные предпочтения */
+#footer {
+font-size:xx-small ;
+width: 100%;
+background: black;
+color: #FFF;
+text-align: center;
+padding: 4px 0;
+}
+
+#footer span {float:right;}
+
+.float_left {
+	float:left;
+	margin: 0 15px 0 5px;
+}
+
+em {color:red;}
+#tourlist div, #pllist div  {margin:0px;padding:0px;}
+
+fieldset {background-color:<%=$form_background%>;}
+
+.placeholder {color : <%=$placeholder_color%>;font-size:12px;}
+
+.trntab {
+	border:2px inset white;font-size:12px;font-family:courier;
+	height:35px;
+}
+
+.trntab.gray {
+	background-color:<%=$header_bg%>;
+}
+
+input.small {width:100px;font-size:10px; height:1.2em; padding:0.1em 0.5em; border:1px solid <%=$gray_color%>; margin:1px;}
+
+
+.inputs input { text-align:center;width:40px; }
+.inputs {text-align:center;}
+
+.pad4 td, .pad4 th {padding:2px 6px;}
+
+.trntab a {display:block; height:100%; text-decoration:none;}
+
+.graybottom {
+	border-bottom:solid 1px #d7dee9;padding-bottom:2px;
+}
+.tab_game {
+	top:5px;left:5px;
+	position:absolute;
+	height:4em; width:100px;
+	border:1px solid <%=$deepblue%>;
+}
+.tab_game .loosers{
+	border-color: <%=$lgreen%>;
+}
+
+/* <% insert_point("css_site"); %> */

@@ -1,0 +1,40 @@
+#
+# иконизация ...
+# 
+AddType image/x-icon .ico
+
+#
+# защита, типа,  от порнолизаторов...
+# 
+php_value allow_url_fopen 0
+
+#
+# на хостинге умные люди его включили...
+#
+php_value register_globals off
+
+#
+#  как-то пригодилось... хай буде...
+#
+#php_value auto_prepend_file prepend.inc
+
+<IfModule mod_rewrite.c>
+	RewriteEngine On
+#
+# защита от порнолизаторов...
+# 
+	RewriteRule ((%3A|:)25|%0D%0A) - [G,L]
+
+#
+#   darts.html посылаем на index не глядя
+# 
+	RewriteRule darts.html /darts/index.php?it=../darts/darts.2000.html [QSA,NE,L]
+#	RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_URI} !-f
+
+#
+#   ЧПУ. Все, что не знаем - обрабатываем index.php
+# 
+	RewriteCond %{REQUEST_FILENAME} !-f
+	RewriteCond %{REQUEST_FILENAME} !-d
+	RewriteRule ^(.*)$ /darts/index.php?it=$1 [QSA,NE,L]
+</IfModule>

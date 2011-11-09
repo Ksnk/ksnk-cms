@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head >
+<title>{{title}}</title>
+<meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta http-equiv="Content-Language" content="ru">
+<base href="http://ksnk.dpb.ru/darts/">
+<!--[if lte IE 6]></base><![endif]-->
+##<script src="http://yandex.st/jquery/1.4.4/jquery.min.js"></script>
+<script src="js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="js/site.js"></script>
+<LINK  rel="stylesheet" type="text/css" href="css/site.css">
+
+</head>
+<body>
+<table style="table-layout:fixed;width:100%;height:100%;">
+{% if is_admin %}
+{% set admnews=callex('darts_News','show_News',0) %}
+{% endif %}
+{% if is_user %}
+{% set allnews=callex('darts_News','show_News',lastclub) %}
+{% endif %}
+<col style="vertical-align:top;width:{% if admnews or allnews %}200{% else %}20{% endif %}px;">
+<col style="width:100%;">
+<col style="vertical-align:top;width:20px;">
+<tr><td id="header" style="height:80px;background: #EEE;" colspan=3>
+
+<div class="align_right" style="width:250px;float:right;"><div style="padding:8px 20px 0 0;">
+########################
+##  форма логина!
+{% if is_user %}
+	{% set clubs=callex("darts_Players","_clublist") %}
+	<a href="?do=logout">logout</a><br>
+	{% if clubs|length >0 %}
+		клуб {% for club in clubs %}{% if lastclub==club.ID %}{{club.NAME}}{% endif -%}
+		{% endfor %}
+	{% else %}
+		нет клуба
+	{% endif %}
+{% else %}
+	{{ loginform() }}
+{% endif %}
+
+</div></div>
+<h1>{{title}}
+{%- if lastclub %}
+	{% for club in clubs -%}
+		{% if lastclub==club.ID %}({{club.NAME}}){% endif-%}
+	{% endfor -%}
+	{% endif -%}
+</h1>
+<span style="color:#FF0000;" id="login_error">{{error}}</span>
+<div class="ulmenuContainer" STYLE="margin-bottom:0px;">
+<ul class="ulmenu">
+<li><a href='darts.html'>Играть в Дартс</a>
+	<ul>
+		<li><a href='darts.html'>Без записи результатов</a></li>
+	</ul>
+</li>
+{% if is_user %}
+	{% set tourn=callex("darts_Tourn","_list") %}
+	{% if tourn %}
+	<li><a href="?do=showtour">Турниры</a>
+	  <ul>
+  {% for p in tourn %}
+  		<li{%if p.LEVEL>1 %} class="level{{p.LEVEL}}" {% endif %} ><a href="?do=showtour&amp;id={{p.ID}}">{{p.NAME}}</a></li>
+	  {% for pp in p.childs %}
+  		<li{%if pp.LEVEL>1 %} class="level{{pp.LEVEL}}" {% endif %} ><a href="?do=showtour&amp;id={{pp.ID}}">{{pp.NAME}}</a></li>
+	  {% for ppp in pp.childs %}
+  		<li{%if ppp.LEVEL>1 %} class="level{{ppp.LEVEL}}" {% endif %} ><a href="?do=showtour&amp;id={{ppp.ID}}">{{ppp.NAME}}</a></li>
+	  {% endfor %}
+	  {% endfor %}
+  {% endfor %}
+		</ul>
+	</li>
+	{%- endif %}	{%- endif %}
+##	{% set plr=callex("darts_Players",'_list') %}
+##	{% if plr %}
+##	{% if is_editor %}
+##	<li><a>Игроки</a>
+##	  <ul>
+##  {% for d in plr %}
+##  <li><a href="?do=player&amp;id={{d.ID}}">{{d.name}}</a></li>
+##  {% endfor %}
+##		</ul>
+##	</li> {% endif %}
+##	{% endif %}
+	{% if is_editor %}
+##    <li >
+##		<a href="?do=tourn_List&amp;plugin=darts_Rating"><span>рейтинг</span></a>
+##	  </li>
+
+{% endif %}
+	<li><a href="?do=qa">Вопрос-ответ</a><ul>
+		<li><a href="?do=writeus">написать нам</a></li>
+		</ul>
+	</li>
+
+{% if is_user %}	
+	{% if is_editor %}
+{#	<li><a>Новый</a><ul>
+		<li><a href="?do=player">игрок</a></li>
+		<li><a href="?do=newtour">турнир</a></li>
+		<li><a href="?do=addnews&amp;plugin=darts_News">новость</a></li>
+		</ul>
+	</li>#}
+	{% elif not is_reader  %}
+	<li><a>Новый</a><ul>
+		<li><a href="?do=club">Создать  клуб</a></li>
+		</ul>
+	</li>
+	{% endif -%}		
+{% else %}	
+	<li><a href="?do=register">Регистрация</a>
+	</li>
+{% endif -%}
+
+{% if length(clubs)>0 %}
+	<li><a  href="?do=club&id={{lastclub}}">Клуб</a><ul>
+{% for club in clubs %}
+<li><a href="?do=club&id={{club.ID}}">{{club.NAME}}</a></li>
+{% endfor %}
+	</ul>
+	</li>
+{% endif %} 
+
+{% if is_admin %}	
+	<li><a>Админ</a><ul>
+	<li><a href="?do=userlist">Список пользователей</a></li>
+	</ul>
+	</li>
+{% endif %}	
+</ul>	
+</div>
+</td></tr>
+<tr><td id="navigation" class="orangebg">
+
+{% if admnews %}
+<h3> системные новости </h3>
+	{% for news in admnews %}
+	<p class="menu" data-menu="#editnews" data-item="{{news.ID}}">
+	<b><a class="editnews" href="?do=news&id={{news.ID}}">{{news.DATE}}</a></b>&nbsp; {{news.text}}</p>
+	{% endfor %}
+{% endif %}
+{% if allnews %}
+<h3> новости клуба</h3>
+	{% for news in allnews %}
+	<p{%if is_editor %} class="menu" data-menu="#editnews" data-item="{{news.ID}}"{% endif %}>
+	<b><a class="editnews" href="?do=news&id={{news.ID}}">{{news.DATE}}</a></b>&nbsp; {{news.text}}</p>
+	{% endfor %}
+{% endif %}
+
+ </td>
+<td id="content"><div style="overflow:auto;">
+
+{% if data!=" " %}{{data}}
+{% else %}
+{% if is_user %}
+##<h1> Новости </h1>
+	{% block newslink %}
+	{% for news in callex('darts_News','_news') %}
+	{% if is_admin %}
+	<div style='float:right;'><a href="#" onclick="_news(this,'kill');">Kill</a>&nbsp;<a href="#" onclick="_news(this,'add');">Edit</a></div>
+	{% endif %}
+	<p id="news_{{news.ID}}"><b>{{news.DATE}}</b>&nbsp; {{news.text}}</p>
+	{% endfor %}
+	{% endblock %}
+{% else %}
+точнее - здесь хранят результаты Ваших игр. Еще точнее - это просто записная книжка,
+снабженная некими удобствами для более комфортной игры в Дартс.
+<ul><li><em>Что такое дартс-клуб?</em>
+<ul><li>
+Это просто компания игроков, которые постоянно играют вместе. Им нужен инструмент для достаточно простого подсчета и сохранения результатов игр.
+А еще они могут устраивать турниры...
+</li></ul><li><em>Как все это выглядит?</em>
+<ul><li><em>Анархия - мать порядка</em> - 
+В помещении, где бросают дротики, устанавливается компьютер, 
+компьютер заходит в клуб под аккаунтом с правом на ввод результатов игры 
+и любой игрок клуба может записать результаты партии. </li>
+<li><em>Диктатура - основа стабильности</em> -
+На соревнованиях можно выделить специального судью, который будет отмечать результаты бросков. 
+<li>Результаты партии сохраняются на сервере.
+В любой момент времени, любой человек, имеющий доступ к аккаунту клуба, может 
+увидеть свои результаты, сравнить с предыдущими и, возможно, порадоваться за себя ;)
+</li></ul></li><li>
+
+<em>Как все это устроено?</em>
+<ul><li>
+Для начала вы регистрируете на сайте свой аккаунт.
+Нужно будет указать имя, пароль, название клуба, какое-то описание. 
+Название и описание будут отображатся на всех страницах клуба.
+</li><li>
+после создания клуба можно добавить новый аккаунт, с правом только на ввод игр. 
+Под этим аккаунтом будет заходить клубный компьютер, стоящий рядом с доской. 
+</li><li>
+Можно разослать всем игрокам клуба "инвайт-ссылку", которая позволит им завести 
+свой аккаунт на сервере, если его не было и автоматически присоединится к вашему клубу.
+</li><li>
+Можно разослать игрокам клуба "инвайт-ссылку", которая позволит им не заводить
+аккаунт на сервере, а просто вводить результаты своих игр в турнирную таблицу клуба. Если используется чужой 
+компьютер, такой подход может оказаться предпочтительней.
+</li><li>
+затем нужно ввести список игроков, которые будут играть под этим аккаунтом. Игроки, введенные таким образом, 
+не имеют учетной записи на сервере, однако в любой момент могут ее завести.
+</li>
+<li>Начните <em>новый турнир</em>. У турнира есть отдельный пароль на просмотр результатов и пароль на ввод результатов.
+Также можно было бы присобачить к турниру турнирную таблицу, сроки проведения, ets... но это пока в проекте.
+Если не сделать пароль на ввод результатов любые ваши игроки смогут в любой момент пойти в тир, расписать партейку и сохранить результаты.
+Если не сделать пароль на просмотр результатов любые люди смогут просмотреть результаты партий...
+
+</li></ul></li></ul>
+{% endif %}
+{% endif %}
+
+{{debug}}
+</div></td>
+<td id="extra"  class="bluebg">
+
+
+</td>
+</tr>
+<tr><td colspan=3 id="footer" style="height:20px;"><span></span>(с) by -=ksnk=-
+</td></tr>
+</table>
+
+<div style="display:none;">
+<div id="debug"></div>
+<div id="editnews">
+<a href="?plugin=darts_News&do=killnews&nid=~~"><img src="img/ik19.gif"></a>
+<a href="?plugin=darts_News&do=addnews&nid=~~"><img src="img/ik20.gif"></a>
+</div>
+
+ <div id="dialog-confirm">
+ <span>
+ Вы уверены, что хотите чего-то там удалить?</span>
+ </div>
+ <div id="dialog-form" title="Введите данные">
+	<form>
+		<input type="text" name="text" id="name" class="text ui-widget-content ui-corner-all" />
+	</form>
+</div> 
+
+</div>
+</body>
+</html>
+
+##################################################################
+##
+##   - writeus описание 
+##
+{% macro writeus (noquote,is_user,list,pages,user,return) %}
+<form class="ajax" action="" method="post"
+data-complete="reload();"
+><fieldset style="padding:10px 0px 10px 25px;width:450px;"><legend>написать нам </legend>
+##{% if not noquote %}
+<div class="quote_div"></div>
+##{% endif %}
+<input type="hidden" name="action" value="newkomment">
+<div style="margin:10px 0px 10px 25px;">Ваше имя
+	<input type="hidden" name="user" value="{{user.id}}">
+	<input type="text" name="username" value="{{user.name}}" style="margin:0px 0px 0px 15px;border:solid 1px #d7dee9;"/>
+</div>
+<textarea name="newpost" style="height:145px;width:425px;border:solid 1px #d7dee9;">
+</textarea><br>
+<input type="hidden" name="comment" value="{{par.id}}">
+<input type="hidden" name="quote_id" value="">
+<input type="hidden" name="quote" value="">
+##<input type="hidden" name="form" value="{{return|default('qa:check')}}">
+<input type="submit" value="Отправить" >
+</fieldset></form>
+{% endmacro %}
+##################################################################
+##
+##   - qa описание 
+##
+{% macro qa (list,pages,root,user,is_user) %}
+<div class="para">
+{% if pages %}{{pages}}{% endif %}
+<table style="width:75%;margin-top:30px;">
+{% for l in list %}
+<tr style="color:#9eafc3;">
+<td class="graybottom">{{l.date}}</td>
+<td class="graybottom">{{l.username}}</td>
+<td class="graybottom">
+{% if is_user %}<a href="#" onclick="return komment(this,{{l.id}});">Ответить</a>{% endif %}</td>
+<td style="border-bottom:solid 1px #eb8017;width:100px;">сообщение #{{loop.index}}</td>
+</tr>
+<tr>
+<td class="question" colspan="3" style="padding: 20px 0px 12px 25px;">{{l.text}}
+</td><td style="{{style_str}}"></td>
+</tr>
+{% for c in l.childs %}
+	<tr>
+<td class="answer" colspan="3" style="padding: 20px 0px 12px 85px;">{{c.text}}
+</td><td style="{{style_str}}"></td>
+</tr>
+{% endfor %}
+
+{% endfor %}
+</table>
+{% if pages %}{{pages}}{% endif %}
+
+<div class="container" >{{ writeus(noquote=1,user=user,root=root,is_user=is_user)}}</div>
+</div>
+{% endmacro %}
+
+
+##########################################################################
+##
+##  Loginform
+##
+{%- macro loginform() %}
+<form action="" method="POST" name="login">
+<table  style="width:96%;table-layout:fixed;">
+	<col style="width:90px;text-align:right;"><col ><col style="width:30px;">
+<tr>
+	<td>имя:</td>
+	<td colspan="2"><input name="login_name" type="text" value="" class="small"></td>
+</tr><tr>
+	<td> пароль:</td>
+	<td colspan="2"><input name="login_pass" type="password" value="" class="small"></td>
+</tr><tr>
+	<td><input type="checkbox" value="1" style="float:right;" name="login_save">сохр.</td>
+	<td>
+	&nbsp;<a href="?do=register">регистрация.</a>
+	</td>
+	<td class="align_right"><input type="submit" style="font-size:10px;" value="&raquo;">
+	<input name="form" type="hidden" value="darts_Auth:check"></td>
+</tr></table></form>
+{% endmacro -%}
+
+##########################################################################
+##
+##  UserRights - генерируем набор чекбоксов для прав пользователя
+##    right - отмеченные права, allow - доступные права
+##	
+##
+{%- macro userrights(right,allow,columns=3,columnswidth=240) %}
+<div style="display:inline-block;width:{{columns * columnswidth}}px">
+
+{% for r in [
+	'Добавлять результаты игр',
+	'Изменять турниры',
+	'Добавлять новости','Отвечать',
+	'',
+	'Просматривать турнирную таблицу',
+	'',
+	'','',
+	'',
+	'Администратор'] %}
+{% set rr =1<<loop.index0 %}
+
+{% if (allow & rr) %} 
+<div style="float:left; width:{{columnswidth}}px;">
+<input type="checkbox" name="right[]" {% if right & rr%} checked{% endif %} value="{{rr}}">{{r}}<br>
+</div>
+{% endif %}
+{% endfor %}
+</div>
+{% endmacro -%}
+
+##########################################################################
+##
+##  Regnew
+##
+{%- macro Regnew(user,invite,error,is_user) %}
+<form action="" method="POST" name="tir">
+<div style="margin:0 auto;max-width:400px;min-width:400px;width:80%;">
+
+{% if invite %}
+<p class="align_left">Вы получили приглашение для вступление в клуб {{invite}}.</p>
+{% endif %}
+{% if not is_user %}
+<p class="align_left">Если вы уже зарегистрированы на сервере - войдите, используя окно входа.<br>
+Для создания нового аккаунта на сервере заполните, пожалуйста форму. 
+</p> 
+
+<fieldset><legend>Регистрация</legend>
+        <table style="table-layout:fixed;">
+            <col style="width:160px;">
+			<col style="width:230px;">
+			<tr><td>
+                    имя
+            </td><td >
+            {% if error.akk %}<em>{{error.akk}}</em><br>{% endif %}
+                    <input name="user" type="text" class="long" placeholder="login(*)">
+            </td></tr>
+            <tr><td>
+                    пароль
+            </td><td >
+            {% if error.password %}<em>{{error.password}}</em><br>{% endif %}
+                    <input name="password" type="password" class="long" placeholder="password (*)">
+            </td></tr>
+            <tr><td>
+                    повторить пароль
+            </td><td >
+                    <input name="rpassword" type="password" class="long" placeholder="password (*)">
+            </td></tr>
+            </table>
+ 	</fieldset>
+{% endif %}
+{% if is_user %}
+<p class="align_left">Изменение персональных данных должно подтверждаться вводом пароля</p>
+  <fieldset><legend> {{user.name}} </legend>
+        <table style="table-layout:fixed;">
+            <col style="width:160px;">
+			<col style="width:230px;">
+			<tr><td>
+                    пароль
+            </td><td >
+            {% if error.akk %}<em>{{error.akk}}</em><br>{% endif %}
+                    <input name="opassword" type="text" class="long" value="{{user.name}}" placeholder="login(*)">
+            </td></tr>
+             </table>
+ 	</fieldset>
+<p class="align_left">Здесь можно сменить пароль</p>
+ 	<fieldset><legend>сменить пароль </legend>
+        <table style="table-layout:fixed;">
+            <col style="width:160px;">
+			<col style="width:230px;">
+			<tr><td>
+                    новый пароль
+            </td><td >
+            {% if error.password %}<em>{{error.password}}</em><br>{% endif %}
+                    <input name="password" type="password" class="long" placeholder="password (*)">
+            </td></tr>
+            <tr><td>
+                    повторить пароль
+            </td><td >
+                    <input name="rpassword" type="password" class="long" placeholder="password (*)">
+            </td></tr>
+            </table>
+ 	</fieldset>
+<p class="align_left">
+Персональный аккаунт позволит вам смотреть статистику по собственным играм и 
+подключаться к другим клубам. Для этого необходимо заполнить свои имя и фамилию.
+<br>Общий аккаунт подключен к одному клубу.
+</p>   	<fieldset><legend><input type="checkbox" name="aktype">Персональный аккаунт</legend>
+       
+        <table style="table-layout:fixed;">
+           <col>
+			<col>
+			<tr><td>
+                    <input name="username" type="text" class="long" placeholder="Имя">
+            </td><td >
+                    <input name="username2" type="text" class="long" placeholder="Фамилия">
+            </td></tr>
+            </table>	
+ 	</fieldset>
+{% endif %}
+{% if not is_user %}
+{% if error.captcha %}<em>{{error.captcha}}</em><br>{% endif %}
+    Введите цифры, которые вы видите на картинке
+ 	<table class="align_middle align_center"><td>
+ 	<img src="captcha.php"></td><td>
+ 	<input type="text" name="captcha" style="width:50px;" placeholder="цифры"></td>
+ 	<td><input type="submit" value="&raquo;"></td>
+ </tr></table> 
+<p class="align_left">
+Администратор вашего клуба может сделать "постоянное" приглашение - ссылку, 
+перейдя по которой вы можете записывать свои игры и просматривать турнирную таблицу.
+<br>Приглашение действительно, как правило, на один турнир. 
+Регистрация на сервере при этом будет необязательна. 
+</p>
+{% else %}
+<input type="submit" value="&raquo;"></br>
+<p class="align_left">Если вы хотите присоединиться к другому клубу - вам нужно получить 
+ссылку-приглашение от администратора. Перейдя по этой ссылке вы 
+автоматически добавляетесь в клуб. </p>
+
+{% endif %}
+ </div>  
+ </form>
+{% endmacro -%}
+
+##########################################################################
+##
+##  ListUser - список всех пользователей системы с возможностью редактирвания
+##
+{%- macro ListUser(users) %}
+##<form name="ListUser" action="" method="post">
+{% for user in users %}
+"{{user.name}}"&nbsp;"{{user.password|e}}"&nbsp;
+<input type="button" class="ajax" value="Удалить"
+	data-confirm="действительно удалить пользователя?"
+	data-href="?do=killuser&id={{user.id}}"
+	data-complete="reload();"
+>
+<input type="button" class="ajax" value="Добавить категорию"
+	data-input="Название категории"
+	data-href="?do=setright&id={{user.id}}&club=~~"
+	data-complete="reload();"
+>
+{% if user.right %}{% set right = user.right %} <ul> ## 29,31
+{% for r in right|keys %}<li> {{r}} {{'=>'|e}} {{ userrights(right[r],1024+31-16+32) }}
+<input type="button" class="ajax" value="сменить"
+	data-href="?do=setright&club={{r}}&id={{user.id}}"
+	data-form="$(this).parents('li').first()"
+	data-complete="reload();"
+><input type="button" class="ajax" value="удалить категоию"
+	data-href="?do=remright&club={{r}}&id={{user.id}}"
+	data-complete="reload();"
+></li>{% endfor %}
+</ul>
+{% endif %}
+{% endfor %}
+##<input type="submit" name="xxx" value="&raquo;">
+##</form>
+{% endmacro -%}
+##########################################################################
+##
+##  ajax - форма вывода данных ajax'ом
+##
+{%- macro ajax(data) %}
+{{data}}
+{% endmacro -%}
+##########################################################################
+##
+##  Regclub - форма вывода данных ajax'ом
+##
+{%- macro Regclub(data,error) %}
+<form name="Regclub" action="" method="post">
+<div style="margin:0 auto;min-width:400px;width:80%;">
+ 	
+<p class="align_left">
+Вы можете создать свой собственный клуб или присоединится к уже существующему. <br> 
+Для создания клуба - заполните форму. После создания клуба вы становитесь 
+его администратором и сможете пригласить других членов клуба.
+</p> 	<fieldset><legend>создать клуб</legend>
+        <table style="table-layout:fixed;">
+           <col style="width:160px;">
+			<col style="width:230px;">
+			<tr><td>
+                    Название клуба
+            </td><td >
+            {% if error.name or error.tirname %}<em>{{error.tirname}}{{error.name}}</em><br>{% endif %}
+            
+                    <input name="tirname" type="text" class="long">
+            </td></tr>
+            <tr><td>
+                    описание
+            </td><td >
+                    <textarea name="tirdescr" class="long"></textarea>
+            </td></tr>
+            <tr><td class="align_center" colspan=2><input type="submit" value="&nbsp;&raquo;&nbsp;">
+            </td></tr>
+            </table>	
+ 	</fieldset>
+ 	
+<p class="align_left">
+Если вы хотите присоединиться к другому клубу - вам нужно получить 
+ссылку-приглашение от администратора. Перейдя по этой ссылке вы 
+автоматически добавляетесь в клуб. 
+
+Администратор клуба может сделать также "постоянное" приглашение - ссылку, 
+перейдя по которой вы можете записывать свои игры, регистация на сервере 
+при этом будет необязательна.  
+</p> 
+</div>
+</form>
+{% endmacro -%}
+##########################################################################
+##
+##  Club - форма редактирования данных о клубе
+##
+{%- macro Club(par,error=0,is_editor=0,user=0) %}
+
+<form name="Club" action="" method="post">
+<div style="margin:0 auto;min-width:470px;width:80%;">
+<fieldset><legend>{{par.NAME}}</legend>
+## добавим панели
+<dl class="tabs">
+	<dt>{% set pllist=callex('darts_Players','_list','',par.ID,'name') -%} 
+		Игроки ({{pllist|length}})</dt>
+	<dd><select name="players" size="6" multiple="multiple" class="ajax long"
+		data-href="?do=playerinfo&id=~~"
+		data-complete="$('#playerinfo').html(data.result).parents('dd').first().prev('dt').trigger('click');"
+	>
+        	{% for p in pllist %}
+        		<option value="{{p.ID}}">{{p.name}}</option>
+        	{% endfor %}
+        </select>
+        {% if is_editor %}
+        <dl class="tabs">
+##
+##
+##        
+			<dt>добавить игрока</dt>
+				<dd id="addplayer">
+				<p class="align_left">
+Просто добавить имя и фамилию игрока. Просматривать статистику своих игр игрок сможет только если 
+зарегистрируется на сайте. Вводить результаты игр можно будет с общего аккаунта клуба или с аккаунта
+игроков клуба. После ввода имени, можно сделать приглашение этому игроку и переслать ему лично по 
+почте.</p> 
+				<input type="text" name="name1"><input type="text" name="name2">
+				<input class="ajax" 
+					data-form="#addplayer" 
+					data-href="?do=addplayer&id={{par.ID}}" 
+					data-complete="reload()"
+					type="button" value="+"></dd>
+##
+##
+##
+			<dt>информация об игроке</dt>
+				<dd class="align_left">
+				<p>
+Здесь можно поменять неправильно введенные имя и фамилию. 
+</p> 
+				<span id="playerinfo"><input type="text" name="name1"><input type="text" name="name2"></span>
+				<input type="button" value="изменить" class="ajax"
+					data-form="#playerinfo" 
+					data-href="?do=changeplayer&id={{par.ID}}" 
+					data-complete="reload()"
+				>
+				<input type="button" value="удалить" class="ajax"
+					data-confirm="Удалить игрока из клуба?" 
+					data-form="#playerinfo" 
+					data-href="?do=delplayer&id={{par.ID}}" 
+					data-complete="reload()"
+				><hr>
+				<table style="margin:5px 10px;"><tr><td colspan=2>
+ <input type="button" value="Пригласить" class="ajax float_left"
+					data-form="#privatedour" 
+					data-href="?do=privaten&id={{par.ID}}" 
+					data-complete="win_alert({txt:data.result});"
+				>
+				<p>Кнопка &laquo;пригласить&raquo; сгенерирует "приглашение" - ссылку для игрока, чтобы он мог 
+ завести аккаунт на сайте и сразу подключится к клубу. Если игрок не желает регистрироваться на сайте,
+ эта ссылка действует как ссылка общего входа с возможностью просматривать свои результаты</p>
+ </td></tr><tr><td>
+ ссылка-приглашение будет действительна до даты <br><input type="text" name="date"> <br>
+ (можно указывать количество дней вместо даты) <br>
+ 0 или пустое значение - без ограничения по дате
+				</td><td>{{ userrights(29,31-16+32,1) }}</td></tr>
+			</table>
+				
+				</dd>
+##
+##
+##
+			<dt>общий вход</dt>
+				<dd id="commondour" class="align_left">
+				<table style="margin:5px 10px;"><tr><td colspan=2>
+ <input type="button" value="Пригласить" class="ajax float_left"
+					data-form="#commondour" 
+					data-href="?do=common&id={{par.ID}}" 
+					data-complete="win_alert({txt:data.result});">
+				<p>Кнопка &laquo;пригласить&raquo; сгенерирует "приглашение" - ссылку для игрока, чтобы он мог 
+ завести аккаунт на сайте и сразу подключится к клубу. Если игрок не желает регистрироваться на сайте,
+ эта ссылка действует как ссылка общего входа с возможностью просматривать свои результаты</p>
+ </td></tr><tr><td>
+ ссылка-приглашение будет действительна до даты <br><input type="text" name="date"> <br>
+ (можно указывать количество дней вместо даты) <br>
+ 0 или пустое значение - без ограничения по дате
+				</td><td>{{ userrights(29,31-16+32,1) }}</td></tr>
+			</table>
+{#				<p>
+Ссылка общего входа предназначена для того, чтобы любой игрок клуба мог занести 
+результаты своей игры на компьютере клуба. У такой записи есть только право на ввод
+результатов игры турнира и просмотр итоговых таблиц идущих и завершившихся турниров клуба.
+<p>Cсылка-приглашение будет действительна до даты <input type="text" name="date"> (можно указывать количество дней вместо даты) 
+				0 или пустое значение - без ограничения по дате</p> 
+				<h3>Права пользователя</h3>
+{{ userrights(right(user,'tir_'~par.ID),31) }}
+				<input type="button" value="генерировать" class="ajax"
+					data-form="#commondour" 
+					data-href="?do=common&id={{par.ID}}" 
+					data-complete="win_alert({txt:data.result});"
+				>#}
+				</dd>
+		</dl>
+		{% endif %}
+	</dd>
+##
+##  вкладка - турниры
+##
+	{%- set trlist=callex('darts_Tourn','_list','',par.ID) -%}
+	<dt> 
+		Турниры ({{trlist|length}})</dt>
+    <dd><select id="trnlist" name="trn" size="6" multiple="multiple" 
+    	{%- if is_editor %}	class="ajax long"
+			data-href="?do=newtour&id=~~"
+			data-complete="$('#trntabs').html(data.result).find('.ajax').justajax().end().parents('dd').first().prev('dt').trigger('click');"
+		{%- else %} class="long"
+		{%- endif -%}	
+		>
+        	{% for p in trlist %}
+        		<option value="{{p.ID}}">{{p.NAME}}</option>
+        	{% for pp in p.childs %}
+        		<option value="{{pp.ID}}">&nbsp;|-{{pp.NAME}}</option>
+        	{% for ppp in pp.childs %}
+        		<option value="{{ppp.ID}}">&nbsp;&nbsp;&nbsp;|-{{ppp.NAME}}</option>
+        	{% endfor %}
+        	{% endfor %}
+        	{% endfor %}
+        	<option value="0">-=создать новый=-</option>
+        </select>
+         {% if is_editor %}
+        <dl class="tabs">
+##
+##
+##        
+			<dt>турнир</dt>
+				<dd><div id="trntabs"></div></dd>
+		</dl>
+		{% endif %}
+	</dd>
+	{% if is_editor %}
+	<dt>Добавить новость</dt>
+	<dd id="addnews"><textarea style="width:90%;" name='text'></textarea>
+	<br>Дата:
+{% if is_admin %}
+<select name="PLACE">
+	<option value="0"> Общая
+	<option value="{{par.ID}}" selected> Местная
+</select>
+{% else %}
+<input type="text" style="display:none;" name="PLACE" value="{{par.ID}}">
+{% endif %}
+
+<input name='DATE' type="text" value="{{DATE}}"/>
+
+<input type="button" class="ajax" value="&raquo;"
+data-form="#addnews"
+data-href="?do=addnews&plugin=darts_News"
+data-complete="reload()"
+>
+</dd>{% endif %}
+{% if is_editor %}
+	<dt>Клуб</dt>
+	<dd >
+<input type="button" class="ajax" value="Удалить клуб"
+data-confirm="Клуб и все турниры будут удалены. Продолжать?"
+data-href="?do=deltourn&id={{par.ID}}"
+>
+</dd>{% endif %}
+</dl>
+  	</fieldset>
+ 	
+
+</div>
+</form>
+{% endmacro -%}
+
+
+##########################################################################
+##
+##  PlayerInfo
+##
+{%- macro PlayerInfo(data) %}
+<input type="text" name="name1" value="{{data.NAME}}"><input type="hidden" name="id" value="{{data.ID}}"><input type="text" name="name2" value="{{data.NAME1}}">
+{% endmacro -%}
+
+##########################################################################
+##
+##  NewTourn - ajax форма для вкладки Турниры панели клуб
+##
+{%- macro NewTourn(tour,ID=0) %}
+<table>
+	<tr>
+		<td> турнир</td>
+		<td colspan="3"><input name="NAME" type="text" value="{{tour.NAME}}" placeholder="Название турнира"></td>
+		<td rowspan="4">
+		<select  name="players[]" multiple="5"  size="6" >
+		{% set players=callex("darts_Players",'_list') %}
+		{% set cplayers=callex("darts_Players",'_listid',ID) %}
+		{% for p in players %}
+			<option value="{{p.ID}}"{% if in_array(p.ID,cplayers)%} selected{% endif %}>{{p.name}}</option>
+		{% endfor %}
+		</select><br>
+		всего {{cplayers|length}}({{players|length}}) 
+		</td>
+	</tr><tr>
+		<td> правила:</td>
+		<td><select  name="ASCORE"><option value="0"{% if tour.ASCORE==0%} selected{% endif %}>&lt;без условий&gt;</option>
+		<option value="1"{% if tour.ASCORE==1%} selected{% endif %}>до 3 побед</option>
+		<option value="2"{% if tour.ASCORE==2%} selected{% endif %}>до 2 побед</option>
+		</select></td>
+		<td> игра</td><td><select  name="AGPARAM" style="width:50px;">
+			<option value="0"/>
+			{% for p in callex("DARTS",'game_list') %}
+			<option value="{{p.id}}"{% if p.id==tour.AGPARAM%} selected{% endif %}>{{p.name}}</option>
+			{% endfor %}
+			</select></td>
+	</tr><tr>
+		<td> способ проведения</td>
+		<td colspan="3"><select  name="RULE" class="long" >
+			<option value="0"/>
+			<option value="group"{% if 'group'==tour.RULE%} selected{% endif %}>групповой турнир</option>
+			<option value="table"{% if 'table'==tour.RULE%} selected{% endif %}>каждый с каждым</option>
+			<option value="olimp"{% if 'olimp'==tour.RULE%} selected{% endif %}>олимпиская система</option>
+			<option value="finn"{%  if 'finn' ==tour.RULE%} selected{% endif %}>финская система</option>
+			</select></td></tr><tr><td colspan=2>
+			<fieldset><legend>статус</legend>
+			<input type="radio" name="STATUS" value="0"{% if 0==tour.STATUS%} checked{% endif %}
+			>&nbsp;создание<br><input type="radio" name="STATUS" value="2"{% if 2==tour.STATUS%} checked{% endif %}
+			>&nbsp;идет<br><input type="radio" name="STATUS" value="1"{% if 1==tour.STATUS%} checked{% endif %}
+			>&nbsp;завершен
+			</select></fieldset></td>
+			<td> </td>
+			<td> 
+			</td>
+		</tr><tr>
+			<td colspan="5">
+			<input type="hidden" name="id" value="{{tour.ID}}"
+			>
+		{%-  if 'finn' ==tour.RULE and 0==tour.STATUS  -%}
+			<input type="button" class="ajax" value="Жеребьевка игроков"
+				data-href="?do=solve&plugin=darts_Tourn&id={{tour.ID}}"
+				data-complete="reload();"
+			>&nbsp;<input type="button" class="ajax" value="Турнирная сетка"
+				data-href="?do=solve&plugin=darts_Tourn&id={{tour.ID}}"
+				data-complete="reload();"
+			>
+		{%- endif -%}
+			&nbsp;<input type="button" class="ajax" value="&raquo;"
+				data-form="$(this).parents('table').eq(0)"
+				data-href="?do=save&plugin=darts_Tourn"
+				data-complete="$('#trnlist').trigger('change');"
+			>&nbsp;<input disabled="disabled" type="submit" name="clear" value="Очистить"
+			>&nbsp;<input type="button" class="ajax" value="удалить"
+				data-href="?do=deltrn&plugin=darts_Tourn&id={{tour.ID}}"
+				data-complete="reload();"
+			>
+		{%- if 'group'==tour.RULE-%}
+			&nbsp;<input type="button" class="ajax" value="Добавить турнир"
+				data-href="?do=addtrn&plugin=darts_Tourn&id={{tour.ID}}"
+				data-complete="reload();"
+			>
+		{%- endif -%}
+			</td>
+		</tr>
+	</table>
+{% endmacro -%}
+
+##########################################################################
+##
+##  show_meeting
+##
+{%- macro show_meeting(par,players='',number=6,is_editor=0) %}
+<form action="" method="POST" name="show_meeting">
+<fieldset class="border"><legend>
+{%- for t in slice(callex("darts_Tourn","_title",par.ID),2) -%}
+	{% if loop.last -%}
+		{{t[1]}}
+	{%- else -%}
+		<a href="?do=showtour&id={{t[0]}}">{{t[1]}}</a>&nbsp;|&nbsp;
+	{%- endif %}
+{%- endfor -%}	
+</legend>
+<div style="padding:0 auto;">
+<table class="pad4" style="table-layout:fixed;">
+<col style="width:20px;"><col style="width:120pxl"><col style="width:50px;">
+<col><col><col><col><col>
+<tr>
+<th></th>
+<th></th>
+<th></th>
+{% for p in players %}
+<th colspan=2>{{callex('darts_Players','playerById',p.ID_PLAYER)}}</th>
+{% endfor %}
+</tr><tr>
+<th></th>
+<th>дата</th>
+<th>игра</th>
+{% for p in players %}
+<th>очки</td><th>дротики</th>
+{% endfor %}
+</tr>
+{% for r in range(number) %}
+{% set idx=loop.index %}
+<tr><th>{{loop.index}}</th><td>
+<input type="text" name="date_{{loop.index}}" style="width:120px;">
+</td><td>
+<select name="rule_{{loop.index}}"  style="width:50px;">
+	<option value="0">&nbsp;</option>
+	{% for p in callex("DARTS",'game_list') %}
+	<option value="{{p.id}}">{{p.name}}</option>
+	{% endfor %}
+</select></td>
+{% for p in players %}
+<td class="inputs">
+<input type="text" name="score_{{loop.index}}_{{idx}}" >
+</td><td class="inputs">
+<input type="text" name="scorex_{{loop.index}}_{{idx}}" >
+</td>
+{% endfor %}
+</tr>
+{% endfor %}
+<tr><td colspan=3>результаты:</td>
+{% for p in players %}
+<th colspan=2 class="inputs"><input title="Выиграно легов" type="text" name="RES1_{{loop.index}}" 
+><br><input title="Всего набрано очков" type="text" name="RES2_{{loop.index}}" >
+<input title="Всего брошено дротиков" type="text"  name="RES3_{{loop.index}}" 
+>
+</th>
+
+{% endfor %}
+</table>
+<input type="submit" value="сохранить">
+<input type="submit" name="recalc" value="Пересчитать">
+</div>
+</fieldset>
+</form>
+{% endmacro -%}
+
+
+##########################################################################
+##
+##  news_newuser - сообщение о регистрации нового юзера
+##
+{%- macro news_tpl(tpl='donow',user=0) %}
+{% if tpl=='newuser' %}
+зарегистрирован новый пользователь <a href="?do=userlist&id={{user.ID}}">{{user.name|default('xxx')}}</a>
+{% else %}
+какое-то подозрительное сообщение, ашипка, однако случилась.
+{% endif %}
+{% endmacro -%}
+
+##########################################################################
+##
+##  AddNews
+##
+{%- macro AddNews(is_admin,lastclub) %}
+<form action=''   name="news" method="POST">
+<input type='hidden' name='ID' value="{{ID}}">
+<fieldset style=""width:80px; min-width:400px;><legend>Вводите сообщение</legend>
+<textarea style="width:80%;" name='text'>{{val}}</textarea>
+<table><tr><td>
+Дата:
+</td><td>
+{% if is_admin %}
+<select name="PLACE">
+	<option value="0"> Общая
+	<option value="{{lastclub}}" selected> Местная
+</select>
+{% else %}
+<input type="text" style="display:none;" name="PLACE" value="{{lastclub}}">
+{% endif %}
+</td><td>
+<input name='DATE' type="text" value="{{DATE}}"/>
+</td><td align="right">
+<input type='submit' value="&raquo;&raquo;">
+</td></tr></table>
+</fieldset>
+</form>
+{%- endmacro -%}
+##########################################################################
+
+##########################################################################
+##########################################################################
+##########################################################################
+##########################################################################
+##########################################################################
+##########################################################################
+##
+##  player_form
+##
+{%- macro player_form() %}
+<form action="" enctype="multipart/form-data" method="POST" name="player">
+<fieldset><legend>Игрок </legend>
+<table  style="table-layout:fixed;"  class="long">
+<col style="width:150px;"><col><col style="width:100px;"><col style="width:50px;">
+<tr>
+	<td rowspan="4"> <img id='pl_photo' src='{photo}'></td>
+	<td colspan="3"><input name="NAME" type="text"  class="long"></td>
+</tr><tr>
+	<td colspan="3"><input name="NAME1" type="text"  class="long"></td>
+</tr><tr>
+	<td colspan="3"><input name="NAME2" type="text" class="long" ></td>
+</tr><tr>
+	<td><input name="photo" type="file" class="long"></td>
+	<td>&nbsp;Rating<input name="RATING" type="text"  style="width:50px" ></td>
+	<td  align="right"><input type="submit" value="&raquo;"></td>
+</tr>
+</table></fieldset>
+</form>
+{% endmacro -%}
+
+##########################################################################
+##
+##  gamelist
+##
+{%- macro gamelist() %}
+<em>Записанные игры</em>
+<div style='overflow:auto;height:400px;'>
+<table class='sort' border='1'>
+<thead>
+<tr><th class='header'>Дата</th><th  class='header'>Игра</th><th class='header'>Счет</th><th class='header'>Противник</th><th class='header'>Турнир</th></tr>
+</thead>
+<tbody>
+{% for r in rows %}
+<tr><td>{{r.DATE}}</td><td> {{r.RULE}}</td><td>{{r.SCOREGAME1|default("0")}}---{{r.SCOREGAME|default("0")}}</td><td>{{ID_PLAYER}}</td><td>{{r.ID_TOURNAMENT}}</td></tr>
+{% endfor %}
+</tbody>
+</table></div>
+##<!--<script type="text/javascript">
+##$(function() {
+##		$(".sort").tablesorter()
+##});
+##</script>-->
+{% endmacro -%}
+
+##########################################################################
+##
+##  Rating
+##
+{%- macro Rating() %}
+<form action="" method="POST" name="rating">
+<fieldset class="border"><legend>Список турниров</legend>
+<table class='sort tabs-nav long' style="table-layout:fixed;">
+<col><col style="width:150px;"><col style="width:150px;">
+<thead>
+<tr >
+	<th class="header">Название</th>
+	<th class="header">дата</th>
+	<th class="header">рейтинг</th>
+</tr>
+</thead>
+<tbody>
+{% for t in trn %}
+<tr id="trn_{{t.ID}}"><td>{{t.NAME}}</td><td>{{t.DATE}}</td><td>yyy</td></tr>
+{% endfor %}
+</tbody>
+</table>
+</fieldset>
+<script type="text/javascript">
+$(function() {
+		$(".sort").tablesorter()
+});
+</script>
+</form>
+{% endmacro -%}
+
+
+##########################################################################
+##
+##  Slogin
+##
+{%- macro Slogin() %}<form action=''   name="slogin" method="POST">
+Введите пароль администратора
+<input name='slogin' type='password'><input type='submit' value="&raquo;">
+</form>
+{% endmacro -%}
+
+##########################################################################
+##
+##  GamePlan
+##
+{%- macro GamePlan() %}
+<form action="" method="POST" name="game">
+Игра: <select name="pl1">
+					<option value="0">Выбирайте игрока
+	<!--begin:pl1-->
+					<option value="{id}">{val}
+	<!--end:pl1-->
+				</select> против <select name="pl2">
+					<option value="0">Выбирайте игрока
+	<!--begin:pl2-->
+					<option value="{id}">{val}
+	<!--end:pl2-->
+				</select><br> в турнире
+ <select name="tourn">
+					<option value="0">Выбирайте турнир
+	<!--begin:trn-->
+					<option value="{id}">{val}
+	<!--end:trn-->
+				</select>
+
+<input type='submit' value='Wait' name='Wait'>
+</form>
+{% endmacro -%}
+
+##########################################################################
+##
+##  DoPlay
+##
+{%- macro DoPlay(player,player1,number) %}
+<form name="DoPlay" action="" method="post">
+<table style="table-layout:fixed;">
+<col style="width:20px;"><col style="width:120px;"><col style="width:50px;">
+<col><col><col><col><col>
+<tr>
+<th></th>
+<th>дата</th>
+<th>игра</th>
+<th colspan=2>{{player}}</th>
+<th colspan=2>{{player1}}</th>
+</tr>
+{% for r in range(number) %}
+<tr><th>{{loop.index}}</th><td>
+<input type="text" name="date_{{loop.index}}" style="width:120px;">
+</td><td>
+<select name="rule_{{loop.index}}"  style="width:50px;">
+	<option value="0">&nbsp;</option>
+	{% for p in callex("DARTS",'game_list') %}
+	<option value="{{p.id}}">{{p.name}}</option>
+	{% endfor %}
+</select></td>
+<td>
+<input type="text" name="score_{{loop.index}}" style="width:120px;">
+</td>
+<td>
+<input type="text" name="scorex_{{loop.index}}" style="width:120px;">
+</td>
+<td>
+<input type="text" name="score1_{{loop.index}}" style="width:120px;">
+</td>
+<td>
+<input type="text" name="score1x_{{loop.index}}" style="width:120px;">
+</td>
+</tr>
+{% endfor %}
+</table>
+</form>
+{% endmacro -%}

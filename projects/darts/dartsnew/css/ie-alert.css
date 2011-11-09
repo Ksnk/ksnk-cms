@@ -1,0 +1,16 @@
+/* Fixed posistioning emulation for IE6
+     Star selector used to hide definition from browsers other than IE6
+     For valid CSS, use a conditional include instead */
+* html div.jqmDialog {
+     position: absolute;
+     top: expression((document.documentElement.scrollTop || document.body.scrollTop) + Math.round(17 * (document.documentElement.offsetHeight || document.body.clientHeight) / 100) + 'px');
+}
+* div.jqm, * iframe.jqm {
+	position:absolute;
+/*	top: expression(document.scrollTop +'px');*/
+	height: expression(this.parentNode.offsetHeight);
+/*	width: expression(alert(this.parentNode.offsetWidth+'px'));*/
+    width: expression(document.body.clientWidth);
+/*    top: expression(this.parentNode.parentNode.scrollTop+this.parentNode + this.offsetHeight - this.offsetHeight);*/
+    top: expression(this.parentNode.parentNode.scrollTop);
+}

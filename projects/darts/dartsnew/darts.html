@@ -1,0 +1,166 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+<title>Калькулятор Darts</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>DARTS calculator</title>
+<link rel="stylesheet" type="text/css" href="css/jqModal.css"
+	media="screen">
+<link rel="stylesheet" type="text/css" href="css/darts.css"
+	media="screen">
+<script type="text/javascript">
+	function requireJS(s, f){
+		if(f)f();
+	}
+</script>
+<!--
+<script type="text/javascript" src="js/jquery-latest.pack.js">
+-->
+<script type="text/javascript" src="js/jquery-1.2.1.pack.js">
+</script>
+<script type="text/javascript" src="js/engine.js">
+</script>
+<script type="text/javascript" src="js/JSHttpRequest.js">
+</script>
+<script type="text/javascript" src='js/dart-calc.js'>
+</script>
+<script type="text/javascript" src='js/scalc.js'>
+</script>
+<script type="text/javascript">
+_l.lang='ru'
+startgame=false;
+/**
+ * большое место для маленькой пакости! Сюда шаблон вставит пользу
+ */
+/* {realgame}
+// */
+//startgame={players:[{name:'one'},{name:'two'}],rule:3,tour:334}
+
+</script>
+</head>
+
+<body  class='magenta'>
+<div style="z-index: 4; position: absolute; right: 20px;"><input
+	type="button" class="button" value="&raquo;"
+	onclick="dart_pane.nextturn();"> <input type="button"
+	class="button" value="&laquo;" onclick="dart_pane.rollback();">
+<input type="button" class="button" id='ng-button' value="New">
+<input type="button" class="button" value="Help"
+	onclick='showAlert("Help");'></div>
+<div style="overflow: hidden; position: absolute;"><img alt=""
+	galleryimg="off" id="dart" src="img/pane-2.gif"></div>
+<div id="score"
+	style="overflow: auto; padding: 30px 0 0 0; position: absolute; right: 20px;">
+<table id='content'>
+	<tr>
+		<td></td>
+		<!-- пустой элемент-->
+	</tr>
+
+	<tr>
+		<th class='magenta'></th>
+		<!-- номер хода-->
+	</tr>
+</table>
+</div>
+<div id='kriket' style="position: absolute; left: 20px; display: none;">
+<h3>Крикет</h3>
+<table><col  class='magenta'>
+	<tr>
+		<td></td>
+		<!-- пустой элемент-->
+	</tr>
+	<tr>
+		<th>15</th>
+	</tr>
+	<tr>
+		<th>16</th>
+	</tr>
+	<tr>
+		<th>17</th>
+	</tr>
+	<tr>
+		<th>18</th>
+	</tr>
+	<tr>
+		<th>19</th>
+	</tr>
+	<tr>
+		<th>20</th>
+	</tr>
+	<tr>
+		<th>25</th>
+	</tr>
+</table>
+</div>
+
+<div id='dart_handle'
+	style="z-index: 3; position: absolute; top: 10px; left: 10px; height: 1px; width: 1px; background: white;">
+</div>
+
+<div class="arrow" tagx="49" tagy="45"><img alt=""
+	src='img/arrow_green.gif'>
+<p> </p>
+<p class="shadow"> </p>
+</div>
+
+<div class="arrow" tagx="5" tagy="11"><img alt=""
+	src='img/arrow_yellow.gif'>
+<p> </p>
+<p class="shadow"> </p>
+</div>
+
+<div class="arrow" tagx="45" tagy="5"><img alt=""
+	src='img/arrow_blue.gif'>
+<p> </p>
+<p class="shadow"> </p>
+</div>
+
+<div id='newgame' style='display:none;'>
+<form method="get" action="#" name='new_game_form'
+	onsubmit="ch(this);return false;"><select name='language'
+	style="float: right;" onchange="ch(this)">
+	<option>ru</option>
+	<option>en</option>
+</select>
+<h2>$1</h2>
+<table>
+	<tr>
+		<th style="color: red;" colspan="6"></th>
+	</tr>
+	<tr>
+		<td colspan="4"><select name="game" onchange="return ch(this);"
+			class='c100'>
+			<option value="0">$2</option>
+		</select></td>
+	</tr>
+	<tr>
+		<td>$3</td>
+		<td><select>
+			<option>1</option>
+			<option selected="selected">3</option>
+			<option>5</option>
+		</select></td>
+		<td>$4</td>
+		<td><select name='plnumber'>
+			<option>1</option>
+			<option>2</option>
+			<option>3</option>
+			<option>4</option>
+			<option>5</option>
+			<option>6</option>
+		</select></td>
+	</tr>
+	<tr>
+		<td colspan="4"><input name="sub" style="width: 95%;"
+			type="submit" value="$5" /></td>
+	</tr>
+</table>
+</form>
+
+</div>
+<pre id='debug' style="overfow: auto;"></pre>
+
+</body>
+</html>
+

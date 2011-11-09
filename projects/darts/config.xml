@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<files >
+		<file>engine/hosts.*</file> 
+		<file>css/site.*</file>
+	</files>
+	<!-- ************************************** -->
+	<!-- **** внедряем jinja шаблоны       **** -->
+	<!-- ************************************** -->
+	<files dstdir="$dst/engine" dir="/xilen/common/templater/build/lib"> 
+		<file>template_parser.class.php</file>
+		<file>compiler.class.php</file>
+		<file>compiler.php.php</file>
+		<file>nat2php.class.php</file>
+	</files>
+	<files dstdir="$dst/templates" dir="/xilen/common/templater/build/render">
+		<file>tpl_base.php</file>
+		<file>tpl_compiler.php</file>
+	</files>
+	<files dir="plugins" >
+		<file>jinja_template.php</file>
+	</files>
+	<!-- ************************************** -->
+	<!-- **** placeholders			       **** -->
+	<!-- ************************************** -->
+	<files dir="plugins" >
+		<file>placeholders.php</file>
+	</files>
+	<!-- ************************************** -->
+	<!-- **** tabs      			       **** -->
+	<!-- ************************************** -->
+	<files dir="/xilen/cms/plugins" >
+		<file>tabs.php</file>
+	</files>
+	<!-- ************************************** -->
+	<!-- **** captcha   			       **** -->
+	<!-- ************************************** -->
+	<files dstdir="$dst" dir="/xilen/common"> 
+		<file>captcha.php</file>
+		<copy>Comic_Sans_MS.ttf</copy>
+	</files>
+	<!-- ************************************** -->
+	<!-- **** HackerConsole			       **** -->
+	<!-- ************************************** -->
+	<files dstdir="$dst" dir="/xilen/Debug">
+		<copy>Debug/HackerConsole/*.*</copy>
+	</files>
+	<!-- ************************************** -->
+	<!-- **** горизонтальное меню сайта    **** -->
+	<!-- ************************************** -->
+	<files dir="/xilen/cms/plugins/ulmenu">
+		<copy dstdir="$dst/img">*.gif</copy>
+	</files>
+	<files dir="plugins">
+		<file>ulmenu.php</file>
+	</files>
+	<!-- **************************** -->
+	<!-- **** jq UI integration **** -->
+	<!-- **************************** -->
+	<files>
+	  	<file>plugins/jquery.UI.php</file> 
+	</files>
+	<!-- ************************************** -->
+	<!-- **** мелкий порт cms в darts      **** -->
+	<!-- ************************************** -->
+	<files dstdir="$dst/engine" dir="/xilen/cms/admin/engine/"> 
+		<file>rights.php</file>
+		<file>engine.php</file>
+		<file>syspar.php</file>
+		<file>func.php</file>
+		<file>html.class.php</file>
+		<file>Generic.php</file>
+		<file>Mysql.php</file>
+	</files>
+	<!-- ************************************** -->
+	<!-- **** вопрос-ответ и проч мура      **** -->
+	<!-- ************************************** -->
+	<files dstdir="$dst/engine" dir="plugins/forum/"> 
+		<file>qa.php</file>
+		<file>tree.php</file>
+	</files>
+	<!-- ************************************** -->
+	<!-- **** gtalk нотификатор            **** -->
+	<!-- ************************************** -->
+	<files dir="/xilen/cms/plugins/"> 
+		<file>gtalk.php</file>
+	</files>
+	<!-- ************************************** -->
+	<!-- **** все копируем на базу         **** -->
+	<!-- ************************************** -->
+	<files dstdir="$dst" dir="/xilen/cms">
+		<file name=".htaccess">htaccess.txt</file>
+	</files>
+	<files dstdir="$dst">
+		<file>engine/*.*</file>
+		<file>*.php</file>
+		<file>*.html</file>
+		<file>templates/*.*</file>
+		<file>js/*.*</file>
+		<copy>img/*.*</copy>
+		<file>css/*.*</file>
+	</files>
+	<files dstdir="$dst/js">
+		<copy dir="/workspace/jQuery/jquery/dist/">jquery-1.4.4.min.js</copy>
+	</files>
+	<files dstdir="$dst/engine">
+		<file>tournaments.php</file>
+	</files>
+</config>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="darts" default="init">
+	<property name="dir" value="darts"/>
+
+	<property name="last_ftp" value="06/25/2009 11:06 AM"/>
+	<property name="target_dir" value="darts"/>
+	<property name="test_dir" value="/home/${dir}.me/www/${target_dir}"/>
+	<property name="test_url" value="http://${dir}.me/${target_dir}/"/> 
+	<property name="xln" value="admin"/>
+	<property name="target_charset" value="UTF-8"/>
+
+	<property description="Common Folder" name="common_dir" location="Z:/xilen/common"/>
+	
+	<import file="${common_dir}/extend.xml"/>
+
+	<target name="build_debug">
+		<SVNcheck src="config.xml" dst="config.svn.xml"/>
+		<exec executable="Z:/usr/local/php5/php.exe" dir=".">
+			<arg value="-f"/>
+			<arg file="${common_dir}/preprocessor/preprocessor.php"/>
+			<arg value="/Dtarget=debug"/>
+			<arg value="/Dtarget_host=localhost"/>
+			<arg value="/Dtarget_charset=${target_charset}"/>
+			<arg value="/Dtarget_dir=${target_dir}"/>
+			<arg value="/Ddst=${test_dir}"/>
+			<arg file="config.svn.xml"/> 
+		</exec>
+		<delete file="config.svn.xml"/>
+	</target>
+	
+	<target name="build_release">
+		<SVNcheck src="config.xml" dst="config.svn.xml"/>
+		<exec executable="Z:/usr/local/php5/php.exe" dir=".">
+			<arg value="-f"/>
+			<arg file="${common_dir}/preprocessor/preprocessor.php"/>
+			<arg value="/Dtarget=release"/>
+			<arg value="/Dtarget_host=ksnk"/>
+			<arg value="/Dtarget_charset=${target_charset}"/>
+			<arg value="/Dtarget_dir=${target_dir}"/>
+			<arg value="/Ddst=build/release"/>
+			<arg file="config.svn.xml"/>
+		</exec>
+		<delete file="config.svn.xml"/>
+	</target>
+	
+	<target name="init" depends="build_debug"/>
+	
+</project>

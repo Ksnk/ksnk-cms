@@ -1,0 +1,117 @@
+##########################################################################
+##
+##  finn вспомогательная макра - вывод одной игры с 2-мя участниками
+##
+{%- macro tab(game,top,left) %}
+<div class="tab_game{%if game.loosers}} loosers{% endif %}" style="top:{{5+60*top}}px;left:{{5+110*left}}px;">
+{{game.idx}} {{game.player1}}:{{game.player2}}
+</div>
+{% endmacro %}
+##########################################################################
+##
+##  finn на 8 участников
+##
+{%- macro finn(table=1,res=1,xid=0,is_editor=0,is_reader=0) %}
+{% if table %}
+<fieldset><legend>
+{%- for t in slice(callex("darts_Tourn","_title",xid),2) -%}
+	{% if loop.last -%}
+		{{t[1]}}
+	{%- else -%}
+		<a href="?do=showtour&id={{t[0]}}">{{t[1]}}</a>&nbsp;|&nbsp;
+	{%- endif %}
+{%- endfor -%}
+</legend>
+<div style="position:relative;">
+<div style="float:left;height:500px;width:1px;"></div>
+{{tab(table[0],0,0)}}
+{{tab(table[1],1,0)}}
+{{tab(table[2],2,0)}}
+{{tab(table[3],3,0)}}
+
+{{tab(table[4],0,1)}}
+{{tab(table[5],1,1)}}
+{{tab(table[6],2,1)}}
+{{tab(table[7],3,1)}}
+
+{{tab(table[8],1,2)}}
+{{tab(table[9],2,2)}}
+
+{{tab(table[11],0,3)}}
+{{tab(table[11],1,3)}}
+{{tab(table[12],0,4)}}
+{{tab(table[13],0,5)}}
+
+</div>
+</fieldset>
+{% endif %}
+{% endmacro %}
+##########################################################################
+##
+##  Trntable
+##
+{%- macro Trntable(table=1,res=1,xid=0,is_editor=0,is_reader=0) %}
+
+{% if table %}
+<fieldset><legend>
+{%- for t in slice(callex("darts_Tourn","_title",xid),2) -%}
+	{% if loop.last -%}
+		{{t[1]}}
+	{%- else -%}
+		<a href="?do=showtour&id={{t[0]}}">{{t[1]}}</a>&nbsp;|&nbsp;
+	{%- endif %}
+{%- endfor -%}
+</legend>
+<table class="pad4 align_center">
+<col style="width:30px;"><col>
+{% for row[1] in table %}
+<col style="width:40px;">
+{% endfor %}
+{% for r in [1,2,3,4,5] -%}
+	<col>
+	{%- endfor %}
+<tr>
+<td></td><td></td>
+{% for row[1] in table %}
+<th>{{loop.index}}</th>
+{% endfor %}
+{% for r in [1,2,3,4,5] -%}
+	<th>{{loop.cycle("Очки","набор","леги<br>В/П","РЛ","Место")}}</th>
+	{%- endfor %}
+</tr>
+{% for row in table %}
+	{% set rindex=res[loop.index0] %}
+	{% set loopindex=loop.index %}
+	<tr><th>{{loop.index}}</th><th class="align_left">{{callex('darts_Players','playerById',rindex[0])}}</th>
+	{% for cell in row %}
+	<td class="trntab{% if loop.index==loopindex %} gray{% endif %}">
+		{% if cell.add or is_reader %}
+		{%- if cell.name %}<a href="{{cell.name}}">{% endif -%}
+		{%- if cell.add %}<span style="font-size:14px;">{{cell.x}}:{{cell.y}}</span><br><span title="средний набор" style="font-size:10px;">{{cell.add}}</span>
+		{%endif-%}
+		{%- if cell.name %}</a> {% endif -%}
+		{% endif %}
+	</td>
+	{% endfor %}
+	## результаты
+	<th>{{rindex[1]}}</th><th>{{"%01.1f"|format(rindex[2]/rindex[3])}}</th>
+	<th>{{rindex[4]}}/{{rindex[5]}}</th>
+	<th>{% set xx =rindex[4]-rindex[5]%}{{xx}}</th>
+	<th>{{rindex[6]}}</th>
+	</tr>
+{% endfor %}
+
+</table>
+<ul class="align_left">
+<li><b>набор</b> - средний набор за один дротик.</li>
+<li><b>Леги</b> - количество выигранных и проигранных легов.</li>
+<li><b>РЛ</b> - разница выигранных и проигранных легов.</li>
+</ul>
+{% if is_editor %}
+<input type="button" class="ajax" value="Пересчитать"
+	data-href="?do=recalc&id={{xid}}"
+	data-complete="reload();"
+>{% endif %}</fieldset>
+{% endif %}
+
+{% endmacro -%}

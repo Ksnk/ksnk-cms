@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+	<var name="dst" default="build/$target"/>
+<!-- file to build standalon version -->
+	<files dstdir="$dst">
+		<file>js/*.*</file>
+		<file>index.html</file>
+	</files>
+</config>
