@@ -4,11 +4,11 @@
  */
 //<% 
 	point_start('js_head') ;
-	include_once('/xilen/common/jqUI/js/jquery-ui-1.8.4.custom.min.js');
+	include_once($env_common.'/common/jqUI/js/jquery-ui-1.8.4.custom.min.js');
 	point_finish();
 	
 	point_start('css_site') ;
-	include_once('/xilen/common/jqUI/css/ui-lightness/jquery-ui-1.8.4.custom.css');
+	include_once($env_common.'/common/jqUI/css/ui-lightness/jquery-ui-1.8.4.custom.css');
 	point_finish();
 	
 	point_start('main_html'); 
@@ -86,7 +86,7 @@ window.win_alert=function (par){
 <%
 	$this->xml_read('
 <config>
-	<files dir="/xilen/common/jqUI/css/ui-lightness" dstdir="$dst/css/">
+	<files dir="'.$env_common.'/common/jqUI/css/ui-lightness" dstdir="$dst/css/">
 		<copy>images/*.*</copy>
 	</files>
 </config>

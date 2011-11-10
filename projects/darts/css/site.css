@@ -19,7 +19,7 @@
 	$darkbackground=$deepblue;
 	$ondarkbackground=$white;
 	
-	include "/xilen/common/common.css"	;
+	include $env_common."/common/common.css"	;
 %>
 html, body { 
 	font-family: Verdana; 

@@ -6,7 +6,7 @@
     require_once('/simpletest/reporter.php');
     require_once('/simpletest/xml.php');
 
-require_once('/xilen/common/nat2php/nat2php.class.php');
+require_once($env_common.'/common/nat2php/nat2php.class.php');
 function pps(&$x,$default=''){if(empty($x))return $default; else return $x;}
 
 class TestOfExistans extends UnitTestCase {

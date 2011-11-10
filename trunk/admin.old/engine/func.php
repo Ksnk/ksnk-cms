@@ -24,40 +24,50 @@ mkt(true);
 include_once(ROOT_PATH.'/engine/hosts.php');
 
 $connect="mysql://$the_login:$the_pass@$the_host/$the_db";
-if(!defined('DB_SETUP')) define ('DB_SETUP','set NAMES "cp1251";');
+
+if(empty($db_setup)) {
+    if(!defined('DB_SETUP'))
+        $db_setup='set NAMES "cp1251";';
+    else
+        $db_setup=DB_SETUP;
+}
 if(!defined('TEMPLATE_PATH')){
 	define("TEMPLATE_PATH",ROOT_PATH.DIRECTORY_SEPARATOR.'templates');
-	define('ELEMENTS_TPL','tpl_elements');
-} else { 
+	if(!defined('ELEMENTS_TPL'))
+		define('ELEMENTS_TPL','tpl_elements');
+} else if(!defined('ELEMENTS_TPL')){
 	define('ELEMENTS_TPL','tpl_main');
 }
+if(!defined('MAIN_TPL'))
+	define('MAIN_TPL','tpl_main');
+if(!defined('ADMIN_TPL'))
+	define('ADMIN_TPL','tpl_admin');
 
-define('MAIN_TPL','tpl_main');
-define('ADMIN_TPL','tpl_admin');
 define('FORMS_TPL','tpl_forms');
 define('FORUM_TPL','tpl_forum');
 define('ROOT_INDEX',toUrl(INDEX_PATH));
 
 //echo ini_get('include_path');
-function _l($mess,$par=array()){
-	static $lang=array(
-		 'wrong password'=>'Неверный пароль'
-		,'page not found, sorry!'=>'Страница не найдена ;-('
-		,'Hello "%s"'=>'<a href="?do=logout"
-	 onclick="if(!confirm(\'Хотите закончить сеанс?\')) return false;">Завершение сеанса &laquo;%s&raquo;</a>'
-		,"\n<!-- (%s) page was built for %f sec -->"=>
-	 "<!-- (%s) страница генерировалась %f сек  -->"
-	 	,'query'=>"запрос||а|ов"
-	 );
+if(!function_exists('_l')){
+    function _l($mess,$par=array()){
+        static $lang=array(
+             'wrong password'=>'Неверный пароль'
+            ,'page not found, sorry!'=>'Страница не найдена ;-('
+        ,'Hello "%s"'=>'Вы авторизованы<br>как &laquo;<a href="?do=logout"
+     onclick="if(!confirm(\'Хотите закончить сеанс?\')) return false;">%s</a>&raquo;'
+             ,"\n<!-- (%s) page was built for %f sec -->"=>
+         "<!-- (%s) страница генерировалась %f сек  -->"
+            ,'query'=>"запрос||а|ов"
+         );
 
-	if(isset($lang[$mess])) $mess=$lang[$mess];
-
-	if($par!==null)
-		return vsprintf($mess,$par);
-	else
-		return $mess ;
+        if(isset($lang[$mess])) $mess=$lang[$mess];
+    
+        if($par!==null)
+            return vsprintf($mess,$par);
+        else
+            return $mess ;
+    }
 }
-
 ########## Check if database exist #################################################
 require_once "Generic.php";
 // Устанавливаем соединение.
@@ -94,14 +104,14 @@ function myLogger($db, $sql)
   }
 }
 function DATABASE(){
-	global $DATABASE,$connect;
+    global $DATABASE,$connect,$db_setup;
 	if(isset($DATABASE)) return $DATABASE;
 	//echox 'test1';//$connect; //mysql://dbu_xilen_7:Ivnsqk0eCru@mysql.xilen.z8.ru
 	$DATABASE = DbSimple_Generic::connect($connect);
 	$DATABASE->setIdentPrefix(TAB_PREF.'_');
 	$DATABASE->setErrorHandler('databaseErrorHandler');
 	$DATABASE->setLogger('myLogger');
-	$DATABASE->select(DB_SETUP);// High  magic!!!!!!!!!!!!!!!!!
+    @$DATABASE->select($db_setup);// High  magic!!!!!!!!!!!!!!!!!
 	//echo 'test2';
 	return $DATABASE;
 }
@@ -379,16 +389,13 @@ function &LoadClass($cls,$param=0){
 		// creating an object
 		if(!class_exists($class_name))
 			return $result;
-		if(is_array($param))
+        if(is_array($param) && count($param))
 		switch(count($param)){
 			case 1:  
-				$result=&new $class_name(&$param[0]) ;
+				$result=new $class_name(&$param[0]) ;
 				break; 
-			case 2:  
-				$result=&new $class_name(&$param[0],&$param[1]) ;
-				break;
 			default:
-				$result=&new $class_name() ;
+                $result=new $class_name(&$param[0],&$param[1]) ;
 		}
 		else
 			$result=&new $class_name() ;
@@ -402,7 +409,10 @@ function &LoadClass($cls,$param=0){
 		if(is_string($v))
 			$v=array($k,$v);
 		
-		if($v[0])
+        if(is_object($v))
+            continue;
+
+        if(isset($v[0]))
 			$class_record[$k]=$v[0];
 		if(isset($v[1])){
 			if(substr($v[1],-1,1)=='/')
@@ -417,6 +427,7 @@ function &LoadClass($cls,$param=0){
 /**
  * настройки на двигл CMS
  */
+        if(defined('ADMIN')){
 LoadClass(array(
 // модули
 	'Auth'=>ROOT_PATH.'/'.ADMIN.'/engine/users.php',
@@ -453,7 +464,9 @@ LoadClass(array(
 /**
  * Вялая попытка вставить файловое кэширование
  */
-if (!defined('NOCACHE') && !defined('INTERNAL')){
+if (!defined('NOCACHE') && !defined('INTERNAL')
+	&& is_readable(ROOT_PATH.'/'.ADMIN.'/engine/FileCache.php'))
+{
 //*
 include_once(ROOT_PATH.'/'.ADMIN.'/engine/FileCache.php');
 // построение группы по GET'у
@@ -485,6 +498,7 @@ if(isset($_GET['cache'])?$_GET['cache']:true){
 }
 $_GLOBAL['cache']=&$cache;
 }
+        };
 // FileCache
 //*/
 ?>

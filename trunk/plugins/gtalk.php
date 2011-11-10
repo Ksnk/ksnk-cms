@@ -51,7 +51,7 @@ class notifygtalk extends plugin {
  */
 $this->xml_read(//?>
 '<config>
-	<files dstdir="$dst/xmpphp/" dir="/xilen/store/gtalk++/xmpphp/xmpphp-0.1rc2-r77/XMPPHP"> 
+	<files dstdir="$dst/xmpphp/" dir="$env_common/store/gtalk++/xmpphp/xmpphp-0.1rc2-r77/XMPPHP">
 	<copy>*.php</copy>
 	</files></config>
 '); /**/ %>

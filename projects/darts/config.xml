@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<files >
-		<file>engine/hosts.*</file> 
-		<file>css/site.*</file>
-	</files>
+    <!-- ************************************** -->
+    <!-- **** параметры проекта            **** -->
+    <!-- ************************************** -->
+	<var name="target_charset">UTF-8</var>
+
 	<!-- ************************************** -->
 	<!-- **** внедряем jinja шаблоны       **** -->
 	<!-- ************************************** -->
-	<files dstdir="$dst/engine" dir="/xilen/common/templater/build/lib"> 
-		<file>template_parser.class.php</file>
-		<file>compiler.class.php</file>
-		<file>compiler.php.php</file>
-		<file>nat2php.class.php</file>
-	</files>
-	<files dstdir="$dst/templates" dir="/xilen/common/templater/build/render">
-		<file>tpl_base.php</file>
-		<file>tpl_compiler.php</file>
-	</files>
+    <!-- копируем файлы шаблонизатора - core -->
+        <files  dstdir="$dst/engine" dir="templater">
+            <file>template_parser.class.php</file>
+            <file>compiler.class.php</file>
+            <file>compiler.php.php</file>
+        </files>
+    <!-- копируем файлы шаблонизатора - core -->
+        <files  dstdir="$dst/engine" dir="nat2php">
+            <file>nat2php.class.php</file>
+        </files>
+    <!-- копируем файлы шаблонизатора - сайт шаблоны -->
+        <files  dstdir="$dst/templates" dir="templater/templates">
+            <file>tpl_base.php</file>
+            <file>tpl_compiler.php</file>
+        </files>
+
 	<files dir="plugins" >
 		<file>jinja_template.php</file>
 	</files>
@@ -29,26 +36,25 @@
 	<!-- ************************************** -->
 	<!-- **** tabs      			       **** -->
 	<!-- ************************************** -->
-	<files dir="/xilen/cms/plugins" >
+	<files dir="plugins.2" >
 		<file>tabs.php</file>
 	</files>
 	<!-- ************************************** -->
 	<!-- **** captcha   			       **** -->
 	<!-- ************************************** -->
-	<files dstdir="$dst" dir="/xilen/common"> 
-		<file>captcha.php</file>
-		<copy>Comic_Sans_MS.ttf</copy>
-	</files>
+    <files>
+        <file>plugins.2/captcha/captcha.ezavod.php</file>
+    </files>
 	<!-- ************************************** -->
 	<!-- **** HackerConsole			       **** -->
 	<!-- ************************************** -->
-	<files dstdir="$dst" dir="/xilen/Debug">
-		<copy>Debug/HackerConsole/*.*</copy>
-	</files>
+    <files  dstdir="$dst">
+        <copy>Debug/HackerConsole/*.*</copy>
+    </files>
 	<!-- ************************************** -->
 	<!-- **** горизонтальное меню сайта    **** -->
 	<!-- ************************************** -->
-	<files dir="/xilen/cms/plugins/ulmenu">
+	<files dir="plugins.2/ulmenu">
 		<copy dstdir="$dst/img">*.gif</copy>
 	</files>
 	<files dir="plugins">
@@ -63,7 +69,7 @@
 	<!-- ************************************** -->
 	<!-- **** мелкий порт cms в darts      **** -->
 	<!-- ************************************** -->
-	<files dstdir="$dst/engine" dir="/xilen/cms/admin/engine/"> 
+	<files dstdir="$dst/engine" dir="admin/engine/">
 		<file>rights.php</file>
 		<file>engine.php</file>
 		<file>syspar.php</file>
@@ -82,28 +88,22 @@
 	<!-- ************************************** -->
 	<!-- **** gtalk нотификатор            **** -->
 	<!-- ************************************** -->
-	<files dir="/xilen/cms/plugins/"> 
+	<files dir="plugins.2/">
 		<file>gtalk.php</file>
 	</files>
 	<!-- ************************************** -->
 	<!-- **** все копируем на базу         **** -->
 	<!-- ************************************** -->
-	<files dstdir="$dst" dir="/xilen/cms">
+<!--	<files dstdir="$dst" dir="$env_common/cms">
 		<file name=".htaccess">htaccess.txt</file>
-	</files>
+	</files>-->
 	<files dstdir="$dst">
 		<file>engine/*.*</file>
 		<file>*.php</file>
 		<file>*.html</file>
+        <file>css/*.*</file>
 		<file>templates/*.*</file>
 		<file>js/*.*</file>
 		<copy>img/*.*</copy>
-		<file>css/*.*</file>
-	</files>
-	<files dstdir="$dst/js">
-		<copy dir="/workspace/jQuery/jquery/dist/">jquery-1.4.4.min.js</copy>
-	</files>
-	<files dstdir="$dst/engine">
-		<file>tournaments.php</file>
 	</files>
 </config>

@@ -12,12 +12,14 @@ w3box.ru © 2008
 error_reporting(E_ALL);
 ini_set('display_errors',false);
 ini_set('log_errors',true);
-//include_once('project.php');
+@include_once('project.php');
 if(!defined('ADMIN'))
 	define ('ADMIN','admin');
 //*
 if(include_once(ADMIN.'/engine/db_session.php')){
 include_once(ADMIN.'/engine/Generic.php');
+if(class_exists('SessionManager'))
+	$sm = &SessionManager::instance();
 include_once('engine/hosts.php');
 $connect="mysql://$the_login:$the_pass@$the_host/$the_db";
 $db_setup='set NAMES "cp1251";';

@@ -2,9 +2,9 @@
  * 
  */
 <% 
-	include_once('/xilen/common/js/site.src/menu.js'); 
-    include_once('/xilen/common/js/site.src/debug.js'); 
-    include_once('/xilen/common/js/site.src/cookie.js'); 
+	include_once($env_common.'/common/js/site.src/menu.js');
+    include_once($env_common.'/common/js/site.src/debug.js');
+    include_once($env_common.'/common/js/site.src/cookie.js');
 	
     echo point('js_head'); //%>
    
@@ -75,7 +75,7 @@ $(function(){
 	
 	
 	
-	<% include_once('/xilen/common/js/site.src/justajax.js'); %>
+	<% include_once($env_common.'/common/js/site.src/justajax.js'); %>
 	<%=point("js_main"); %>
 
 }) 

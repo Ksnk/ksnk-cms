@@ -7,7 +7,7 @@
 <base href="<%=$target_host.$target_dir%>/">
 <!--[if lte IE 6]></base><![endif]-->
 ##<script src="http://yandex.st/jquery/1.4.4/jquery.min.js"></script>
-<script src="js/jquery-1.4.4.min.js"></script>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 <script type="text/javascript" src="js/site.js"></script>
 <LINK  rel="stylesheet" type="text/css" href="css/site.css">
 
