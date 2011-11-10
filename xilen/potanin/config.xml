@@ -20,9 +20,7 @@
 		<copy>Comic_Sans_MS.ttf</copy>
 	</files>
 	<files  dstdir="$dst">
-		<copy>Debug/HackerConsole/*
-
-            .*</copy>
+		<copy>Debug/HackerConsole/*.*</copy>
 	</files>
 <!-- ****************************************************************** -->
 <!-- ****   копируем файлы отсюда на место                          *** -->
@@ -49,7 +47,6 @@
 	</files>
 <!-- копируем файлы шаблонизатора - core -->
     <files  dstdir="$dst/admin/engine" dir="templater">
-        <file>compiler.class.php</file>
         <file>compiler.class.php</file>
         <file>compiler.php.php</file>
     </files>
