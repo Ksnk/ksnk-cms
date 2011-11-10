@@ -9,6 +9,10 @@ include_once ("point.ext.php");
 
 $paths=new preprocessor();
 
+foreach($_ENV as $k=>$v){
+    $paths->export('env_'.$k,$v);
+}
+
 for ($i=1;$i<$argc;$i++){
 	if(preg_match('/^\/D(\w+)\=(\S+)$/',$argv[$i],$m)){
 		$paths->export($m[1],$m[2]);
