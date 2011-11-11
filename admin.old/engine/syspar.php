@@ -1,6 +1,6 @@
 <?php
 /**
- *  - storePar(name,val,type) - поместить параметр с именем namr на хранение
+ *  - storePar(name,val,type) - поместить параметр с именем name на хранение
  *  - getPar(name) - получить параметр обратно.
  */
 
@@ -150,7 +150,7 @@ class sysPar extends plugins {
 			return $this->database->selectCell(
 				"select `id` FROM ?_tree WHERE page=?d",$id
 			);
-		} else if(empty($_POST['id'])){
+        } else if(!isset($_POST['id'])) {
 			return -1;
 		} else {	
 			$x=$this->parent->readRecord(array('url'=>$_POST['id']));
@@ -540,8 +540,11 @@ class sysPar extends plugins {
 	 */
 	function delRecord($param){
 		$param=$this->readRecord($param);
-		if(!empty($param['id']))
+		if(!empty($param['id'])){
 			$this->database->select('delete from ?_flesh where `id`=?d',$param['id']);
+            return true;
+        } else
+            return false;
 	}
 	
 /**
@@ -1204,7 +1207,7 @@ function flash2($par='',$par2='',$par3=''){
 		$this->ffirst('_logout');
 		$cache->cleanForUser();
 		basket::getStore()->clear();
-		$this->go();
+        $this->go($this->curl('do'));
 	}
 	/**
 	 * Выход пользователя из системы
@@ -1328,7 +1331,6 @@ LIMIT 100;';
 				,$this->req_cnt>>1
 				,mkt());
 			echo php2js($result);
-		} elseif (OPTIONS::par('jinja2')){
            // debug('tpl',$this->tpl,MAIN_TPL);
             if($this->tpl==MAIN_TPL)
                 echo $this->_tpl ('tpl_jmain','_main',array_merge($this->par,array('param'=>$this->parent->parameters)));
@@ -1336,7 +1338,7 @@ LIMIT 100;';
                 echo $this->_tpl ('tpl_jmain','_second',array('param'=>$this->parent->par));
             //else echo '3-th temlate not supported';
         } else {
-            debug('tplx',$this->tpl,MAIN_TPL);
+           // debug('tplx',$this->tpl,MAIN_TPL);
 			$this->template();
         }
 		unset($_SESSION['errormsg']);
@@ -1423,6 +1425,7 @@ LIMIT 100;';
 			return '';
 		}
 		$this->par['error'].=$s;
+        return $this->par['error'];
 	}
 	function init(){
 		//*******************************************************
@@ -2104,8 +2107,9 @@ if($engine->has_rights(right_READ)){
 	$engine->menu['basket']=array('basket','_basket');
 //}
 $engine->par['user']=&$engine->user;
+$engine->execute('init2',pps($_GET['do']));
 if(!defined('INTERNAL')){
-	// отсюда не возвращаются праведные запросы
+    // отсюда не возвращаются праведные запросы
 	$engine->act(pps($_GET['do']),pps($_GET['plugin']));
 	// а сюда отправляем остальной мусор
 	

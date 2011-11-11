@@ -702,7 +702,7 @@ order by `id` LIMIT 50;';
 	//debug($news);
    // debug($news2);
 	//debug(array(NEWS_TPL,''.$tpl));
-        if (OPTIONS::par('jinja2'))
+        if (SUPER::option('jinja2'))
             return $x[$tpl]=$this->parent->_tpl('tpl_news','_'.$tpl,array('news'=>$news,'news2'=>$news2,'pages'=>$pages,'years'=>$years));
         else
 		    return $x[$tpl]=smart_template(array(NEWS_TPL,''.$tpl),array('news'=>$news,'news2'=>$news2,'pages'=>$pages,'years'=>$years));

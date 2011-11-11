@@ -14,6 +14,7 @@ define("right_LOGIN",16);
 define("right_LOGOUT",32);
 define("right_MULTY",64);
 define("right_SPECIAL",128);
+define("right_CHAT",128);
 define("right_ADMIN",1024);
 // and so on!!!
 // идентификатор общей секции прав
@@ -34,6 +35,10 @@ class rights
 		$this->_right=array();
 		$this->apply_rights($allow,$deny);
 	}
+
+    function list_right(){
+        return $this->_right;
+    }
 /**
  *  внутренняя функция - проверка точной секции
  */
@@ -145,6 +150,7 @@ class  Auth extends plugin{
 	}
 
 	function _loginform(){
+        if(!function_exists('smart_template')) return 'improper installation/ no templater found';
 		$form=new form('login');
 		$form->scanHtml(smart_template(array(FORMS_TPL,'login'),
 			array(
@@ -170,7 +176,9 @@ class  Auth extends plugin{
 	function auth_check($user='',$password='',$saveincookie=LOGIN_SAVEINCOOKIE) {
 		//debug($_SESSION);
 		$by_using_cookie = false ;
-		if((''===$user) && isset($_SESSION['USER_ID'])) {
+		if((''===$user) && isset($_SESSION['USER'])) {
+            $this->parent->user=$_SESSION['USER'];
+        } elseif((''===$user) && isset($_SESSION['USER_ID'])) {
 			$this->parent->user=$this->parent->readRecord(array('id'=>$_SESSION['USER_ID']));
 		} else {
 			if((''===$user) && isset($_COOKIE[$this->login_cookie])) {
@@ -183,6 +191,9 @@ class  Auth extends plugin{
 				//debug($this->parent->user);
 			}
 		}
+        if(empty($this->parent->rights))
+            $this->parent->rights=new rights();
+
 		if(isset($this->parent->user['id'])){
 			//print_r($this->parent->user);
 			$_SESSION['USER_ID']=ppi($this->parent->user['id']);
