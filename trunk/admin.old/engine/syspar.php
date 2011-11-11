@@ -1332,6 +1332,7 @@ LIMIT 100;';
 				,mkt());
 			echo php2js($result);
            // debug('tpl',$this->tpl,MAIN_TPL);
+        } elseif (SUPER::option('jinja2')){
             if($this->tpl==MAIN_TPL)
                 echo $this->_tpl ('tpl_jmain','_main',array_merge($this->par,array('param'=>$this->parent->parameters)));
             else

@@ -27,6 +27,7 @@ include_once('project_core.php');
 include_once 'compiler.class.php';
 template_compiler::checktpl();/****finish point site_includes *//*
 */
+SUPER::option(array('jinja2'=>true));
 
 /**
  * Описание главного обьекта приложения
@@ -475,7 +476,6 @@ class engine extends engine_Main
 $engine=&new engine('Auth','sitemap','news','altname');
 DATABASE();
 $engine->setPar('charset',CHARSET);
-OPTIONS::par('jinja2',true);
 //echo $engine->tpl;
 $_GLOBALS['engine']=&$engine;
 DO_IT_ALL();
