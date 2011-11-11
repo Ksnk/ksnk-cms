@@ -1,5 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
+    <files dir="engine" >
+        <file>hosts.php</file>
+    </files>
     <!-- ************************************** -->
     <!-- **** параметры проекта            **** -->
     <!-- ************************************** -->
@@ -8,22 +11,6 @@
 	<!-- ************************************** -->
 	<!-- **** внедряем jinja шаблоны       **** -->
 	<!-- ************************************** -->
-    <!-- копируем файлы шаблонизатора - core -->
-        <files  dstdir="$dst/engine" dir="templater">
-            <file>template_parser.class.php</file>
-            <file>compiler.class.php</file>
-            <file>compiler.php.php</file>
-        </files>
-    <!-- копируем файлы шаблонизатора - core -->
-        <files  dstdir="$dst/engine" dir="nat2php">
-            <file>nat2php.class.php</file>
-        </files>
-    <!-- копируем файлы шаблонизатора - сайт шаблоны -->
-        <files  dstdir="$dst/templates" dir="templater/templates">
-            <file>tpl_base.php</file>
-            <file>tpl_compiler.php</file>
-        </files>
-
 	<files dir="plugins" >
 		<file>jinja_template.php</file>
 	</files>
@@ -36,9 +23,9 @@
 	<!-- ************************************** -->
 	<!-- **** tabs      			       **** -->
 	<!-- ************************************** -->
-	<files dir="plugins.2" >
-		<file>tabs.php</file>
-	</files>
+    <files dir="plugins.2" >
+        <file>tabs.php</file>
+    </files>
 	<!-- ************************************** -->
 	<!-- **** captcha   			       **** -->
 	<!-- ************************************** -->
@@ -54,6 +41,9 @@
 	<!-- ************************************** -->
 	<!-- **** горизонтальное меню сайта    **** -->
 	<!-- ************************************** -->
+    <files dir="plugins.2" dstdir="$dst/engine">
+        <file>altname.php</file>
+    </files>
 	<files dir="plugins.2/ulmenu">
 		<copy dstdir="$dst/img">*.gif</copy>
 	</files>
@@ -75,8 +65,10 @@
 		<file>syspar.php</file>
 		<file>func.php</file>
 		<file>html.class.php</file>
-		<file>Generic.php</file>
-		<file>Mysql.php</file>
+        <file>Generic.php</file>
+        <file>templater.php</file>
+        <file>Mysql.php</file>
+        <file dir="admin/engine/plugins">news.php</file>
 	</files>
 	<!-- ************************************** -->
 	<!-- **** вопрос-ответ и проч мура      **** -->

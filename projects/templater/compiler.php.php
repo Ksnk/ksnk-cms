@@ -50,6 +50,7 @@ class php_compiler extends tpl_parser {
 			->newFunc('finnumb','$this->func_finnumb(%s)')
 			->newFunc('right','$this->func_rights(%s)')
             ->newFunc('russuf','$this->func_russuf(%s)')
+            ->newFunc('in_array','$this->func_in_array(%s)')
 			;
 		
 	}

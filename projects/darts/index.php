@@ -17,7 +17,7 @@ ini_set('include_path',ini_get('include_path').PATH_SEPARATOR
 
 define('ROOT_URL',"<%=$target_dir%>");
 
-define("TEMPLATE_PATH",ROOT_PATH.'/templates/');
+define("TEMPLATE_PATH",ROOT_PATH.DIRECTORY_SEPARATOR.'templates');
 
 function _l($mess,$par=array()){
 	static $lang=array(
@@ -42,6 +42,11 @@ function _l($mess,$par=array()){
 //ob_start('ob_mmyhandle');
 //include_once("htmlopt.php");
 include_once("func.php");
+SUPER::classes(array(
+// модули
+	'ml_plugin'=>'engine/news.php',
+    'jinja2'=>true,
+));
 //include_once("templater.php");
 include_once("engine.php");
 include_once("syspar.php");

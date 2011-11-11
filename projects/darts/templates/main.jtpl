@@ -4,12 +4,13 @@
 <title>{{title}}</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Language" content="ru">
-<base href="<%=$target_host.$target_dir%>/">
+<base href="{{root}}">
 <!--[if lte IE 6]></base><![endif]-->
 ##<script src="http://yandex.st/jquery/1.4.4/jquery.min.js"></script>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 <script type="text/javascript" src="js/site.js"></script>
 <LINK  rel="stylesheet" type="text/css" href="css/site.css">
+<%=point('html_header');%>
 
 </head>
 <body>
@@ -760,7 +761,7 @@ data-href="?do=deltourn&id={{par.ID}}"
 		{% set players=callex("darts_Players",'_list') %}
 		{% set cplayers=callex("darts_Players",'_listid',ID) %}
 		{% for p in players %}
-			<option value="{{p.ID}}"{% if in_array(p.ID,cplayers)%} selected{% endif %}>{{p.name}}</option>
+			<option value="{{p.ID}}"{% if ( in_array(p.ID,cplayers))%} selected{% endif %}>{{p.name}}</option>
 		{% endfor %}
 		</select><br>
 		всего {{cplayers|length}}({{players|length}}) 

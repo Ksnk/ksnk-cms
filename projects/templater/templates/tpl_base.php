@@ -160,6 +160,18 @@ Pellentesque dictum scelerisque urna, sed porta odio venenatis ut. Integer aucto
 		return implode($glue,$pieces);
 	}
 	
+
+/**
+ * фильтр in_array - проверка на наличие значения в массиве
+ * @param mixed $p - mixed
+ * @param array $a
+ */
+	function func_in_array($p,$a){
+		if(is_array($a))
+			return in_array($p,$a);
+		else
+			return $p==$a;
+	}
 /**
  * фильтр default - вывод значения по умолчанию, при пустом параметре
  * @param $par

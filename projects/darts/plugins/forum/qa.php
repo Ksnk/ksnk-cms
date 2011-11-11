@@ -49,7 +49,7 @@ class qa {
 		// qa при id=0 - вывод всего дерева вопрос-ответ с темами.
 		//$par=self::$tree->getChilds($id,$page,ppi($this->options['perpage'],40),$total);
 		$par=self::$tree->getDeep2($id,$page,ppi($this->options['perpage'],40),$total);
-		debug($par);
+	//	debug($par);
 		return $this->parent->_tpl('tpl_main','_qa',array('list'=>$par));
 	}
 	

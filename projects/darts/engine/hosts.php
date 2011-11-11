@@ -29,7 +29,7 @@ $the_login="ksnk";
 
 	
  } else { 
-$target_host='http://darts.me'	;		
+$target_host='http://localhost'	;
  	%>
 $basename="tmp";
 error_reporting(E_ALL);

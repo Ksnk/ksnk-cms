@@ -15,8 +15,8 @@ define("right_TABLE",32);
 //define("right_CHAT",128);
 //define("right_ADMIN",1024);
 
-
 require_once('tournaments.php');
+
 
 
 /**
@@ -31,7 +31,7 @@ class darts_Auth extends Auth {
 	 */
 	function do_killuser(){
 		if (!$this->parent->has_rights(right_ADMIN)){
-			$this->parent->error("Sorry. you have no right to do it!");
+			$this->parent->error("Sorry! you have no right to do this.");
 			return " ";
 		}
 		$id=pps($_GET['id']);
@@ -362,7 +362,7 @@ class darts_Players  extends plugin{
 		if($style=='keys'){
 			$pnames=array();
 			for($i=0;$i<count($names);$i++){
-				$x=$pllist[$i];
+				$x=$names[$i];
 				$pnames[$x['ID']]=$x['name'];
 			};
 			$res[$trn][$style]=$pnames;
@@ -1181,6 +1181,7 @@ class darts_Main extends engine_Main {
 		$tpl = '';
 		if ($tournament->tournament['RULE']=='group'){
 			$tournament->prepChilds();
+            $par='';
 			foreach($tournament->childs as &$child)
 				$par.=$this->parent->export('DARTS','getTourTable',$child);
 			return $par;	
@@ -1520,6 +1521,7 @@ class config extends plugin {
   `LEVEL` int(3) NOT NULL,
   `NAME` varchar(255) NOT NULL default '',
   `STATUS` varchar(40) default '0',
+  `DESCR` text NOT NULL,
   `RULE` int(11) default NULL,
   PRIMARY KEY  (`ID`),
   KEY `PLACE` (`PLACE`),
@@ -1571,6 +1573,7 @@ class config extends plugin {
 		"CREATE TABLE IF NOT EXISTS ?_news (
   `ID` int(11) NOT NULL auto_increment,
   `text` text NOT NULL,
+  `CATEGORY` int(11) NOT NULL DEFAULT '0',
   `PLACE` int(11) default NULL,
   `DATE` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
   PRIMARY KEY  (`ID`)

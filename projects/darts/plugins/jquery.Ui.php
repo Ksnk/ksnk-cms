@@ -2,13 +2,12 @@
 /**
  * плагин интеграции с jQuery.UI
  */
-//<% 
-	point_start('js_head') ;
-	include_once($env_common.'/common/jqUI/js/jquery-ui-1.8.4.custom.min.js');
-	point_finish();
-	
+//<% point_start('html_header') ;%>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
+<%	point_finish();
+
 	point_start('css_site') ;
-	include_once($env_common.'/common/jqUI/css/ui-lightness/jquery-ui-1.8.4.custom.css');
+	readfile($env_common.'/common/jqUI/css/ui-lightness/jquery-ui-1.8.4.custom.css');
 	point_finish();
 	
 	point_start('main_html'); 

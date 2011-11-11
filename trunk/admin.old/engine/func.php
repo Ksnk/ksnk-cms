@@ -21,6 +21,79 @@ function mkt($store=false){
 }
 mkt(true);
 
+class SUPER {
+    private static
+        $options=array(),
+        $path_record=array();
+    protected static
+        $EXPORTS=array();
+    /**
+     * функция работы с параметрами
+     *
+     * @param  $opt
+     * @param null $val
+     * @return null
+     */
+    static function option($opt,$def=null){
+        if(is_array($opt)){
+            foreach($opt as $k=>$v)
+                self::$options[$k]=$v;
+            return;
+        }
+        if(isset(self::$options[$opt]))
+            return self::$options[$opt];
+        else
+            return $def;
+    }
+
+    /**
+     * autoload suppert/ internal function
+     * @static
+     * @param  $cls
+     * @return
+     */
+
+    static function include_file_with_class($cls){
+        if(!class_exists($cls))
+            //var_dump(array(self::$path_record[$cls],getcwd()));
+            if(isset(self::$path_record[$cls])){
+                include_once(self::$path_record[$cls]);
+                return;
+            }
+            $x=self::option('path','engine/').$cls.self::option('class_ext','.php');
+            if(is_readable($x)){
+                include_once($x);
+            }
+    }
+
+    /**
+     * autoload support, настройка расположения классов
+     * @static
+     * @param  $classes
+     * @return void
+     */
+    static function classes($classes){
+        foreach($classes as $k=>$v){
+            if(is_string($v))
+                $v=array($k,$v);
+
+            if(is_object($v)) //TODO:wtf?
+                continue;
+
+            if(isset($v[1])){
+                if(substr($v[1],-1,1)=='/')
+                    self::$path_record[$v[0]]=$v[1].$v[0].'.php';
+                else
+                    self::$path_record[$v[0]]=$v[1];
+            }
+        }
+    }
+}
+
+function __autoload($cls){
+    SUPER::include_file_with_class($cls);
+}
+
 include_once(ROOT_PATH.'/engine/hosts.php');
 
 $connect="mysql://$the_login:$the_pass@$the_host/$the_db";
@@ -370,65 +443,11 @@ function toRusDate($daystr=null,$format="j F, Y г."){
 			$daystr)));
 }
 
-function &LoadClass($cls,$param=0){
-	static  $class_record=array(),
-			$path_record=array();
-	
-	if(is_string($cls)){ 
-		// checking dependence
-		$class_name = $cls;
-		if(!class_exists($class_name))
-			includeit($class_name,$path_record[$class_name]);
-		if (isset($class_record[$cls])){
-			// checking class itself
-			$class_name = $class_record[$cls];	
-			if(!class_exists($class_name))
-				includeit($class_name,$path_record[$class_name]);
-		} 
-		$result=null;	
-		// creating an object
-		if(!class_exists($class_name))
-			return $result;
-        if(is_array($param) && count($param))
-		switch(count($param)){
-			case 1:  
-				$result=new $class_name(&$param[0]) ;
-				break; 
-			default:
-                $result=new $class_name(&$param[0],&$param[1]) ;
-		}
-		else
-			$result=&new $class_name() ;
-		return $result;
-		
-	}
-	
-	// is_array($cls) - configuration parcing
-	
-	foreach($cls as $k=>$v){
-		if(is_string($v))
-			$v=array($k,$v);
-		
-        if(is_object($v))
-            continue;
-
-        if(isset($v[0]))
-			$class_record[$k]=$v[0];
-		if(isset($v[1])){
-			if(substr($v[1],-1,1)=='/')
-				$path_record[$v[0]]=$v[1].$v[0].'.php';
-			else
-				$path_record[$v[0]]=$v[1];
-		}
-	}
-	return $reg_record ;
-}
-
 /**
  * настройки на двигл CMS
  */
         if(defined('ADMIN')){
-LoadClass(array(
+SUPER::classes(array(
 // модули
 	'Auth'=>ROOT_PATH.'/'.ADMIN.'/engine/users.php',
 	'html_mime_mail'=>ROOT_PATH.'/'.ADMIN.'/engine/sendmail.php',
@@ -458,7 +477,6 @@ LoadClass(array(
 	'spec'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
 	'csv_reader'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
 	'csv'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
-
 ));
 
 /**
@@ -476,7 +494,8 @@ unset($x[session_name()],$x['debug'],$x['cache']);
 ksort($x);
 $page_hash=md5(serialize($x));
 $group=isset($_REQUEST[session_name()])?'x':'s';
-$cache = LoadClass('FileCache',array(array(
+    
+$cache = new FileCache(array(
 	'is_enabled' => ($_SERVER['REQUEST_METHOD']=='GET'
 			&& !in_array(pps($_GET['do']),array('search','basket','writeus', 'logout'))
 			&& !in_array(pps($_GET['id']),array('search','basket','writeus'))
@@ -487,7 +506,8 @@ $cache = LoadClass('FileCache',array(array(
 	'group' => $group,
 	'hash'  => $page_hash,
 	'user_id' => ppi($_SESSION['USER_ID']),
-)));
+));
+    
 if(isset($_GET['cache'])?$_GET['cache']:true){
 //if(false){
 	$gz_content = $cache->read($last_modified, $content_type);
