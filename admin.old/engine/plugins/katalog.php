@@ -160,6 +160,10 @@ class basket extends ml_plugin {
         }
         return self::$store;
     }
+
+    function _logout(){
+        basket::getStore()->clear();
+    }
 	
 	function getPluginName(){
 		return 	pps($this->pluginname,'ќформить заказ');

@@ -61,6 +61,7 @@ class plugins extends SUPER
         $this->database =& $DATABASE; //DATABASE();
         $arg_list = func_get_args();
         foreach ($arg_list as $v) $this->export($v);
+        self::$engine=$this;
     }
 
 /* execute all methods */
@@ -159,9 +160,8 @@ class plugins extends SUPER
 
 function _export($a, $b, $c = '', $d = '')
 {
-    global $engine;
-    if ($a) return $engine->export($a, $b, $c, $d);
-    else return $engine->ffirst($b, $c, $d);
+    if ($a) return SUPER::$engine->export($a, $b, $c, $d);
+    else return SUPER::$engine->ffirst($b, $c, $d);
 }
 
 function arr_scan(&$arr, $idx, $val, $res = null)

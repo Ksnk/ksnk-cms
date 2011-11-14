@@ -1181,8 +1181,6 @@ function flash2($par='',$par2='',$par3=''){
 	 * Добавляется ссылка обратно в каталог
 	 */	
 	function do_catalog() {
-		global $engine;
-		//print_r($engine);
 		$return = $this->do_page();
 		if($return == '')
 			return '';
@@ -1205,8 +1203,7 @@ function flash2($par='',$par2='',$par3=''){
 	function do_logout(){
 		global $cache;
 		$this->ffirst('_logout');
-		$cache->cleanForUser();
-		basket::getStore()->clear();
+		if(!empty($cache))$cache->cleanForUser();
         $this->go($this->curl('do'));
 	}
 	/**
@@ -1219,12 +1216,11 @@ function flash2($par='',$par2='',$par3=''){
 	 * Создание страницы описания для каталога
 	 */
 	function do_ajax_cat_opisanie(){
-		global $engine;
 		$sql = 'SELECT the_href, xarticle FROM ?_katalog WHERE id = '.$_POST['id'];
 		$res=$this->database->select($sql);
-      if($engine->node($res[0]['the_href']) > 0)
+      if(SUPER::$engine->node($res[0]['the_href']) > 0)
       	return $res[0]['the_href'];	
-		$nd_info = $engine->nodeGetInfo($engine->nodeAdd($engine->node($res[0]['xarticle']),array('name'=>'subarticle','type'=>type_ARTICLE)));
+		$nd_info = SUPER::$engine->nodeGetInfo(SUPER::$engine->nodeAdd(SUPER::$engine->node($res[0]['xarticle']),array('name'=>'subarticle','type'=>type_ARTICLE)));
 		$sql = 'UPDATE ?_katalog SET the_href = '.$nd_info['page'] .' WHERE id = '.$_POST['id'];
 		$this->database->select($sql);
 		return $nd_info['page'];
@@ -1292,7 +1288,7 @@ LIMIT 100;';
 		return ' ';
 	}
 	function do_error(){
-		return _l("page not found, sorry!");
+		return self::_l(mess_page_not_found);
 	}
 	function act($do='',$act=''){
 		if(is_callable('apache_request_headers'))
@@ -1498,7 +1494,7 @@ LIMIT 100;';
 			$par='http://'.$_SERVER["SERVER_NAME"]
 				.toUrl(INDEX_PATH) //preg_replace('~\?.*~','',$_SERVER['REQUEST_URI'])
 				.pp($par,'?');
-		if(empty($_GET['debug'])){
+		if(!SUPER::$engine->debug){
 			if (!headers_sent()){
 				header("location:".$par	); exit;
 			} else {
@@ -1906,8 +1902,8 @@ LIMIT 100;';
 
 function convert_href($s){
 	static $xfunc;
-	global $engine,$cache;
-	$root = $engine->getRoot();
+	global $cache;
+	$root = SUPER::$engine->getRoot();
 	if(!isset($xfunc)) {
 	if(!defined('IS_ADMIN') && (class_exists('altname'))) {
 		$xfunc=create_function(
@@ -1935,15 +1931,16 @@ function convert_href($s){
     	);
 	}}
 	//$prop= &new prop();
-	$ar=prop::prep(_l('query'));
+	$ar=prop::prep(SUPER::_l(mess_query));
 	
 	$x=preg_replace_callback('~href="(.*?)/?(\?.*?)"~',$xfunc,	$s	);
-	if(is_callable(array($engine,'get_head')))
-		$x=preg_replace_callback('~<!--head-->~',array($engine,'get_head'),$x	);
-	if (!$engine->is_ajax) 
-		$x=$x._l("\n<!-- (%s) page was built for %f sec -->"
-				,array(prop::sema(-($engine->req_cnt>>1),$ar[0])
+	if(is_callable(array(SUPER::$engine,'get_head')))
+		$x=preg_replace_callback('~<!--head-->~',array(SUPER::$engine,'get_head'),$x	);
+	if (!SUPER::$engine->is_ajax){
+		$x.=SUPER::_l(mess_page_was_build
+				,array(prop::sema(-(SUPER::$engine->req_cnt>>1),$ar[0])
 				,mkt()));
+    }
 	// решение о сбросе кэша
 	if(!empty($cache)){
 		if( $_SERVER['REQUEST_METHOD']!='GET'){
@@ -1960,7 +1957,6 @@ function convert_href($s){
  * Поехали работать
  */
 function DO_IT_ALL(){
-	global $engine;
 /**
  * ЧПУ для сайта
  */
@@ -1976,11 +1972,11 @@ if (empty($url))
 if(!empty($url)){
 	DATABASE();
 	//debug('url');
-	if($res=$engine->export('altname','getaddr',$url)){
+	if(class_exists('altname') && $res=SUPER::$engine->export('altname','getaddr',$url)){
 		$_GET['do']=$res['do'];
 		$_GET['id']=$res['id'];
 	}
-	else if($res=$engine->export('altname','getaddr',preg_replace('#/(\d+)$#', '', $url))){
+	else if(class_exists('altname') && $res=SUPER::$engine->export('altname','getaddr',preg_replace('#/(\d+)$#', '', $url))){
 		$_GET['do']='catalog';
 		$_GET['id']=preg_replace('#^(.+)/(\d+)$#', '\2', $url);
 	}
@@ -2002,7 +1998,7 @@ if(!empty($url)){
 	//debug($_GET);
 	//print_r($engine);
 	//print_r($_GET);
-	$engine->setUrl(array('do'=>pps($_GET['do']),'id'=>pps($_GET['id'])));
+	SUPER::$engine->setUrl(array('do'=>pps($_GET['do']),'id'=>pps($_GET['id'])));
 }
 
 /**
@@ -2020,10 +2016,11 @@ if(isset($_GET['debug'])) {
     } else {
         setcookie ("debug", "", time() - 3600);
     }
+    SUPER::$engine->go(SUPER::$engine->curl('debug'));
 }
-$engine->debug=pps($_GET['debug'])|| pps($_COOKIE['debug']);
+SUPER::$engine->debug=pps($_GET['debug'])|| pps($_COOKIE['debug']);
 
-if($engine->debug){
+if(SUPER::$engine->debug){
 	function backtrace(){
 		$x=debug_backtrace();
 		$z=array();
@@ -2040,49 +2037,57 @@ if($engine->debug){
 		//}
 		return $z;
 	}		
-	$d='Debug/HackerConsole/Main.php';
-	if (file_exists ($d)) require_once $d;
 
-	if (class_exists('Debug_HackerConsole_Main') ) {
-		new Debug_HackerConsole_Main(true);
-
-		function debug()
-		{
-            $na=func_num_args();
-            for ($i=0; $i<$na;$i++){
-                $msg=func_get_arg($i);
-                call_user_func(array('Debug_HackerConsole_Main', 'out'),is_string($msg)?$msg:print_r($msg,true));
+    if (isset($headers['X-Requested-With']) || isset($_GET['ajax']) || (substr(pps($_GET['do']),0,4)=='ajax')){
+        function debug()
+        {
+            foreach(func_get_args() as $msg){
+                SUPER::$engine->ajaxdata['debug'].=is_string($msg)?$msg:print_r($msg,true)."<br>\n\r";
             }
-			call_user_func(array('Debug_HackerConsole_Main', 'out'),'>>>>>'.backtrace());
-		}
-	} else {
-		function debug($msg){
-			var_dump($msg);
-		};
-	}
-	$engine->database->do_log=true;
+            SUPER::$engine->ajaxdata['debug'].='>>>>>'.backtrace()."<br>\n\r";
+        }
+    } else {
+        $d='Debug/HackerConsole/Main.php';
+        if (file_exists ($d)) require_once $d;
+        if (class_exists('Debug_HackerConsole_Main') ) {
+
+            new Debug_HackerConsole_Main(true);
+            function debug()
+            {
+                foreach(func_get_args() as $msg){
+                    call_user_func(array('Debug_HackerConsole_Main', 'out'),is_string($msg)?$msg:print_r($msg,true));
+                }
+                call_user_func(array('Debug_HackerConsole_Main', 'out'),'>>>>>'.backtrace());
+            }
+        } else {
+            function debug($msg){
+                var_dump($msg);
+            };
+        }
+    }
+	SUPER::$engine->database->do_log=true;
 	if(!empty($_POST))
 		debug($_POST);
 } else {
 	function debug($msg){;}
 	function backtrace(){;}
 }
-if($engine->getPar('UPLOAD_DIR')!=TMP_DIR)
-	$engine->setPar('UPLOAD_DIR',TMP_DIR);
+if(SUPER::$engine->getPar('UPLOAD_DIR')!=TMP_DIR)
+	SUPER::$engine->setPar('UPLOAD_DIR',TMP_DIR);
 
-$engine->execute('init',pps($_GET['do']));
+SUPER::$engine->execute('init',pps($_GET['do']));
 // если можно стартовать сессию - стартуем
 if(isset($_POST['login_name']) && isset($_POST['login_pass']) ){
-	$engine->sessionstart();
-	if($engine->export('Auth','auth_check'
+	SUPER::$engine->sessionstart();
+	if(SUPER::$engine->export('Auth','auth_check'
 		,$_POST['login_name']
 		,$_POST['login_pass']
 		,ppx($_POST['login_save'][0])
 	)){
-        $engine->ffirst('onJustLogin');
-		$engine->go($engine->curl());
+        SUPER::$engine->ffirst('onJustLogin');
+		SUPER::$engine->go(SUPER::$engine->curl());
 	} else {
-        $engine->error(_l('wrong password'));
+        SUPER::$engine->error(self::_l(mess_wrong_password));
     }
 }
 if(isset($_REQUEST[session_name()])){
@@ -2090,28 +2095,28 @@ if(isset($_REQUEST[session_name()])){
 		&& isset($_COOKIE[session_name()])
 		&& ($_GET[session_name()]==$_COOKIE[session_name()])
 	){	
-		$engine->go($engine->curl(session_name()));
+		SUPER::$engine->go(SUPER::$engine->curl(session_name()));
 	}
 	//session_start();
-	$engine->sessionstart();
-	$engine->export('Auth','auth_check');
+	SUPER::$engine->sessionstart();
+	SUPER::$engine->export('Auth','auth_check');
 }
-$engine->par['root']=rtrim(toUrl(ROOT_PATH),'/').'/';
-if($engine->has_rights(right_READ)){
-	$engine->par['userhello']= _l('Hello "%s"',$engine->user['name']);
-	$engine->par['userhello2']= 'Вы авторизованы как &laquo;'.$engine->user['name'].'&raquo;';
+SUPER::$engine->par['root']=rtrim(toUrl(ROOT_PATH),'/').'/';
+if(SUPER::$engine->has_rights(right_READ)){
+	SUPER::$engine->par['userhello']= SUPER::_l(mess_hello_user,SUPER::$engine->user['name']);
+	SUPER::$engine->par['userhello2']= SUPER::_l(mess_your_name,SUPER::$engine->user['name']);
 }
 
 // продолжение инициализации
 //debug($engine->rights);
 //if($engine->has_rights(right_READ)){
-	$engine->menu['basket']=array('basket','_basket');
+	SUPER::$engine->menu['basket']=array('basket','_basket');
 //}
-$engine->par['user']=&$engine->user;
-$engine->execute('init2',pps($_GET['do']));
+SUPER::$engine->par['user']=&SUPER::$engine->user;
+SUPER::$engine->execute('init2',pps($_GET['do']));
 if(!defined('INTERNAL')){
     // отсюда не возвращаются праведные запросы
-	$engine->act(pps($_GET['do']),pps($_GET['plugin']));
+	SUPER::$engine->act(pps($_GET['do']),pps($_GET['plugin']));
 	// а сюда отправляем остальной мусор
 	
 	//$engine->go();
