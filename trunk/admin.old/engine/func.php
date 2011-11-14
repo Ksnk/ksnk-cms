@@ -24,9 +24,12 @@ mkt(true);
 class SUPER {
     private static
         $options=array(),
-        $path_record=array();
+        $path_record=array(),
+        $lang=array();
     protected static
         $EXPORTS=array();
+    public static
+        $engine=null;
     /**
      * функция работы с параметрами
      *
@@ -63,6 +66,7 @@ class SUPER {
             $x=self::option('path','engine/').$cls.self::option('class_ext','.php');
             if(is_readable($x)){
                 include_once($x);
+                return ;
             }
     }
 
@@ -87,6 +91,28 @@ class SUPER {
                     self::$path_record[$v[0]]=$v[1];
             }
         }
+    }
+
+    static function setlang($lang){
+        self::$lang=array_merge(self::$lang,$lang);
+    }
+    /**
+     * многоязыкость
+     * @static
+     * @param  $mess
+     * @param array $par
+     * @return string
+     */
+    static function _l($mess,$par=array()){
+
+        if(isset(self::$lang[$mess]))
+            $mess=self::$lang[$mess];
+        if(is_array($mess))
+            $mess=$mess[self::option('language','en')];
+        if($par!==null)
+            return vsprintf($mess,$par);
+        else
+            return $mess ;
     }
 }
 
@@ -207,7 +233,7 @@ function includeit($x,&$y){
 	if(!empty($y))
 		include_once($y);
 	else
-		include_once($x.'.php');	
+		include_once($x.'.php');
 }
 
 /* usefull stuff */

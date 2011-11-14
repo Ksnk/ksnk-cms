@@ -480,7 +480,7 @@ class form{
 //        ��������� ������ ������� ����������
 		$this->havenewfile=false;
 		$res=FALSE ;
-		$x=$GLOBALS["_".$this->method];
+		$x=$GLOBALS["_".strtoupper($this->method)];
 		foreach ($this->controls as $i)
 		{
 			if (isset($this->var[$i->c[1]]))
@@ -489,6 +489,7 @@ class form{
 				$res=TRUE ;
 			}
 		}
+       // debug($this->method);
 		// store values into session
 		if ($res) {
 			if (!empty($_FILES))

@@ -29,6 +29,10 @@
 			if(data && data.debug){
 				debug(data.debug);
 			}
+            if(data && data.result && data.result.complete){
+				//var x = new Function('','try{'+data.result.complete+'}; catch(e){debug("fault");}');
+                setTimeout(data.result.complete,100);
+			}
 			
 		}
 
@@ -36,7 +40,7 @@
 			debug('error',textStatus);
 		}
 
-	}); // 5 second, no more
+	}); // 5 seconds, no more
 
 	function justajax(e,href,repl){
 		var $self = this,confirm,ajaxit

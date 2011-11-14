@@ -653,5 +653,15 @@ class trn_finn extends tournament {
  */
 class trn_title extends tournament {
 
-	
+    function addChild($par){
+        $this->prepChilds();
+        // поискать турнир
+         $child=tournament::createTournament(array_merge(array(
+                'LEVEL'=>$this->tournament['LEVEL']+1
+                ,'PARENT'=>$this->getId()
+             ),$par));
+        $child->save();
+        return $child;
+    }
+
 }

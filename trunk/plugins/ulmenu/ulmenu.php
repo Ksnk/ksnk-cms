@@ -161,8 +161,8 @@ ul.ulmenu li ul li ul{top:5px;left:100%; }
 </style>
 <script>
 <% point_start('js_main');
-include_once($env_common.'/common/js/site.src/menu.js');
-include($env_common.'/common/js/site.src/ulmenu.js');
+include_once('../common/site.src/menu.js');
+include('../common/site.src/ulmenu.js');
 
 %>
 $("ul.ulmenu li>a").hover(function(){

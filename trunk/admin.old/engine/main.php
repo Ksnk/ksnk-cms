@@ -1489,8 +1489,8 @@ class engine extends engine_Main
 	}
 
 	function do_logout(){
-		$this->ffirst('_logout');
-		$this->go($this->curl('do'));
+        $this->ffirst('_logout');
+		$this->go($this->curl('do'))
 	}
 
 	function get_parameters(&$par){

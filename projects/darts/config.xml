@@ -3,11 +3,11 @@
     <files dir="engine" >
         <file>hosts.php</file>
     </files>
+
     <!-- ************************************** -->
     <!-- **** параметры проекта            **** -->
     <!-- ************************************** -->
 	<var name="target_charset">UTF-8</var>
-
 	<!-- ************************************** -->
 	<!-- **** внедряем jinja шаблоны       **** -->
 	<!-- ************************************** -->
@@ -41,11 +41,11 @@
 	<!-- ************************************** -->
 	<!-- **** горизонтальное меню сайта    **** -->
 	<!-- ************************************** -->
-    <files dir="plugins.2" dstdir="$dst/engine">
+<!--    <files dir="plugins.2" dstdir="$dst/engine">
         <file>altname.php</file>
-    </files>
-	<files dir="plugins.2/ulmenu">
-		<copy dstdir="$dst/img">*.gif</copy>
+    </files>-->
+	<files dir="plugins.2/ulmenu" dstdir="$dst/img">
+		<copy >*.gif</copy>
 	</files>
 	<files dir="plugins">
 		<file>ulmenu.php</file>

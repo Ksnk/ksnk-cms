@@ -1,12 +1,12 @@
 /**
  * 
- */
+
 <% 
-	include_once($env_common.'/common/js/site.src/menu.js');
-    include_once($env_common.'/common/js/site.src/debug.js');
-    include_once($env_common.'/common/js/site.src/cookie.js');
+	include_once('../common/site.src/menu.js');
+    include_once('../common/site.src/debug.js');
+    include_once('../common/site.src/cookie.js');
 	
-    echo point('js_head'); //%>
+    echo point('js_head'); //*///%>
    
 function komment(el,id){
 	try{
@@ -26,9 +26,15 @@ function komment(el,id){
 function reload(){
 	if(!cookie('debug'))
 		window.location.reload();
-	else 
-		win_alert({txt:'reload page, plz'});
-}  
+	else {
+        win_confirm({
+				txt:'reload page?',
+				yes:function(){
+					window.location.reload();
+				}
+        });
+    }
+}
 
 function _news(e,what){
 	var x='' ;
@@ -75,7 +81,7 @@ $(function(){
 	
 	
 	
-	<% include_once($env_common.'/common/js/site.src/justajax.js'); %>
+	<% include_once('../common/site.src/justajax.js'); %>
 	<%=point("js_main"); %>
 
 }) 

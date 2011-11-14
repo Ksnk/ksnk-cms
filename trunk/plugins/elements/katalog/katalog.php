@@ -534,7 +534,7 @@ class xKatalog extends xCommon {
 			$this->katalog->cloneAsChild();
 			return 'ok';
 		} else {
-			print_r($_GET);
+			//print_r($_GET);
 			return 'fault!';
 		}
 	}

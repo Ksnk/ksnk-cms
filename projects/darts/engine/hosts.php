@@ -4,9 +4,12 @@ define('TAB_PREF','darts'); // префикс базы данных
 $db_setup='SET NAMES utf8;';
 //$basename="rosin";
 <%
-//if(trim($target_dir,' /')!='') 
-$target_dir='/'.trim($target_dir,'/');
-$target_host='';
+//if(trim($target_dir,' /')!='')
+if(empty($target_dir))
+    $target_dir='/';
+else
+    $target_dir='/'.trim($target_dir,'/');
+//$target_host='';
 
 if($target!='debug' && $target_host!='localhost') {
 	switch ($target_host) {

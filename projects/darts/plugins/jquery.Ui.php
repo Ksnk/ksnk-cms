@@ -7,7 +7,7 @@
 <%	point_finish();
 
 	point_start('css_site') ;
-	readfile($env_common.'/common/jqUI/css/ui-lightness/jquery-ui-1.8.4.custom.css');
+	readfile($env_common.'/common/jqUI/css/ui-lightness/jquery-ui-1.8.16.custom.css');
 	point_finish();
 	
 	point_start('main_html'); 

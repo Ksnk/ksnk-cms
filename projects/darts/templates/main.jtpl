@@ -675,7 +675,7 @@ data-complete="reload();"
 		Турниры ({{trlist|length}})</dt>
     <dd><select id="trnlist" name="trn" size="6" multiple="multiple" 
     	{%- if is_editor %}	class="ajax long"
-			data-href="?do=newtour&id=~~"
+			data-href="?do=newtour&pid={{par.ID}}&id=~~"
 			data-complete="$('#trntabs').html(data.result).find('.ajax').justajax().end().parents('dd').first().prev('dt').trigger('click');"
 		{%- else %} class="long"
 		{%- endif -%}	
@@ -751,7 +751,7 @@ data-href="?do=deltourn&id={{par.ID}}"
 ##
 ##  NewTourn - ajax форма для вкладки Турниры панели клуб
 ##
-{%- macro NewTourn(tour,ID=0) %}
+{%- macro NewTourn(tour,pid=0) %}
 <table>
 	<tr>
 		<td> турнир</td>
@@ -759,7 +759,7 @@ data-href="?do=deltourn&id={{par.ID}}"
 		<td rowspan="4">
 		<select  name="players[]" multiple="5"  size="6" >
 		{% set players=callex("darts_Players",'_list') %}
-		{% set cplayers=callex("darts_Players",'_listid',ID) %}
+		{% set cplayers=callex("darts_Players",'_listid',pid) %}
 		{% for p in players %}
 			<option value="{{p.ID}}"{% if ( in_array(p.ID,cplayers))%} selected{% endif %}>{{p.name}}</option>
 		{% endfor %}
@@ -811,7 +811,7 @@ data-href="?do=deltourn&id={{par.ID}}"
 		{%- endif -%}
 			&nbsp;<input type="button" class="ajax" value="&raquo;"
 				data-form="$(this).parents('table').eq(0)"
-				data-href="?do=save&plugin=darts_Tourn"
+				data-href="?do=save&pid={{pid}}&plugin=darts_Tourn"
 				data-complete="$('#trnlist').trigger('change');"
 			>&nbsp;<input disabled="disabled" type="submit" name="clear" value="Очистить"
 			>&nbsp;<input type="button" class="ajax" value="удалить"

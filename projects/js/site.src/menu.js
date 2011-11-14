@@ -35,7 +35,7 @@ function menu(_self,param){
 	  	param.hide.apply(_self);
 	  else
 	  	$(_self).hide();
-	  _self.shown=false;
+	  setTimeout(function(){_self.shown=false},500);
 	  return false;
 	};
 	_self.show_menu=show_menu;

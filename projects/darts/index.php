@@ -19,47 +19,26 @@ define('ROOT_URL',"<%=$target_dir%>");
 
 define("TEMPLATE_PATH",ROOT_PATH.DIRECTORY_SEPARATOR.'templates');
 
-function _l($mess,$par=array()){
-	static $lang=array(
-		 'wrong password'=>'Неверный пароль'
-		,'page not found, sorry!'=>'Страница не найдена ;-('
-		,'Hello "%s"'=>'Вы авторизованы<br>как &laquo;<a href="?do=logout" 
-	 onclick="if(!confirm(\'Хотите закончить сеанс?\')) return false;">%s</a>&raquo;'
-		,"\n<!-- (%s) page was built for %f sec -->"=>
-	 "<!-- (%s) страница генерировалась %f сек  -->"
-	 	,'query'=>"запрос||а|ов"
-	 );
-
-	if(isset($lang[$mess])) $mess=$lang[$mess];
-
-	if($par!==null)
-		return vsprintf($mess,$par);
-	else
-		return $mess ;
-}
-
 //include_once("chkmod.php");
 //ob_start('ob_mmyhandle');
 //include_once("htmlopt.php");
 include_once("func.php");
+include_once("engine/language.php");
 SUPER::classes(array(
-// модули
+    'tournament'=>'engine/tournaments.php',
+    'plugin'=>'engine/engine.php',
+    'engine_Main'=>'engine/syspar.php',
+    'darts_Main'=>'engine/darts.php',
+    'template_compiler'=>'engine/compiler.class.php',
 	'ml_plugin'=>'engine/news.php',
-    'jinja2'=>true,
+    'form'=>'engine/html.class.php',
+    'Auth'=>'engine/rights.php',
 ));
-//include_once("templater.php");
-include_once("engine.php");
-include_once("syspar.php");
-include_once("rights.php");
-//include_once("tests.php");
-//include_once("mail.php");
-include_once("html.class.php");
-
-//include_once("functions/chkmod.php");
-// Подключаем библиотеку.
-require_once "darts.php";
-include_once("darts_News.php");
-require_once "Generic.php";
+SUPER::option(array(
+    'path'=>'engine/',
+    'language'=>'ru',
+//    'jinja2'=>true,
+));
 	
 ########## Check if database exist #################################################
 // Код обработчика ошибок SQL.

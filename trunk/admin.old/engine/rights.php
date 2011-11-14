@@ -165,7 +165,7 @@ class  Auth extends plugin{
 				$this->parent->go($this->parent->curl());
 			}
 			else
-				$this->parent->error(_l('wrong password'));
+				$this->parent->error(self::_l(mess_wrong_pasword));
 		}
 		return $form->getHtml(' ');
 	}
