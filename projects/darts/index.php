@@ -2,7 +2,7 @@
 /**
  * $Id$
  */
-// Set flag that this is a parent file
+//  Set flag that this is a parent file
 define('_DARTS',1);
 header('Content-type: text/html; charset=<%=$target_charset%>');
 define ('IS_ADMIN',false);
