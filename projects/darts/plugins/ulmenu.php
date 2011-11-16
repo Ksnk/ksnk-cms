@@ -94,7 +94,7 @@ ul.ulmenu li {
 	display:block;
 	padding:0 <%=$menu_padding%>;
 	height:<%=$menu_height%>px; 
-	background: url(<%=$target_dir%>img/menubg.gif) 100% 16px no-repeat;
+	background: url(<%=$target_dir%>/img/menubg.gif) 100% 16px no-repeat;
 }
 
 ul.ulmenu>li.last {
@@ -114,7 +114,7 @@ ul.ulmenu li a img {
 }
 
 ul.ulmenu li a:hover, ul.ulmenu li a.current {
-	background:url(<%=$target_dir%>img/regbg.gif) 0 <%=$menu_height%>px repeat-x;
+	background:url(<%=$target_dir%>/img/regbg.gif) 0 <%=$menu_height%>px repeat-x;
 }
 
 ul.ulmenu li ul {
@@ -130,7 +130,7 @@ ul.ulmenu li ul li{
 	float:none;
 	display:block;
 	height:auto; 
-	background: url(<%=$target_dir%>img/arr_gray.gif) 6px 11px no-repeat;
+	background: url(<%=$target_dir%>/img./arr_gray.gif) 6px 11px no-repeat;
 }
 
 ul.ulmenu li li.first a {

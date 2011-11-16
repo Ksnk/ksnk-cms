@@ -29,6 +29,9 @@
 			if(data && data.debug){
 				debug(data.debug);
 			}
+            if(cookie('debug') && data && data.result && data.result.debug){
+				debug(data.result.debug);
+			}
             if(data && data.result && data.result.complete){
 				//var x = new Function('','try{'+data.result.complete+'}; catch(e){debug("fault");}');
                 setTimeout(data.result.complete,100);

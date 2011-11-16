@@ -1,48 +1,91 @@
-<?xml version="1.0" encoding="utf-8"?>
-<project name="darts" default="init">
-	<property name="dir" value="darts"/>
+<?xml version="1.0" encoding="UTF-8"?>
 
-	<property name="last_ftp" value="06/25/2009 11:06 AM"/>
-	<property name="target_dir" value="darts"/>
-	<property name="test_dir" value="/home/${dir}.me/www/${target_dir}"/>
-	<property name="test_url" value="http://${dir}.me/${target_dir}/"/> 
-	<property name="xln" value="admin"/>
-	<property name="target_charset" value="UTF-8"/>
+<project name="darts" default="deploy">
 
-	<property description="Common Folder" name="common_dir" location="Z:/xilen/common"/>
-	
-	<import file="${common_dir}/extend.xml"/>
+    <!-- Sets the DSTAMP, TSTAMP and TODAY properties -->
+        <tstamp/>
 
-	<target name="build_debug">
-		<SVNcheck src="config.xml" dst="config.svn.xml"/>
-		<exec executable="Z:/usr/local/php5/php.exe" dir=".">
-			<arg value="-f"/>
-			<arg file="${common_dir}/preprocessor/preprocessor.php"/>
-			<arg value="/Dtarget=debug"/>
-			<arg value="/Dtarget_host=localhost"/>
-			<arg value="/Dtarget_charset=${target_charset}"/>
-			<arg value="/Dtarget_dir=${target_dir}"/>
-			<arg value="/Ddst=${test_dir}"/>
-			<arg file="config.svn.xml"/> 
-		</exec>
-		<delete file="config.svn.xml"/>
-	</target>
-	
-	<target name="build_release">
-		<SVNcheck src="config.xml" dst="config.svn.xml"/>
-		<exec executable="Z:/usr/local/php5/php.exe" dir=".">
-			<arg value="-f"/>
-			<arg file="${common_dir}/preprocessor/preprocessor.php"/>
-			<arg value="/Dtarget=release"/>
-			<arg value="/Dtarget_host=ksnk"/>
-			<arg value="/Dtarget_charset=${target_charset}"/>
-			<arg value="/Dtarget_dir=${target_dir}"/>
-			<arg value="/Ddst=build/release"/>
-			<arg file="config.svn.xml"/>
-		</exec>
-		<delete file="config.svn.xml"/>
-	</target>
-	
-	<target name="init" depends="build_debug"/>
-	
+        <!-- Load our configuration -->
+        <property file="./darts.prop" />
+
+<!-- create our migration task -->
+    <target name="migrate" description="Database Migrations">
+
+        <!-- load the dbdeploy task -->
+        <taskdef name="dbdeploy" classname="phing.tasks.ext.dbdeploy.DbDeployTask"/>
+
+        <!-- these two filenames will contain the generated SQL to do the deploy and roll it back-->
+        <property name="build.dbdeploy.deployfile" value="deploy/scripts/deploy-${DSTAMP}${TSTAMP}.sql" />
+        <property name="build.dbdeploy.undofile" value="deploy/scripts/undo-${DSTAMP}${TSTAMP}.sql" />
+        <property name="build.dir" value="db" />
+        <property name="progs.mysql" value="z:\usr\local\mysql-5.1\bin\mysql.exe"/>
+        <mkdir dir="${build.dir}/deltas" />
+        <mkdir dir="${build.dir}/deploy/scripts/" />
+                        <!-- generate the deployment scripts -->
+        <dbdeploy
+            url="mysql:host=${debug.db.host};dbname=${debug.db.name}"
+            userid="${debug.db.user}"
+            password="${debug.db.pass}"
+            dir="${build.dir}/deltas"
+            outputfile="${build.dir}/${build.dbdeploy.deployfile}"
+            undooutputfile="${build.dir}/${build.dbdeploy.undofile}" />
+
+        <!--  -p${db.pass} execute the SQL - Use mysql command line to avoid trouble with large files or many statements and PDO -->
+        <exec
+            command="${progs.mysql} -h${db.host} -u${db.user} ${db.name} &lt; ${build.dbdeploy.deployfile}"
+            dir="${build.dir}"
+            checkreturn="true" />
+    </target>
+
+    <!-- ============================================  -->
+    <!-- Target: prepare                               -->
+    <!-- ============================================  -->
+    <target name="prepare">
+        <echo msg="Making directory ./build" />
+        <mkdir dir="./build" />
+    </target>
+    <target name="revision">
+        <echo file="rev.tmp" append="false"><![CDATA[
+SVN(r $WCREV$) $WCURL$
+]]>        </echo>
+         <exec executable="SubWCRev" dir="." output="svn.lastrevision">
+          <arg file="." />
+             <arg file="rev.tmp" />
+             <arg file="rev.tmp" />
+                             <arg value="-f" />
+          </exec>
+        <loadfile property="svn.lastrevision" file="rev.tmp"/>
+
+        <echo msg="revision=${svn.lastrevision}"/>
+    </target>
+    <target name="set.last">
+        <copy file="darts.prop" tofile="_darts.prop" overwrite="yes">
+
+        <filterchain>
+          <replaceregexp>
+          <!--  <regexp modifiers='e' pattern="(ftp.lasttime=)([^\n\r]+)" replace="'$1'.date('cP-3:00')"/>-->
+          <regexp modifiers='e' pattern="(ftp.lasttime=)([^\n\r]+)" replace="'$1'.strftime('%c')"/>
+          </replaceregexp>
+        </filterchain>
+
+        </copy>
+        <copy file="_darts.prop" tofile="darts.prop" overwrite="yes"/>
+        <delete file="_darts.prop" />
+    </target>
+    
+
+<target name="deploy">
+    <echo msg="deploing to ${ftp.host} ${ftp.user}" />
+    <ftpdeploy host="${ftp.host}"
+           username="${ftp.user}"
+           password="${ftp.password}"
+                dir="${ftp.dir}"
+    >
+        <fileset dir="d:/projects/darts/build">
+            <include name="**" />
+            <date datetime="${ftp.lasttime}" when="after"/>
+        </fileset>
+    </ftpdeploy>
+</target>  
+<!-- //skip -->  
 </project>

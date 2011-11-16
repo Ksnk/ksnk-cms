@@ -763,6 +763,7 @@ where d1.ID='.intval($id).';';
 			,'STATUS'=>$_POST['STATUS']
 			,'RULE'=>pps($_POST['RULE'],'table')
 			,'ASCORE'=>$_POST['ASCORE']
+            ,'AGPARAM'=>$_POST['AGPARAM']
 			);
         if(empty($key['NAME']))
             return 'fail - name';
@@ -1082,17 +1083,17 @@ class darts_Main extends engine_Main {
 		foreach($tournament->childs as $child){
 			$i++;
 			$form->var['date_'.$i]=$child->tournament['DATE'];
-			$form->var['rule_'.$i]=$child->tournament['SUBRULE'];
+			$form->var['rule_'.$i]=$child->tournament['AGPARAM'];
 			$form->var['score_1_'.$i]=$child->tresult[0]['RES1'];
  			$form->var['scorex_1_'.$i]=$child->tresult[0]['RES2'];
-			$form->var['score_2_'.$i]=$child->tresult[1]['RES1'];
 			$form->var['scorex_2_'.$i]=$child->tresult[1]['RES2'];
-		}
-		for($i=1;$i<=2;$i++) for($j=1;$j<=4;$j++)
-			$form->var['RES'.$j.'_'.$i]=$tournament->result($i,$j);
-		//debug($form->var,$tournament->childs);
-		return $form->getHtml( ' ');
-	}
+        }
+        for($i=1;$i<=2;$i++) for($j=1;$j<=4;$j++)
+        $form->var['RES'.$j.'_'.$i]=$tournament->result($i,$j);
+        //debug($form->var,$tournament->childs);
+        return $form->getHtml( ' ');
+    }
+$form->var['score_2_'.$i]=$child->tresult[1]['RES1'];
 
 	/**
 	 * регистрация клуба - это регистрация турнира нулевого уровня
@@ -1276,7 +1277,7 @@ class darts_Main extends engine_Main {
 			for($i=0;$i<count($turnlist);$i++){
 				$x=$turnlist[$i];
 
-				if(pps($x['ASCORE'])){
+				if(pps($x['STATUS'])==2){
 					$par.='<fieldset><legend>'.$x['NAME'].'</legend>'.DARTS::getTourTable($x['ID'],$do!='show').'</fieldset>';
 				}
 			}
@@ -1448,7 +1449,7 @@ class DARTS extends plugin{
 			
 		$x=$tournament->getTable();
 		$x['xid']=$tournament->getId();
-		//debug('xx',$x);
+		debug('xx',$x);
 		if($tournament instanceof trn_finn){
 			return 
 				$this->parent->_tpl('tpl_trntab','_finn',	$x);

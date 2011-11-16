@@ -19,7 +19,7 @@ class tournament {
 	/**
 	 * базовые поля турнирной таблицы
 	 */	
-		,$base_fields=array('ID','PARENT','DATE','LEVEL','NAME','STATUS','RULE','SUBRULE')
+		,$base_fields=array('ID','PARENT','DATE','LEVEL','NAME','STATUS','RULE','AGPARAM')
 		
 	/**
 	 * собствено данные из таблицы

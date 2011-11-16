@@ -2,7 +2,8 @@
 /**
  * плагин интеграции с jQuery.UI
  */
-//<% point_start('html_header') ;%>
+
+//<% define('WIN_CONFIRM_COMPLETE',1);point_start('html_header') ;%>
 <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js"></script>
 <%	point_finish();
 

@@ -1,6 +1,17 @@
-past_ftp=06/25/2009 11:06 AM
-last_ftp=12/29/2010 07:18 PM
-ftp_host=test-x.ru
-ftp_dir=/www/site2/public_html/darts
-ftp_user=ftp_xilen_1
-ftp_password=oiUjMExgXGR
+#
+# ftp
+#
+ftp.host=ftp.500mb.net
+ftp.user=runet_9452834
+ftp.password=81b1c399ca
+ftp.dir=/htdocs
+
+debug.db.host=localhost
+debug.db.name=tmp
+debug.db.user=root
+debug.db.pass=
+
+
+
+ftp.lasttime=11/16/11 12:23:29
+ftp.xxx=yyy

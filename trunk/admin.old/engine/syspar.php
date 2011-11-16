@@ -1995,10 +1995,16 @@ if(!empty($url)){
 		$_GET['do']=$m[1];
 		$_GET['id']=$m[2];
 	}
+
+    SUPER::set_option(array(
+        'action'    =>pps($_GET['do']),
+        'id'        =>pps($_GET['id']),
+    ));
+    
 	//debug($_GET);
 	//print_r($engine);
 	//print_r($_GET);
-	SUPER::$engine->setUrl(array('do'=>pps($_GET['do']),'id'=>pps($_GET['id'])));
+	SUPER::$engine->setUrl(array('do'=>SUPER::option('action'),'id'=>SUPER::option('id')));
 }
 
 /**

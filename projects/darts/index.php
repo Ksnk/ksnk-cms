@@ -1,4 +1,7 @@
 <?php
+/**
+ * $Id$
+ */
 // Set flag that this is a parent file
 define('_DARTS',1);
 header('Content-type: text/html; charset=<%=$target_charset%>');
@@ -15,7 +18,7 @@ ini_set('include_path',ini_get('include_path').PATH_SEPARATOR
 //		.'\\workspace\\common\\cms'
 );
 
-define('ROOT_URL',"<%=$target_dir%>");
+define('ROOT_URL',"<%=$target_dir%>"); //TODO: Убрать эту ROOT_URL хрень!!!!!
 
 define("TEMPLATE_PATH",ROOT_PATH.DIRECTORY_SEPARATOR.'templates');
 
@@ -34,7 +37,7 @@ SUPER::classes(array(
     'form'=>'engine/html.class.php',
     'Auth'=>'engine/rights.php',
 ));
-SUPER::option(array(
+SUPER::set_option(array(
     'path'=>'engine/',
     'language'=>'ru',
 //    'jinja2'=>true,

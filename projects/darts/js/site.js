@@ -1,5 +1,5 @@
 /**
- * 
+ *
 
 <% 
 	include_once('../common/site.src/menu.js');
@@ -43,6 +43,7 @@ function _news(e,what){
 	if (e && (x=e.getAttribute('newsid'))) //; alert(x) ; return ;
 		document.location="?do="+what+"news&plugin=darts_News&nid="+x;
 }
+//<% if(!defined("WIN_CONFIRM_COMPLETE")) { %>
 
 function win_confirm(par){
 	if (confirm(par.txt)){
@@ -53,6 +54,7 @@ function win_confirm(par){
 function win_alert(par){
 	alert(par.txt);
 }
+//<% }; %>
 
 $(function(){
 	// всплывающие менюшки (только над блоковыми элементами!!!)
@@ -74,7 +76,7 @@ $(function(){
 			}
 			$($self.data('xmenu')).show();
 		},
-		function(){
+		function(){ 
 			$($(this).data('xmenu')).hide();
 		}
 	)

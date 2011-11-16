@@ -1,11 +1,12 @@
 @CHARSET "UTF-8";
-<% // определение цветов  
+<% // определение цветов
 	$gray_color = 'gray';
 	$lgreen="#f0ffff";
 	$orange="moccasin";
 	$deepblue="navy";
 	$white="white";
 	$light_gray="#EEE";
+    $title_color="#79B30B";
 	
 	// цвета по сайту	
 	$placeholder_color=$gray_color;
@@ -43,7 +44,7 @@ color: white;
 }
 
 #header h1{
-	color: #79B30B;
+	color: <%=$title_color%>;
 	margin:0.7em 30px;
 }
 
@@ -105,4 +106,12 @@ input.small {width:100px;font-size:10px; height:1.2em; padding:0.1em 0.5em; bord
 	border-color: <%=$lgreen%>;
 }
 
+a.nodecoration {
+    text-decoration:none;
+    color:<%=$title_color%>;
+}
+/*
+a:active, a:focus, img {
+    outline: medium none;
+}*/
 /* <% insert_point("css_site"); %> */

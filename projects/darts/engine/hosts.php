@@ -6,7 +6,7 @@ $db_setup='SET NAMES utf8;';
 <%
 //if(trim($target_dir,' /')!='')
 if(empty($target_dir))
-    $target_dir='/';
+    $target_dir='';
 else
     $target_dir='/'.trim($target_dir,'/');
 //$target_host='';

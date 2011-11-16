@@ -50,7 +50,14 @@ class plugins extends SUPER
         $this->parent->par['title'] = $tit;
     }
 
-    function plugins()
+    /**
+     * список измененных хандлеров опций
+     */
+    function __destruct() {
+        $changed_handlers=array();
+    }
+
+    function __construct()
     {
         global $DATABASE;
         $this->RIGHT = new rights();
