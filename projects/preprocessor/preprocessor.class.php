@@ -365,10 +365,15 @@ class preprocessor{
 							$this->cfg_time($filemtime);
 						}
                         if($this->post_process($dstfile,$filemtime)){
-							echo "e>$srcfile-->$dstfile";
+							echo "e>$srcfile";
+							if (strlen($srcfile)+strlen($dstfile)>75){
+                                echo "\n\r  ";
+                            }
+                            echo "-->$dstfile";
 							$___total_cnt++;
+                            echo "\n\r";
 						}
-						echo "\n\r";
+
 						break;
 					}
 				case 'copy':
@@ -380,6 +385,9 @@ class preprocessor{
 						echo "c>$srcfile";	
 						copy($srcfile,$dstfile);
 						betouch ($dstfile,filemtime($srcfile));
+                        if (strlen($srcfile)+strlen($dstfile)>75){
+                           echo "\n\r  ";
+                        }
 						echo "-->$dstfile"."\n\r";//  was last modified: " . date ("F d Y H:i:s.", filectime($srcfile));
 						$___total_cnt++;
 					} 
@@ -392,6 +400,7 @@ class preprocessor{
 	    	sprintf('Error: %s(%s) module raised "%s" '."\n\r"
 	        	,realpath($srcfile), $error['line'], $error['message']));
 		}		
-		printf("total %s of %s files copied.\n\r",$___total_cnt,$___all_cnt);
+		printf("
+total %s of %s files copied.\n\r",$___total_cnt,$___all_cnt);
 	}
 }

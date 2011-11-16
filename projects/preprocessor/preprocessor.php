@@ -13,12 +13,18 @@ foreach($_ENV as $k=>$v){
     $paths->export('env_'.$k,$v);
 }
 
+echo "PHP Preprocessor, written by Ksnk (sergekoriakin@gmail.com). Ver : 1.0(beta)
+
+";
+
 for ($i=1;$i<$argc;$i++){
 	if(preg_match('/^\/D(\w+)\=(\S+)$/',$argv[$i],$m)){
 		$paths->export($m[1],$m[2]);
 	} else if (is_file($argv[$i])) {
 		$arg1=pathinfo($argv[$i]);
 		if ($arg1['extension']=='xml'){
+            echo "making ".$argv[$i]."
+";
 			$paths->xml_read($argv[$i]);
 		} else {
 			$xmlstr = <<<XML
