@@ -69,7 +69,7 @@ class tournament {
 	
 	function set($key){
 		if(empty($key)) return;
-		if(!$changed)	
+		if(!$this->changed)
 			foreach($key as $k=>$v){
 				if (pps($this->tournament[$k])!=$v){
 					$this->changed=true; break;
@@ -128,8 +128,9 @@ class tournament {
 	 */
 	function &save(){
 		$key=$this->tournament;
+        if(empty($key)) return;
 		$diff=array_diff (array_keys($key),$this->base_fields);
-		//print_r($diff);
+		debug('this',$this,'key',$key);
 		if(!empty($diff)){
 			unset($key['DESCR']);
 			$descr=array();
@@ -507,7 +508,7 @@ class trn_finn extends tournament {
 			$ref=sprintf('?do=child&id=%s&x=%s'
 					,$this->getId(),$idx);
 			$x['title']=$child->tournament['NAME'];
-			if ($rown==$celn) {
+	/*		if ($rown==$celn) {
 				$table[$celn][$rown]=array('z'=>1);
 			};
 			if (!isset($table[$rown][$celn])){
@@ -515,10 +516,10 @@ class trn_finn extends tournament {
 			};
 			if (!isset($table[$celn][$rown])){
 				$table[$celn][$rown]=array('name'=>$ref);
-			}
+			}*/
 			$table[]=$x;
 		}
-		return array('table'=>$table,'res'=>$result);
+		return array('table'=>$table/*,'res'=>$result*/);
 	}
 	
 	// 8 игроков 

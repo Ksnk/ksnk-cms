@@ -18,8 +18,6 @@ ini_set('include_path',ini_get('include_path').PATH_SEPARATOR
 //		.'\\workspace\\common\\cms'
 );
 
-define('ROOT_URL',"<%=$target_dir%>"); //TODO: Убрать эту ROOT_URL хрень!!!!!
-
 define("TEMPLATE_PATH",ROOT_PATH.DIRECTORY_SEPARATOR.'templates');
 
 //include_once("chkmod.php");

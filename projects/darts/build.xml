@@ -1,13 +1,27 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="darts" default="deploy">
+<project name="darts" default="build.Darts.me">
 
     <!-- Sets the DSTAMP, TSTAMP and TODAY properties -->
-        <tstamp/>
+    <tstamp/>
 
-        <!-- Load our configuration -->
-        <property file="./darts.prop" />
+    <!-- Load our configuration -->
+    <property file="./darts.prop" />
 
+    <target name="build.Darts.me" description="build project">
+        <exec
+            command="build.bat"
+            checkreturn="true"
+            logoutput="true"/>
+    </target>
+
+    <target name="build.localhost" description="build project">
+            <exec
+            command="build.bat localhost"
+            checkreturn="true"
+            logoutput="true"/>
+    </target>
+    
 <!-- create our migration task -->
     <target name="migrate" description="Database Migrations">
 
@@ -52,7 +66,7 @@ SVN(r $WCREV$) $WCURL$
           <arg file="." />
              <arg file="rev.tmp" />
              <arg file="rev.tmp" />
-                             <arg value="-f" />
+             <arg value="-f" />
           </exec>
         <loadfile property="svn.lastrevision" file="rev.tmp"/>
 
@@ -74,7 +88,7 @@ SVN(r $WCREV$) $WCURL$
     </target>
     
 
-<target name="deploy">
+<target name="deploy" depends="build.Darts.me">
     <echo msg="deploing to ${ftp.host} ${ftp.user}" />
     <ftpdeploy host="${ftp.host}"
            username="${ftp.user}"

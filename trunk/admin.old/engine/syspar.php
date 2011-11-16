@@ -1204,6 +1204,7 @@ function flash2($par='',$par2='',$par3=''){
 		global $cache;
 		$this->ffirst('_logout');
 		if(!empty($cache))$cache->cleanForUser();
+        $_SESSION=array();
         $this->go($this->curl('do'));
 	}
 	/**

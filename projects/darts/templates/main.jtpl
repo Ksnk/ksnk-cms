@@ -7,7 +7,8 @@
 <base href="{{root}}">
 <!--[if lte IE 6]></base><![endif]-->
 ##<script src="http://yandex.st/jquery/1.4.4/jquery.min.js"></script>
-<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+##<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/site.js"></script>
 <LINK  rel="stylesheet" type="text/css" href="css/site.css">
 <%=point('html_header');%>
@@ -558,7 +559,7 @@ data-complete="reload();"
 ##
 ##  Club - форма редактирования данных о клубе
 ##
-{%- macro Club(par,error=0,is_editor=0,user=0) %}
+{%- macro Club(par,error=0,is_editor=0,user=0,root=0) %}
 
 <form name="Club" action="" method="post">
 <% $firstcol=230; $seccol=230 ; %>
@@ -725,10 +726,13 @@ data-complete="reload()"
 {% if is_editor %}
 	<dt>Клуб</dt>
 	<dd >
-<input type="button" class="ajax" value="Удалить клуб"
+<a class="button ajax"
 data-confirm="Клуб и все турниры будут удалены. Продолжать?"
 data-href="?do=deltourn&id={{par.ID}}"
->
+data-complete="reload('{{root}}')"
+><span>Удалить клуб</span></a>
+<a class="button" href="?do=club"><span>Создать еще один клуб</span></a>
+
 </dd>{% endif %}
 </dl>
   	</fieldset>

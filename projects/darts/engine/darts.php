@@ -25,6 +25,7 @@ require_once('tournaments.php');
 class darts_Auth extends Auth {
 	
 	var $login;
+
 	/**
 	 * вызывается ajax'ом
 	 * Enter description here ...
@@ -945,6 +946,9 @@ class darts_Main extends engine_Main {
 		if($tournament=tournament::getTournament($_GET['id'])){
 			$tournament->delete();
 		};
+        if($_GET['id']==$_SESSION['lastclub']){
+            $this->setup_lastclub();
+        }
 		return ' ';
 	}
 	/**
@@ -1031,8 +1035,15 @@ class darts_Main extends engine_Main {
 		 	// безусловная запись 
 			$childs = array_values($tournament->childs);
 			$i=0;
+            $tournament->prepParent();
+            $AGPARAM=$tournament->parent->tournament['AGPARAM'];
+            debug('AGPARAM',$AGPARAM);
 			foreach($childs as &$child){
 		 		$i++;
+                if(empty($AGPARAM))
+                    $tournament->set('AGPARAM',$_POST['rule_'.$i]);
+                else
+                    $tournament->set('AGPARAM',$AGPARAM);
 		 		for($j=1;$j<=2;$j++){
 		 			if(!empty($form->var['score_'.$j.'_'.$i])){
 						$child->setresult($j,1,$form->var['score_'.$j.'_'.$i]);
@@ -1049,7 +1060,11 @@ class darts_Main extends engine_Main {
 					,'PARENT'=>$tournament->getId()
 					,'NAME'=>'лег '.($i) 
 				));
-				$child->addplayer($tournament->getPlayerByNumber(1));
+                if(empty($AGPARAM))
+                    $tournament->set('AGPARAM',$_POST['rule_'.$i]);
+                else
+                    $tournament->set('AGPARAM',$AGPARAM);
+ 				$child->addplayer($tournament->getPlayerByNumber(1));
 				$child->addplayer($tournament->getPlayerByNumber(2));
 				for($j=1;$j<=2;$j++){
 					if(!empty($form->var['score_'.$j.'_'.$i])){
@@ -1085,6 +1100,7 @@ class darts_Main extends engine_Main {
 			$form->var['date_'.$i]=$child->tournament['DATE'];
 			$form->var['rule_'.$i]=$child->tournament['AGPARAM'];
 			$form->var['score_1_'.$i]=$child->tresult[0]['RES1'];
+            $form->var['score_2_'.$i]=$child->tresult[1]['RES1'];
  			$form->var['scorex_1_'.$i]=$child->tresult[0]['RES2'];
 			$form->var['scorex_2_'.$i]=$child->tresult[1]['RES2'];
         }
@@ -1093,7 +1109,30 @@ class darts_Main extends engine_Main {
         //debug($form->var,$tournament->childs);
         return $form->getHtml( ' ');
     }
-$form->var['score_2_'.$i]=$child->tresult[1]['RES1'];
+
+    /**
+     * заполнение lastclub
+     * @return void
+     */
+    function setup_lastclub(){
+        $club=0;
+        $list=$this->parent->rights->list_right();
+        foreach($list as $k=>$v){
+            if(preg_match('/^tir_(\d+)$/',$k,$m)){
+                $club=$m[1];
+                break;
+            }
+        }
+        if(!empty($club)) $_SESSION['lastclub']=$club;
+    }
+
+    /**
+     * хандлер для реакции на непосредственный логин
+     * @return void
+     */
+    function onJustLogin(){
+        $this->setup_lastclub();
+    }
 
 	/**
 	 * регистрация клуба - это регистрация турнира нулевого уровня

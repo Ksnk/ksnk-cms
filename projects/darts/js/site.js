@@ -23,14 +23,14 @@ function komment(el,id){
 	return false;
 }  
 
-function reload(){
+function reload(addr){
 	if(!cookie('debug'))
-		window.location.reload();
+        if(!!addr) window.location=addr; else window.location.reload();
 	else {
         win_confirm({
 				txt:'reload page?',
 				yes:function(){
-					window.location.reload();
+					if(!!addr) window.location=addr; else window.location.reload();
 				}
         });
     }

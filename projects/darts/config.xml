@@ -14,12 +14,18 @@
 	<files dir="plugins" >
 		<file>jinja_template.php</file>
 	</files>
-	<!-- ************************************** -->
-	<!-- **** placeholders			       **** -->
-	<!-- ************************************** -->
-	<files dir="plugins" >
-		<file>placeholders.php</file>
-	</files>
+    <!-- ************************************** -->
+    <!-- **** placeholders			       **** -->
+    <!-- ************************************** -->
+    <files dir="plugins" >
+        <file>placeholders.php</file>
+    </files>
+    <!-- ************************************** -->
+    <!-- **** placeholders			       **** -->
+    <!-- ************************************** -->
+    <files dir="plugins/buttons" >
+        <file>buttons.php</file>
+    </files>
 	<!-- ************************************** -->
 	<!-- **** tabs      			       **** -->
 	<!-- ************************************** -->
@@ -86,9 +92,9 @@
 	<!-- ************************************** -->
 	<!-- **** все копируем на базу         **** -->
 	<!-- ************************************** -->
-<!--	<files dstdir="$dst" dir="$env_common/cms">
-		<file name=".htaccess">htaccess.txt</file>
-	</files>-->
+	<files dstdir="$dst" >
+		<file name=".htaccess">htaccess</file>
+	</files>
 	<files dstdir="$dst">
 		<file>engine/*.*</file>
 		<file>*.php</file>
