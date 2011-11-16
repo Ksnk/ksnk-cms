@@ -23,38 +23,62 @@ mkt(true);
 
 class SUPER {
     private static
-        $options=array(),
         $path_record=array(),
         $lang=array();
     protected static
         $EXPORTS=array();
     public static
         $engine=null;
+
+    //**********************************************************************
     /**
-     * функци€ работы с параметрами
+     * служба работы с параметрами
      *
-     * @param  $opt
-     * @param null $val
+     * фичи:
+     * -- установка списка параметров с/без хандлеров - self::set_option($options as array,$handler as string)
+     * -- установка одного параметра с/без хандлеров - self::set_option($name as string,$value as mixed,$handler as string)
+     * -- получение параметра - self::option($name as string,$def as mixed)
+     * -- получение списка параметров по хандлеру
+     *
+     */
+    /**
+     * структура - name=>0:value,1:handler,2:changed
+     * @var array
+     */
+    private static
+        $options=array();
+
+    static function set_option($opt,$value=null,$handler=null){
+        if(is_array($opt)){
+            foreach($opt as $k=>$v)
+                self::set_option($k,$v,$value);
+            return;
+        }
+        if(isset(self::$options[$opt])){
+            if(self::$options[$opt][0]!=$value){
+                self::$options[$opt][2]=true;
+                if (!empty($handler))
+                    self::$options[$opt][1]=$handler;
+                self::$options[$opt][0]=$value;
+            }
+        } else {
+            self::$options[$opt]=array($value,$handler,false);
+        }
+    }
+    
+    /**
+     * @static
+     * @param mixed $opt - им€ парамера
+     * @param null $def - значение по умолчанию, если параметра нет
      * @return null
      */
     static function option($opt,$def=null){
-        if(is_array($opt)){
-            foreach($opt as $k=>$v)
-                self::$options[$k]=$v;
-            return;
-        }
         if(isset(self::$options[$opt]))
-            return self::$options[$opt];
+            return self::$options[$opt][0];
         else
             return $def;
     }
-
-    /**
-     * autoload suppert/ internal function
-     * @static
-     * @param  $cls
-     * @return
-     */
+    //**********************************************************************
 
     static function include_file_with_class($cls){
         if(!class_exists($cls))
@@ -116,7 +140,14 @@ class SUPER {
     }
 }
 
-function __autoload($cls){
+/**
+  * autoload suppert/ internal function
+  * @static
+  * @param  $cls
+  * @return
+  */
+
+ function __autoload($cls){
     SUPER::include_file_with_class($cls);
 }
 
@@ -472,38 +503,38 @@ function toRusDate($daystr=null,$format="j F, Y г."){
 /**
  * настройки на двигл CMS
  */
-        if(defined('ADMIN')){
-SUPER::classes(array(
-// модули
-	'Auth'=>ROOT_PATH.'/'.ADMIN.'/engine/users.php',
-	'html_mime_mail'=>ROOT_PATH.'/'.ADMIN.'/engine/sendmail.php',
-	'form'=>ROOT_PATH.'/'.ADMIN.'/engine/users.php',
+if(defined('ADMIN')){
+    SUPER::classes(array(
+    // модули
+        'Auth'=>ROOT_PATH.'/'.ADMIN.'/engine/users.php',
+        'html_mime_mail'=>ROOT_PATH.'/'.ADMIN.'/engine/sendmail.php',
+        'form'=>ROOT_PATH.'/'.ADMIN.'/engine/users.php',
 
-// плагины
-	'sitemap'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
-	'bannerlist'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
-	'fileman'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
-	'massmail'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
+    // плагины
+        'sitemap'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
+        'bannerlist'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
+        'fileman'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
+        'massmail'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
 
-	'news'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/news.php',
-	'PhotoSizes'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/news.php',
-	'search'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/news.php',
-	'vocabular'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/news.php',
+        'news'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/news.php',
+        'PhotoSizes'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/news.php',
+        'search'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/news.php',
+        'vocabular'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/news.php',
 
-//	'qa'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/q_a.php',
-//	'writeus'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/q_a.php',
-	'rss'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
-	'rssexport'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
-	'runningline'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
-	'votes'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
+    //	'qa'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/q_a.php',
+    //	'writeus'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/q_a.php',
+        'rss'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
+        'rssexport'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
+        'runningline'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
+        'votes'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/',
 
-	'basket'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
-	'katalog'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
-	'novinki'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
-	'spec'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
-	'csv_reader'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
-	'csv'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
-));
+        'basket'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
+        'katalog'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
+        'novinki'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
+        'spec'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
+        'csv_reader'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
+        'csv'=>ROOT_PATH.'/'.ADMIN.'/engine/plugins/katalog.php',
+    ));
 
 /**
  * ¬€ла€ попытка вставить файловое кэширование
@@ -511,38 +542,38 @@ SUPER::classes(array(
 if (!defined('NOCACHE') && !defined('INTERNAL')
 	&& is_readable(ROOT_PATH.'/'.ADMIN.'/engine/FileCache.php'))
 {
-//*
-include_once(ROOT_PATH.'/'.ADMIN.'/engine/FileCache.php');
-// построение группы по GET'у
-$x=$_GET;
-// исключение некоторых ключей
-unset($x[session_name()],$x['debug'],$x['cache']);
-ksort($x);
-$page_hash=md5(serialize($x));
-$group=isset($_REQUEST[session_name()])?'x':'s';
-    
-$cache = new FileCache(array(
-	'is_enabled' => ($_SERVER['REQUEST_METHOD']=='GET'
-			&& !in_array(pps($_GET['do']),array('search','basket','writeus', 'logout'))
-			&& !in_array(pps($_GET['id']),array('search','basket','writeus'))
-		),
-	'dir'   => 'cache/',
-	'ttl'   => 60 * 60 * 3,  #3 часа
-	'cleaning_probability' => 100,
-	'group' => $group,
-	'hash'  => $page_hash,
-	'user_id' => ppi($_SESSION['USER_ID']),
-));
-    
-if(isset($_GET['cache'])?$_GET['cache']:true){
-//if(false){
-	$gz_content = $cache->read($last_modified, $content_type);
-	if(!empty($gz_content)) {
-		echo $gz_content ;
-		exit;
-	}
-}
-$_GLOBAL['cache']=&$cache;
+    //*
+    include_once(ROOT_PATH.'/'.ADMIN.'/engine/FileCache.php');
+    // построение группы по GET'у
+    $x=$_GET;
+    // исключение некоторых ключей
+    unset($x[session_name()],$x['debug'],$x['cache']);
+    ksort($x);
+    $page_hash=md5(serialize($x));
+    $group=isset($_REQUEST[session_name()])?'x':'s';
+
+    $cache = new FileCache(array(
+        'is_enabled' => ($_SERVER['REQUEST_METHOD']=='GET'
+                && !in_array(pps($_GET['do']),array('search','basket','writeus', 'logout'))
+                && !in_array(pps($_GET['id']),array('search','basket','writeus'))
+            ),
+        'dir'   => 'cache/',
+        'ttl'   => 60 * 60 * 3,  #3 часа
+        'cleaning_probability' => 100,
+        'group' => $group,
+        'hash'  => $page_hash,
+        'user_id' => ppi($_SESSION['USER_ID']),
+    ));
+
+    if(isset($_GET['cache'])?$_GET['cache']:true){
+    //if(false){
+        $gz_content = $cache->read($last_modified, $content_type);
+        if(!empty($gz_content)) {
+            echo $gz_content ;
+            exit;
+        }
+    }
+    $_GLOBAL['cache']=&$cache;
 }
         };
 // FileCache
