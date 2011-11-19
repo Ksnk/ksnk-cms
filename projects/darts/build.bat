@@ -7,8 +7,8 @@ if not exist z:\home\localhost\www md z:\home\localhost\www\darts
 
 :nocreate
 
-if  "%1"=="localhost" %php_exe% -q  ../preprocessor/preprocessor.php /Dtarget_host=localhost /Dtarget_dir=darts /Dtarget=debug /Ddst=z:/home/localhost/www/darts ../darts/config.xml
-if  "%1"=="" %php_exe% -q  ../preprocessor/preprocessor.php /Dtarget_host=darts.me /Dtarget=debug /Ddst=../darts/build ../darts/config.xml
+if  "%1"=="localhost" %php_exe% -q  ../preprocessor/preprocessor.php /Dtarget_host=localhost /Dtarget_dir=darts /Dtarget=debug /Ddst=%2 ../darts/config.xml
+if  not "%1"=="localhost" %php_exe% -q  ../preprocessor/preprocessor.php /Dtarget_host=darts.me /Dtarget=debug /Ddst=%2 ../darts/config.xml
 
 :create
 

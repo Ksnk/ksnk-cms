@@ -10,16 +10,32 @@
 
     <target name="build.Darts.me" description="build project">
         <exec
-            command="build.bat"
+            command="build.bat darts ../darts/build"
             checkreturn="true"
             logoutput="true"/>
+        <jsMin targetDir="build/js"
+                failOnError="false"
+                suffix=".min"
+            >
+            <fileset dir="build/js">
+                <include name="site.js"/>
+            </fileset>
+        </jsMin>
     </target>
 
     <target name="build.localhost" description="build project">
             <exec
-            command="build.bat localhost"
+            command="build.bat localhost z:/home/localhost/www/darts"
             checkreturn="true"
             logoutput="true"/>
+        <jsMin targetDir="z:/home/localhost/www/darts/js"
+                failOnError="false"
+                suffix=".min"
+            >
+            <fileset dir="z:/home/localhost/www/darts/js">
+                <include name="site.js"/>
+            </fileset>
+        </jsMin>
     </target>
     
 <!-- create our migration task -->
@@ -58,6 +74,15 @@
         <echo msg="Making directory ./build" />
         <mkdir dir="./build" />
     </target>
+    <target name="svn.revision">
+        <svnlastrevision
+   svnpath="c:\Program Files\TortoiseSVN\bin\svn.exe"
+   workingcopy="."
+   forceCompatible="yes"
+   propertyname="svn.lastrevision"/>
+        <echo msg="last revision - ${svn.lastrevision}"/>
+    </target>
+
     <target name="revision">
         <echo file="rev.tmp" append="false"><![CDATA[
 SVN(r $WCREV$) $WCURL$
@@ -72,6 +97,7 @@ SVN(r $WCREV$) $WCURL$
 
         <echo msg="revision=${svn.lastrevision}"/>
     </target>
+    
     <target name="set.last">
         <copy file="darts.prop" tofile="_darts.prop" overwrite="yes">
 
@@ -87,6 +113,17 @@ SVN(r $WCREV$) $WCURL$
         <delete file="_darts.prop" />
     </target>
     
+<target name="zip" depends="build.Darts.me">
+    <echo msg="zipping into deploy.zip" />
+    <delete file="deploy.zip" />
+    <zip destfile="deploy.zip" includeemptydirs="false">
+        <fileset dir="d:/projects/darts/build">
+            <include name="**" />
+            <exclude name="engine/hosts.php" />
+            <date datetime="${ftp.lasttime}" when="after"/>
+        </fileset>
+    </zip>
+</target>
 
 <target name="deploy" depends="build.Darts.me">
     <echo msg="deploing to ${ftp.host} ${ftp.user}" />
@@ -97,6 +134,7 @@ SVN(r $WCREV$) $WCURL$
     >
         <fileset dir="d:/projects/darts/build">
             <include name="**" />
+            <exclude name="engine/hosts.php" />
             <date datetime="${ftp.lasttime}" when="after"/>
         </fileset>
     </ftpdeploy>

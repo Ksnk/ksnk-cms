@@ -92,16 +92,25 @@
 	<!-- ************************************** -->
 	<!-- **** все копируем на базу         **** -->
 	<!-- ************************************** -->
+
+    <files dstdir="$dst" >
+		<copy>favicon.ico</copy>
+        <copy>animated*.gif</copy>
+	</files>
 	<files dstdir="$dst" >
 		<file name=".htaccess">htaccess</file>
 	</files>
 	<files dstdir="$dst">
 		<file>engine/*.*</file>
 		<file>*.php</file>
-		<file>*.html</file>
-        <file>css/*.*</file>
+        <file>*.sql</file>
+		<file>css/*.*</file>
 		<file>templates/*.*</file>
 		<file>js/*.*</file>
 		<copy>img/*.*</copy>
+        <file>dartsnew/*.*</file>
+        <file>dartsnew/css/*.*</file>
+        <file>dartsnew/js/*.*</file>
+        <copy>dartsnew/img/*.*</copy>
 	</files>
 </config>

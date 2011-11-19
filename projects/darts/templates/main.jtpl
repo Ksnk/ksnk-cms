@@ -4,12 +4,14 @@
 <title>{{title}}</title>
 <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta http-equiv="Content-Language" content="ru">
+<link rel="shortcut icon" href="favicon.ico" >
+<link rel="icon" type="image/gif" href="animated_favicon1.gif" >
 <base href="{{root}}">
 <!--[if lte IE 6]></base><![endif]-->
 ##<script src="http://yandex.st/jquery/1.4.4/jquery.min.js"></script>
 ##<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
 <script type="text/javascript" src="js/jquery.min.js"></script>
-<script type="text/javascript" src="js/site.js"></script>
+<script type="text/javascript" src="js/site.min.js"></script>
 <LINK  rel="stylesheet" type="text/css" href="css/site.css">
 <%=point('html_header');%>
 
@@ -31,11 +33,12 @@
 ########################
 ##  форма логина!
 {% if is_user %}
+    {% set club=callex("darts_Players","_clublist",lastclub) %}
+
 	{% set clubs=callex("darts_Players","_clublist") %}
 	<a href="?do=logout">logout</a><br>
-	{% if clubs|length >0 %}
-		клуб {% for club in clubs %}{% if lastclub==club.ID %}{{club.NAME}}{% endif -%}
-		{% endfor %}
+	{% if club %}
+		клуб {{club.NAME}}
 	{% else %}
 		нет клуба
 	{% endif %}
@@ -45,18 +48,14 @@
 
 </div></div>
 <h1><a class="nodecoration" href="{{root}}">{{title}}</a>
-{%- if lastclub %}
-	{% for club in clubs -%}
-		{% if lastclub==club.ID %}({{club.NAME}}){% endif-%}
-	{% endfor -%}
-	{% endif -%}
+	{%- if club %} (<a class="nodecoration" href="/club/{{club.ID}}" title="{{club.PLAIN}}">{{club.NAME}}</a>){% endif-%}
 </h1>
 <span style="color:#FF0000;" id="login_error">{{error}}</span>
 <div class="ulmenuContainer" STYLE="margin-bottom:0px;">
 <ul class="ulmenu">
-<li><a href='darts.html'>Играть в Дартс</a>
+<li><a href='dartsnew/darts.php'>Играть в Дартс</a>
 	<ul>
-		<li><a href='darts.html'>Без записи результатов</a></li>
+		<li><a href='dartsnew/darts.php'>Без записи результатов</a></li>
 	</ul>
 </li>
 {% if is_user %}
@@ -128,8 +127,9 @@
 
 {% if is_admin %}	
 	<li><a>Админ</a><ul>
-	<li><a href="?do=userlist">Список пользователей</a></li>
-	</ul>
+    <li><a href="?do=userlist">Список пользователей</a></li>
+    <li><a href="?do=structure">Дамп турниров</a></li>
+    </ul>
 	</li>
 {% endif %}	
 </ul>	
@@ -384,7 +384,7 @@ data-complete="reload();"
                     пароль
             </td><td >
             {% if error.password %}<em>{{error.password}}</em><br>{% endif %}
-                    <input name="password" type="password" class="long" placeholder="password (*)">
+                    <input name="fpassword" type="password" class="long" placeholder="password (*)">
             </td></tr>
             <tr><td>
                     повторить пароль
@@ -408,16 +408,21 @@ data-complete="reload();"
             </td></tr>
              </table>
  	</fieldset>
-<p class="align_left">Здесь можно сменить пароль</p>
- 	<fieldset><legend>сменить пароль </legend>
+<p class="align_left">Здесь можно сменить имя и пароль</p>
+ 	<fieldset><legend>Учетная запись</legend>
         <table style="table-layout:fixed;">
             <col style="width:<%=$firstcol%>px;">
 			<col style="width:<%=$seccol%>px;">
+            <tr><td>
+                    Новое имя
+            </td><td >
+                    <input name="name" type="text" class="long" placeholder="Смените имя">
+            </td></tr>
 			<tr><td>
                     новый пароль
             </td><td >
             {% if error.password %}<em>{{error.password}}</em><br>{% endif %}
-                    <input name="password" type="password" class="long" placeholder="password (*)">
+                    <input name="fpassword" type="password" class="long" placeholder="password (*)">
             </td></tr>
             <tr><td>
                     повторить пароль
@@ -427,8 +432,9 @@ data-complete="reload();"
             </table>
  	</fieldset>
 <p class="align_left">
-Персональный аккаунт позволит вам смотреть статистику по собственным играм и 
-подключаться к другим клубам. Для этого необходимо заполнить свои имя и фамилию.
+Общий аккаунт позволит создавать новые клубы и приглашать в них других игроков с персональными входами.
+Персональный аккаунт, кроме того, позволит подключаться к другим клубам по приглашению администратора клуба.
+Вы можете заполнить свои фамилию и имя, чтобы упростить администратору включение вас в клуб.
 <br>Общий аккаунт подключен к одному клубу.
 </p>   	<fieldset><legend><input type="checkbox" name="aktype">Персональный аккаунт</legend>
        
@@ -474,6 +480,40 @@ data-complete="reload();"
 ##
 {%- macro ListUser(users) %}
 ##<form name="ListUser" action="" method="post">
+{% for user in users %}
+"{{user.name}}"&nbsp;"{{user.password|e}}"&nbsp;
+<input type="button" class="ajax" value="Удалить"
+	data-confirm="действительно удалить пользователя?"
+	data-href="?do=killuser&id={{user.id}}"
+	data-complete="reload();"
+>
+<input type="button" class="ajax" value="Добавить категорию"
+	data-input="Название категории"
+	data-href="?do=setright&id={{user.id}}&club=~~"
+	data-complete="reload();"
+>
+{% if user.right %}{% set right = user.right %} <ul> ## 29,31
+{% for r in right|keys %}<li> {{r}} {{'=>'|e}} {{ userrights(right[r],1024+31-16+32) }}
+<input type="button" class="ajax" value="сменить"
+	data-href="?do=setright&club={{r}}&id={{user.id}}"
+	data-form="$(this).parents('li').first()"
+	data-complete="reload();"
+><input type="button" class="ajax" value="удалить категоию"
+	data-href="?do=remright&club={{r}}&id={{user.id}}"
+	data-complete="reload();"
+></li>{% endfor %}
+</ul>
+{% endif %}
+{% endfor %}
+##<input type="submit" name="xxx" value="&raquo;">
+##</form>
+{% endmacro -%}
+##########################################################################
+##
+##  Structure - список всех пользователей системы с возможностью редактирвания
+##
+{%- macro structure(users) %}
+##<form name="structure" action="" method="post">
 {% for user in users %}
 "{{user.name}}"&nbsp;"{{user.password|e}}"&nbsp;
 <input type="button" class="ajax" value="Удалить"
@@ -641,7 +681,7 @@ data-complete="reload();"
  <input type="button" value="Пригласить" class="ajax float_left"
 					data-form="#commondour" 
 					data-href="?do=common&id={{par.ID}}" 
-					data-complete="win_alert({txt:data.result});">
+					data-complete="win_alert({txt:data.result.html});">
 				<p>Кнопка &laquo;пригласить&raquo; сгенерирует "приглашение" - ссылку для игрока, чтобы он мог 
  завести аккаунт на сайте и сразу подключится к клубу. Если игрок не желает регистрироваться на сайте,
  эта ссылка действует как ссылка общего входа с возможностью просматривать свои результаты</p>
@@ -731,7 +771,8 @@ data-confirm="Клуб и все турниры будут удалены. Пр�
 data-href="?do=deltourn&id={{par.ID}}"
 data-complete="reload('{{root}}')"
 ><span>Удалить клуб</span></a>
-<a class="button" href="?do=club"><span>Создать еще один клуб</span></a>
+        <a class="button" href="?do=club"><span>Создать еще один клуб</span></a>
+        <a class="button" href="?do=register"><span>Рег. информация</span></a>
 
 </dd>{% endif %}
 </dl>
@@ -762,13 +803,13 @@ data-complete="reload('{{root}}')"
 		<td colspan="3"><input name="NAME" type="text" value="{{tour.NAME}}" placeholder="Название турнира"></td>
 		<td rowspan="4">
 		<select  name="players[]" multiple="5"  size="6" >
-		{% set players=callex("darts_Players",'_list') %}
-		{% set cplayers=callex("darts_Players",'_listid',pid) %}
+		{% set players=callex("darts_Players",'_usedplayers',tour.ID) %}
+		{% set cplayers=0 %}
 		{% for p in players %}
-			<option value="{{p.ID}}"{% if ( in_array(p.ID,cplayers))%} selected{% endif %}>{{p.name}}</option>
+			<option value="{{p.ID}}"{% if ( p.selected)%}{% set cplayers=cplayers+1 %} selected{% endif %}>{{p.name}}</option>
 		{% endfor %}
 		</select><br>
-		всего {{cplayers|length}}({{players|length}}) 
+		всего {{cplayers}}({{players|length}})
 		</td>
 	</tr><tr>
 		<td> правила:</td>
@@ -788,7 +829,7 @@ data-complete="reload('{{root}}')"
 			<option value="0"/>
 			<option value="group"{% if 'group'==tour.RULE%} selected{% endif %}>групповой турнир</option>
 			<option value="table"{% if 'table'==tour.RULE%} selected{% endif %}>каждый с каждым</option>
-			<option value="olimp"{% if 'olimp'==tour.RULE%} selected{% endif %}>олимпиская система</option>
+			<option value="olimp"{% if 'olimp'==tour.RULE%} selected{% endif %}>олимпийская система</option>
 			<option value="finn"{%  if 'finn' ==tour.RULE%} selected{% endif %}>финская система</option>
 			</select></td></tr><tr><td colspan=2>
 			<fieldset><legend>статус</legend>
@@ -846,7 +887,10 @@ data-complete="reload('{{root}}')"
 	{%- else -%}
 		<a href="?do=showtour&id={{t[0]}}">{{t[1]}}</a>&nbsp;|&nbsp;
 	{%- endif %}
-{%- endfor -%}	
+{%- endfor -%}
+{%- for p in callex("DARTS",'game_list') -%}
+        {%- if p.id==par.AGPARAM%} [{{p.name}}]{% endif -%}
+{%- endfor -%}
 </legend>
 <div style="padding:0 auto;">
 <table class="pad4" style="table-layout:fixed;">

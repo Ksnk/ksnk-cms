@@ -116,7 +116,9 @@ class darts_Auth extends Auth {
 				foreach($list as $k=>$v){
 					if(preg_match('/^tir_(\d+)$/',$k,$m)){
 						$club=$m[1];
-						break;
+                        if(!!tournament::getTournament($club)){
+                        	break;
+                        } 
 					}
 				}
 			}
@@ -149,8 +151,8 @@ class darts_Auth extends Auth {
 			$par['error']=$_SESSION['regError'];
 			$_SESSION['regError']='';
 		}	
-		debug($par);
 		$par['user']=$this->parent->user;
+        debug($par);
 		$form->scanHtml($this->parent->_tpl('tpl_main','_Regnew',$par));
 		if ($form->handle()) {
 		//debug($_SESSION);
@@ -163,7 +165,7 @@ class darts_Auth extends Auth {
 				$form->var[$k]=trim($v);
 			}
 			
-			if ($form->var['password']!=$form->var['rpassword']){
+			if ($form->var['fpassword']!=$form->var['rpassword']){
 				$error['password']='пароли не совпадают';
 			}
 			
@@ -184,7 +186,8 @@ class darts_Auth extends Auth {
 			}
 			
 			// заводим аккаунт с именем
-			$user['password']=$form->var['password'];	
+			$user['password']=$form->var['fpassword'];
+            $user['type']=$form->var['aktype'];
 			if($userid=$this->parent->writeRecord($user)){
 			// регистрация и вход
 				$_SESSION['USER_ID']=ppi($userid);
@@ -215,7 +218,7 @@ class darts_Players  extends plugin{
 			$this->parent->error(SUPER::_l(mess_sorry_you_have_no_right) );
 			return ' ';
 		}
-		$data=DATABASE()->selectRow('select * from ?_players where id=?',ppi($_GET['id']));
+		$data=plr::select(ppi($_GET['id']));
 		$this->parent->ajaxdata=$this->parent->_tpl('tpl_main','_PlayerInfo',array('data'=>$data));
 		return 'ok';
 	}
@@ -225,8 +228,7 @@ class darts_Players  extends plugin{
 			$this->parent->error(SUPER::_l(mess_sorry_you_have_no_right) );
 			return ' ';
 		}
-		$data=DATABASE()->query('update ?_players set NAME=?, NAME1=? where ID=?'
-			,pps($_POST['name1']),pps($_POST['name2']),ppi($_POST['id']));
+        plr::update($_POST['name1'],$_POST['name2'],$_POST['id']);
 		return 'ok';
 	}
 	
@@ -253,13 +255,9 @@ class darts_Players  extends plugin{
 		if(!$tournament) return 'Oops!'.$id;
 		// добавить юзера в адресную книгу + добавить юзера в клуб + добавить юзера в турнир
 		// addrbook
-		$res=DATABASE()->selectRow('select * from ?_players where NAME=? and NAME1=?'
-			,trim($_POST['name1']),trim($_POST['name2']));
-		if($res){
-			$player=$res['ID'];
-		} else {
-			$player=DATABASE()->query('insert into ?_players set NAME=?,NAME1=?'
-				,trim($_POST['name1']),trim($_POST['name2']));
+		if(!($player=plr::find_by_name($_POST['name1'],$_POST['name2'])))
+        {
+			$player=plr::insert($_POST['name1'],$_POST['name2']);
 		};
 		// добавить юзера в адресную книгу + добавить юзера в клуб + добавить юзера в турнир
 		$x=$tournament->result(array('ID_PLAYER'=>$player));
@@ -270,7 +268,7 @@ class darts_Players  extends plugin{
 		do{
 			$t->prepParent();
 			$t=$t->parent;
-		}while(!empty($t) && $t->tournament['LEVEL']>0);
+		}while(!empty($t) && $t->get('LEVEL')>0);
 		if($t)$t->addplayer(intval($player));
 		return 'ok';
 	}
@@ -278,15 +276,46 @@ class darts_Players  extends plugin{
 	function playerById($id){ 
 		static $names;
 		if(empty($names)){
-			$names=DATABASE()->select(
-				'SELECT * from ?_players ;'
-				);
+			$names=plr::select();
 			foreach($names as $x) {
 				if(isset($x['ID']))
 				$names[$x['ID']]['name']=trim($x['NAME'].' '.$x['NAME1'].' '.$x['NAME2']);
 			}
 		}
 		return $names[$id]['name'];
+	}
+
+    /**
+     * вернуть массив игроков из предшествующего турнира с отметками играющих
+     * @param int $id
+     * @return array
+     */
+    function _usedplayers($trn=0){
+        /* @var tournament $tournament */
+        if(empty($trn)) $trn=$_SESSION['lastclub'];
+        $tdata=trn::select($trn);
+        if(!empty($tdata['PARENT'])) {
+		$names=DATABASE()->select(
+            'SELECT ppp.`NUMBER`, pp.ID_PLAYER as `selected`, p.* '
+            .'FROM darts_tourplayers as ppp '
+            .'left join darts_players as p on p.ID=`ID_PLAYER` '
+            .'left join (select * from darts_tourplayers where ID_TOURNAMENT=?) as pp on ppp.`ID_PLAYER`=pp.ID_PLAYER '
+            .'where ppp.`ID_TOURNAMENT`=? order by p.NAME, p.NAME1'
+			,$trn,$tdata['PARENT']
+			);
+        } else {
+            $names=DATABASE()->select(
+            'SELECT ppp.`NUMBER`, p.* '
+            .'FROM darts_tourplayers as ppp '
+            .'left join darts_players as p on p.ID=`ID_PLAYER` '
+            .'where ppp.`ID_TOURNAMENT`=? order by p.NAME, p.NAME1'
+			,$trn
+			);
+        }
+		foreach($names as &$x) {
+			$x['name']=trim($x['NAME'].' '.$x['NAME1'].' '.$x['NAME2']);
+		}
+		return $names;
 	}
 	
 	/**
@@ -295,13 +324,17 @@ class darts_Players  extends plugin{
 	 * -- вычисляем список клубов
 	 * -- сохраняем его в сессии
 	 */
-	function _clublist(){
+	function _clublist($id=0){
 		//debug('hello');
 		static $clubs;
+        if(!empty($id)) {
+            $x=trn::select($id);
+            debug(trn::unpack($x));
+            return  $x;
+        }
 		if(!empty($clubs)) return $clubs;
 		if ($this->parent->has_rights(right_ADMIN)){
-			$clubs= DATABASE()->select('select ID,NAME,DESCR from ?_tournaments where LEVEL=0 ORDER BY `NAME`;');
-				//debug($clubs);
+            $clubs= trn::select_childs(0);
 			return $clubs;
 //			return self::_l(mess_sorry_you_have_no_right);
 		} else {
@@ -324,22 +357,6 @@ class darts_Players  extends plugin{
 			}
 		}
 		return array();
-	}
-	/**
-	 * вернуть массив ID игроков 
-	 * Enter description here ...
-	 * @param unknown_type $style
-	 * @param unknown_type $trn
-	 * @param unknown_type $sort
-	 */
-	function _listid($trn=0,$sort='NUMBER'){
-		static $res;
-		$trn=ppi($trn,$_SESSION['lastclub']);
-		if (isset($res[$trn])) return $res[$trn] ;
-		return $res[$trn]=DATABASE()->selectCol(
-			'SELECT ID_PLAYER FROM ?_tourplayers where `ID_TOURNAMENT`=?;'
-			,$trn
-			);
 	}
 	/**
 	 * список доступных клубов для зарегистрированного игрока
@@ -379,9 +396,7 @@ class darts_Players  extends plugin{
 		$id=pps($_GET['id']);
 		$this->parent->par['title']=($id?'Изменить данные игрока':'Добавить игрока');
 		//photo
-		$data=DATABASE()->selectRow(
-					'select * from ?_players where `ID`=?;'
-					,$id);
+		$data=plr::select($id);
 		$data['photo']=toUrl($data['PHOTO']);
 		$form->scanHtml($this->parent->_tpl('tpl_main','_player_form',$data));
 
@@ -403,18 +418,14 @@ class darts_Players  extends plugin{
 
 			$key=$form->var; //unset($key['players']) ;
 			if($id){
-				DATABASE()->query('UPDATE  ?_players set ?a where `ID`=?;'
-					,$key,$id);
+				plr::update($key,$id);
 			} else {
-				$id=DATABASE()->query('INSERT INTO ?_players (?#) VALUES(?a);'
-					,array_keys($key),array_values($key));
+				$id=plr::insert($key);
 			}
 			$this->parent->go();
 		}
 		if($id){
-			$form->var=array_merge($form->var
-				,DATABASE()->selectRow('select * from ?_players where `ID`=?;'
-				,$id));
+			$form->var=array_merge($form->var,plr::select($id));
 		}
 		return $form->getHtml(' ')._export(__CLASS__,'_list_games');
 	}
@@ -486,7 +497,7 @@ class darts_Players  extends plugin{
 			'WHERE ((?_tournaments.ID=?) '.
 			'AND (t2.ID_PLAYER=?) AND (t3.ID_PLAYER=?));'
 			,$id,$x,$y);
-		$turn=DATABASE()->selectRow('SELECT * from ?_tournaments where ID=?;',$id);
+		$turn=trn::select($id);
 		$game=array();
 		$par='';
 debug($gmlist);
@@ -507,82 +518,6 @@ debug($gmlist);
 			$form->var['score_'.$i]=$v['SCORE'];
 			$form->var['score1_'.$i]=$v['SCORE1'];
 		}
-		
-		
-	/*	
-		$this->parent->par['title']=('Игры, в которые играют люди');
-		for($i=1;$i<6;$i++){
-			$_SESSION['FORM_game'.$i]='';
-			$gm=new form('game'.$i,
-				array(CNT_INPUT,'DATE'),
-				array(CNT_INPUT,'ID_GAME','hidden'),
-	//			array(CNT_INPUT,'RULE'),
-	//201|301|501|Американский крикет|крикет|Набор очков|Полный круг
-				array(CNT_SELECT,'RULE',DARTS::game_array(),'par'=>'class="long"'),
-	//			array(CNT_INPUT,'SCOREGAME1'),
-				array(CNT_INPUT,'SCORE1'),
-				array(CNT_INPUT,'TRACE1'),
-	//			array(CNT_INPUT,'SCOREGAME'),
-				array(CNT_INPUT,'SCORE'),
-				array(CNT_INPUT,'TRACE'),
-				array(CNT_SUBMIT,'par'=>'name="xxx'.$i.'" class="long" value="&raquo;"'),
-				array(CNT_SUBMIT,'par'=>'name="del'.$i.'" class="long" value="X"')
-			);
-			if ((pps($_REQUEST['del'.$i]))||(pps($_REQUEST['xxx'.$i])))
-			if($gm->handle()){
-				DATABASE()->query('DELETE from ?_games '.
-				'where `ID`=?;',$gm->var['ID_GAME']);
-				DATABASE()->query('DELETE from ?_gplayers '.
-				'where `ID_GAME`=?;',$gm->var['ID_GAME']);
-				if(pps($_REQUEST['xxx'.$i])){
-		//			$par['debug'].='xxx'.$i.' pressed<br>';
-		//!!!!!!!!!!!!!!!!!!!!!!!!!
-					$key=array();
-					$key['ID_TOURNAMENT']=$id;
-					$key['RULE']=$gm->var['RULE'];
-					$ID_GAME=DATABASE()->query('INSERT INTO ?_games (?#) VALUES(?a);',array_keys($key),array_values($key));
-			// трасса игры
-					$key=array();
-					$key['ID_GAME']=$ID_GAME;
-					foreach(array($x=>$gm->var['SCORE1'],$y=>$gm->var['SCORE']) as $k=>$v){
-						$key['ID_PLAYER']=$k;
-						$key['SCORE']=$v;
-						DATABASE()->query('INSERT INTO ?_gplayers (?#) VALUES(?a);',array_keys($key),array_values($key));
-					}
-				}
-				DARTS::getTourTable($id,true,true);
-
-				$this->parent->go('do=play&x='.$x.'&y='.$y.'&id='.$id);
-			}
-			if(isset($gmlist[$i-1])){
-				foreach($gmlist[$i-1] as $k=>$v){
-					if(isset($gm->var[$k])){
-						$gm->var[$k]=$v;
-					}
-				}
-			}
-		//	$par['debug'].=print_r($gm->var,true);
-			$game[]=$gm;
-		}
-		// вывод таблицы
-		$tabpar='style="width:600px;table-layout: fixed; ">'.
-		'<COL width="70px"><COL width="20px">'.
-		'<COL width="20px"><COL width="30px">'.
-		'<COL width="20px"><COL width="30px">'.
-		'<COL width="15px"><COL width="15px"';
-		$head=new table(
-			'abCCFFj',
-			'@val abCFj дата|игра|'.$pnames[$x].'|'.$pnames[$y].'|&nbsp',
-			$tabpar
-		);
-		$par.=$head->getHtml(array());
-
-		for($i=0;$i<count($game);$i++)
-		$par.=$game[$i]->getHtml( new table(
-			'abcefgjh',
-			$tabpar
-		));
-*/
 		// формируем ссылку на игру в darts
 
 		$pl=array();
@@ -658,18 +593,6 @@ where d1.ID='.intval($id).';';
 		}
 		$trn=ppi($trn,$_SESSION['lastclub']);
 		return $this->getList($trn,true);
-	}
-	
-// список игроков турнира
-	function _listplayers($id=null,$force=false){
-		static $res;
-		if(empty($id))
-			$id=pps($_GET['id']);
-		if (!isset($res)) $res=array();
-		if (isset($res[$id]) && !$force) return $res;
-		$res[$id]=DATABASE()->select(
-				'SELECT * FROM ?_tourplayers WHERE ID_TOURNAMENT=?;',$id);
-		return $res[$id];
 	}
 	
 	function do_recalc(){
@@ -778,7 +701,7 @@ where d1.ID='.intval($id).';';
 			//;
         } else {
 			$tournament=tournament::getTournament($id);
-            if($tournament->tournament['NAME']!=$key['NAME'])
+            if($tournament->get('NAME')!=$key['NAME'])
                 $this->parent->ajaxdata['complete']='reload();';
             $tournament->set($key);
         }
@@ -822,102 +745,11 @@ where d1.ID='.intval($id).';';
 		$id=pps($_GET['id']);
 
 		$this->parent->par['id']=$id;
+        /* @var tournament $tournament */
 		$tournament=tournament::getTournament($id);
-		
-		$this->parent->ajaxdata=$this->parent->_tpl('tpl_main','_NewTourn',array('pid'=>ppi($_GET['pid']),'tour'=>$tournament->tournament));
+		$this->parent->ajaxdata=$this->parent->_tpl('tpl_main','_NewTourn'
+            ,array('pid'=>ppi($_GET['pid']),'tour'=>empty($tournament)?array():$tournament->get()));
 		return ' ';
-
-		if($form->handle()){;
-			$tournament=tournament::getTournament($id);
-			if(isset($_POST['clear'])){
-				$tournament->finished(false);
-				$tournament->clearscore();
-				$tournament->deleteChilds();
-				$this->parent->go($this->parent->curl());
-		 	}
-			if(isset($_POST['recalc'])){
-				$tournament->clearscore();
-				$tournament->finished(false);
-				//$tournament->deleteChilds();
-				$this->parent->go($this->parent->curl());
-		 	}
-		 	if(isset($_POST['addtrn'])){
-		 		if(method_exists($tournament,'addChild'))
-		 			$tournament->addChild();
-				$this->parent->go($this->parent->curl());
-		 	}
-		 	
-		 	$key=array(
-				'NAME'=>$form->var['NAME']
-			,	'STATUS'=>$form->var['STATUS']
-			,	'RULE'=>$form->var['RULE']
-			);
-			
-			if($id){
-				DATABASE()->query('UPDATE  ?_tournaments set ?a where `ID`=?;',$key,$id);
-			} else {
-				$key['PARENT']=$this->parent->par['lastclub'];
-				$key['LEVEL']=1;
-				$id=DATABASE()->query('INSERT INTO ?_tournaments (?#) VALUES(?a);',array_keys($key),array_values($key));
-			}
-
-			/**
-			 * жеребьевка, если нужно
-			 */	
-			$players=DATABASE()->select(
-				'SELECT ID_PLAYER AS ARRAY_KEY, NUMBER  FROM ?_tourplayers WHERE ID_TOURNAMENT=?;',$id);
-			$renumber=array();
-			$delete=$players;
-			$insert=array();
-			foreach ($form->var['players'] as $k){
-				if(!isset($players[$k])) {
-					$insert[]=$k;
-				} else {
-					unset($delete[$k]);
-				}	
-			}
-			foreach($delete as $k=>$v){
-				DATABASE()->query('delete from ?_tourplayers where ID_PLAYER=? and ID_TOURNAMENT=?',$k,$id);
-			}
-			foreach($insert as $k){
-				DATABASE()->query('INSERT INTO ?_tourplayers(ID_PLAYER,ID_TOURNAMENT) VALUES (?,?)',$k,$id);
-			}
-					
-			/**
-			 * раскидать сетку игр
-			 */
-			if(isset($_POST['retable'])){
-				// просто построить игры турнира
-				// с удалением	
-				DATABASE()->query('delete * from ?_games WHERE `ID_TOURNAMENT`=?;',$id);
-				DATABASE()->query('select * from ?_games WHERE `ID_TOURNAMENT`=?;',$id);
-			}
-				
-				
-			$this->parent->go($this->parent->curl());
-		}
-		$tp_sel=array();
-		$data=DATABASE()->selectRow('select * from ?_tournaments where `ID`=?;',$id);
-			
-		if($id){
-			$form->var=array_merge($form->var,
-				DATABASE()->selectRow(
-					'select * from ?_tournaments where `ID`=? order by `DATE` DESC ;'
-					,$id));
-			$tpllist=DATABASE()->select(
-				'SELECT * FROM ?_tourplayers WHERE ID_TOURNAMENT=?;',$id);
-			for($i=0;$i<count($tpllist);$i++){
-				$x=$tpllist[$i];
-				$tp_sel[]=$x['ID_PLAYER'];
-			}
-		}
-		$form->var['players']=$tp_sel;
-		//debug($form->var);
-		if($this->parent->is_ajax){
-			$this->parent->ajaxdata=$form->getHtml(' ');
-			return ' ';
-		} else
-			return $form->getHtml(' ');
 	}
 }
 
@@ -931,6 +763,57 @@ class darts_Main extends engine_Main {
 			$this->tpl=SECOND_TPL;
 		}
 		return $this->export('qa','do_writeus');
+	}
+/**
+ * @param int $parent
+ * @return string
+ */
+        function build1lev(&$tournament=null){
+            if(is_null($tournament)) return '<li>#NULL#</li>';
+            $data=$tournament->get();$data=array_diff($data,array('DESCR'=>''));
+            $res='<li>'.$tournament->get('NAME','#undefined#')
+                .'<br>DATA:'.$this->xprint($data)
+                .'<br>TRESULT:<div style="display:inline-block;">'.$this->xprint($tournament->tresult)
+                .'</div>';
+            $tournament->prepChilds();
+            $x='';
+            foreach($tournament->childs as $v){
+                $x.=$this->build1lev($v);
+            }
+            return $res.(empty($x)?'':'<ul>'.$x.'</ul>').'</li>';
+        }
+
+
+        function xprint(&$var){
+            if(is_null($var)) return 'NULL';
+            if(is_numeric($var)) return $var;
+            if(is_string($var)) return '"'.htmlspecialchars($var).'"';
+            if(is_array($var)){
+                $res=array();
+                foreach($var as $k=>&$v){
+                    $res[]='<b>'.$k.':</b>'.$this->xprint($v);
+                }
+                return '['.implode(', ',$res).']';
+            };
+            return '#donknowtf#';
+         }
+
+    /**
+     * список юзеров сайта
+     */
+    function do_structure(){
+		if (!$this->parent->has_rights(right_ADMIN)){
+			return SUPER::_l(mess_sorry_you_have_no_right) ;
+		}
+
+        $res='';
+        $rows= trn::select_childs(0);
+        foreach($rows as $v){
+            /* @var tournament $tournament */
+            $res.=$this->build1lev(tournament::getTournament($v['ID']));
+        }
+
+ 		return $res;
 	}
 	
 	function do_user(){
@@ -959,28 +842,38 @@ class darts_Main extends engine_Main {
 			$this->parent->error(self::_l(mess_sorry_you_have_no_right)) ;
 			return  ' ';
 		};
+        $id=ppi($_GET['id']);
+        if(empty($id)) return 'fail';
 // регистрация аккаунта
-		
-		$key=array('record'=>'user');
-		$right=array();
-		$club='tir_'.$_SESSION['lastclub'];
-		$right[$club]=array_sum($_POST['right']);
-		//echo $club.' '.$right[$club];
-		$key['name']=md5($club.' '.$right[$club]);
-		$user=$this->parent->readRecord($key);
+        /* @var tournament $tournament */
+        $tournament=tournament::getTournament($id);
+        $rights=array_sum($_POST['right']);
+        $linkname='LINK_'.$rights.'~'.pps($_POST['date']);
+        $link=$tournament->get($linkname);
+        if(empty($link)){
+            $club='tir_'.$id;
+            $link=md5($club.' '.$rights).'_'.base_convert(time(),'10','36');
+            $user=array('record'=>'user','name'=>$link);
+            
+            $user=$this->parent->readRecord($user);
+            if(!empty($_POST['date'])){
+                $user['date']=strtotime($_POST['date'].' day');
+            }
 
-		if(!empty($_POST['date'])){
-			$user['date']=strtotime($_POST['date'].' day');
-		} 
-		
-		// заводим аккаунт с именем
-		if(!isset($user['id']))	{
-			$user['right']=$right;
-			$user['password']='';
-			$this->parent->writeRecord($user);
-		}
-		$this->parent->ajaxdata='Скопируйте <a href="http://'.$_SERVER["SERVER_NAME"]
-			.'<%=$target_dir%>/user/'.$user['name'].'">ссылку</a> и перешлите ее игрокам';	
+            // заводим аккаунт с именем
+            if(!isset($user['id']))	{
+                $user['right']=array();$user['right'][$club]=$rights;
+                $user['created']=time();
+                $user['password']='';
+                $this->parent->writeRecord($user);
+            }
+            $tournament->set(array($linkname=>$link));
+            debug($linkname,$link);
+            $tournament->save();
+        } 
+		$this->parent->ajaxdata['html']='Скопируйте <a href="http://'.$_SERVER["SERVER_NAME"]
+			.'<%=$target_dir%>/user/'.$link.'">ссылку</a> и перешлите ее игрокам</br>'
+            .'<center><input style="width:250px" value="http://'.$_SERVER["SERVER_NAME"].'<%=$target_dir%>/user/'.$link.'"></center>';
 		return ' ';			
 	}
 	
@@ -993,7 +886,7 @@ class darts_Main extends engine_Main {
 	}
 	
 	/**
-	 *   Выдать создать child-турнир для турнира $id
+	 *   Выдать создать child-турнир для турнирной таблицы турнира $id игроков X и Y
 	 */
 	function do_child(){
 		if (!$this->has_rights(right_READ)) return '';
@@ -1003,7 +896,7 @@ class darts_Main extends engine_Main {
 		
 		$tournament=tournament::getTournament($id);
 		$x=$tournament->getChild($x,$y);
-		debug($x);
+		//debug($x);
 		if(!empty($x))
 			$this->parent->go('?do=showtour&id='.$x->getId());
 		return 
@@ -1036,7 +929,8 @@ class darts_Main extends engine_Main {
 			$childs = array_values($tournament->childs);
 			$i=0;
             $tournament->prepParent();
-            $AGPARAM=$tournament->parent->tournament['AGPARAM'];
+            /* @var $tournament tournament */
+            $AGPARAM=$tournament->parent->get('AGPARAM');
             debug('AGPARAM',$AGPARAM);
 			foreach($childs as &$child){
 		 		$i++;
@@ -1055,7 +949,7 @@ class darts_Main extends engine_Main {
 			} ;
 			for ($i=$i+1;$i<6;$i++){
 	 		 	$child=tournament::createTournament(array(
-					 'LEVEL'=>$tournament->tournament['LEVEL']+1
+					 'LEVEL'=>$tournament->get('LEVEL')+1
 					,'RULE'=>'game'
 					,'PARENT'=>$tournament->getId()
 					,'NAME'=>'лег '.($i) 
@@ -1097,8 +991,8 @@ class darts_Main extends engine_Main {
 		$i= 0;
 		foreach($tournament->childs as $child){
 			$i++;
-			$form->var['date_'.$i]=$child->tournament['DATE'];
-			$form->var['rule_'.$i]=$child->tournament['AGPARAM'];
+			$form->var['date_'.$i]=$child->get('DATE');
+			$form->var['rule_'.$i]=$child->get('AGPARAM');
 			$form->var['score_1_'.$i]=$child->tresult[0]['RES1'];
             $form->var['score_2_'.$i]=$child->tresult[1]['RES1'];
  			$form->var['scorex_1_'.$i]=$child->tresult[0]['RES2'];
@@ -1182,9 +1076,7 @@ class darts_Main extends engine_Main {
 					$error['name']="Имя клуба не должно быть пустым";
 					break;
 				}
-				$reg=DATABASE()->query('select * from ?_tournaments where `LEVEL`=0 '
-					.'and `NAME`=?;',$form->var['tirname']);
-				if(!empty($reg)){
+				if(trn::name_exists($form->var['tirname'])){
 					$error['tirname']="Клуб с таким название уже существует";
 					break;
 				} 
@@ -1193,11 +1085,11 @@ class darts_Main extends engine_Main {
 				,	'LEVEL'=>0
 				,	'RULE'=>'title'
 				,	'NAME'=>$form->var['tirname']
-				,	'DESCR'=>$form->var['tirdescr']
+				,	'PLAIN'=>$form->var['tirdescr']
 				,	'STATUS'=>-1
 				);
-				$id=DATABASE()->query('INSERT INTO ?_tournaments (?#) VALUES(?a);',array_keys($key),array_values($key));
-				// делаем юзера администратором тира
+				$id=trn::store($key);
+                // делаем юзера администратором тира
 				$this->parent->user['right']['tir_'.$id]=1023;
 				$this->parent->writeRecord($this->parent->user);
 			} while(false);	
@@ -1229,15 +1121,15 @@ class darts_Main extends engine_Main {
 			}
 		}
 		$tpl = '';
-		if ($tournament->tournament['RULE']=='group'){
+		if ($tournament->get('RULE')=='group'){
 			$tournament->prepChilds();
             $par='';
 			foreach($tournament->childs as &$child)
 				$par.=$this->parent->export('DARTS','getTourTable',$child);
 			return $par;	
-		} elseif ($tournament->tournament['RULE']=='meeting'){
+		} elseif ($tournament->get('RULE')=='meeting'){
 			return $this->show_meeting($tournament);
-		} elseif ($tournament->tournament['RULE']=='title' && $tournament->tournament['LEVEL']==0){
+		} elseif ($tournament->get('RULE')=='title' && $tournament->get('LEVEL')==0){
 			return $this->do_club($tournament);
 		}
 		if(!empty($tpl)){		
@@ -1353,7 +1245,7 @@ class DARTS extends plugin{
 	 * @param boolean $dir
 	 */	
 	static function rollback(&$tournament,$dir=true){
-		switch($tournament->tournament['RULE']){
+		switch($tournament->get('RULE')){
 		case 'game':
 			if($tournament->result(1,1)>$tournament->result(2,1)){
 				$res=&$tournament->result(1);
@@ -1377,7 +1269,7 @@ class DARTS extends plugin{
 			$tournament->parent->changed=true;
 			return true;
 		case 'meeting':
-			switch(ppi($tournament->tournament['ASCORE'],1)){
+			switch(ppi($tournament->get('ASCORE'),1)){
 				case 2: $cnt=2; break;
 				default: $cnt=3;
 			}
@@ -1432,7 +1324,7 @@ class DARTS extends plugin{
 			if(DARTS::rollback($tournament,false))
 				$tournament->finished(true);
 		}
-		if($tournament->tournament["RULE"]=='table'){
+		if($tournament->get("RULE")=='table'){
 			// вычисляем место согласно набранным очкам
 			// пузырьковая сортировка
 			// за один проход пузырька всплывет первое место, 
@@ -1488,13 +1380,20 @@ class DARTS extends plugin{
 			
 		$x=$tournament->getTable();
 		$x['xid']=$tournament->getId();
-		debug('xx',$x);
+		//debug('xx',$x);*/
 		if($tournament instanceof trn_finn){
 			return 
 				$this->parent->_tpl('tpl_trntab','_finn',	$x);
-		} else 
+		} else if($tournament instanceof trn_group){
+            $tournament->prepChilds();
+            $par='';
+			foreach($tournament->childs as &$child)
+				$par.=$this->parent->export('DARTS','getTourTable',$child);
+			return $par;
+        } else {
 			return 
 				$this->parent->_tpl('tpl_trntab','_Trntable',	$x);
+        }
 	}
 	
 }
@@ -1535,17 +1434,14 @@ class config extends plugin {
 	
 	
 	function do_create(){
-		$this->parent->database->query(
-		"CREATE TABLE IF NOT EXISTS ?_flesh (
-  `id` int(11) NOT NULL auto_increment,
-  `name` varchar(255) NOT NULL,
-  `ival` int(11) default NULL,
-  `sval` varchar(255) NOT NULL,
-  `tval` text,
-  PRIMARY KEY  (`id`,`name`),
-  KEY `sval` (`sval`)
-);");
-		$this->parent->read_Parameters();	
+        $sql=file_get_contents('structure.sql');
+        foreach(explode(';',$sql) as $s){
+            $s=trim($s);
+            if(!empty($s))
+                $this->parent->database->query($s);
+        };
+
+		$this->parent->read_Parameters();
 		$this->parent->setPar('engine version',200);
 		/**
 		 * Создание администратора, если его нет
@@ -1562,86 +1458,7 @@ class config extends plugin {
 			$this->parent->writeRecord($user);
 		}
 		// создание игроков
-		$this->parent->database->query(
-		"CREATE TABLE IF NOT EXISTS ?_tournaments (
-  `ID` int(11) NOT NULL auto_increment,
-  `PLACE` int(11) default '0',
-  `PARENT` int(11) default '0',
-  `DATE` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `LEVEL` int(3) NOT NULL,
-  `NAME` varchar(255) NOT NULL default '',
-  `STATUS` varchar(40) default '0',
-  `DESCR` text NOT NULL,
-  `RULE` varchar(10) DEFAULT NULL,
-  PRIMARY KEY  (`ID`),
-  KEY `PLACE` (`PLACE`),
-  KEY `PARENT` (`PARENT`)
-) ENGINE=MyISAM AUTO_INCREMENT=24 DEFAULT CHARSET=utf8");
-			$this->parent->database->query(
-		"CREATE TABLE IF NOT EXISTS ?_players (
-  `ID` int(11) NOT NULL auto_increment,
-  `NAME` varchar(255) NOT NULL default '',
-  `NAME1` varchar(255) NOT NULL default '',
-  `NAME2` varchar(255) NOT NULL default '',
-  `PLACE` int(11) NOT NULL default '0',
-  `PHOTO` varchar(255) default NULL,
-  PRIMARY KEY  (`ID`),
-  KEY `PLACE` (`PLACE`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=34 ;");
-			$this->parent->database->query(
-		"CREATE TABLE IF NOT EXISTS ?_games (
-  `ID` int(11) NOT NULL auto_increment,
-  `ID_TOURNAMENT` int(11) NOT NULL default '0',
-  `DATE` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  `RULE` varchar(10) DEFAULT NULL,
-  `P1` int(11) NOT NULL default '0',
-  `P2` int(11) NOT NULL default '0',
-  PRIMARY KEY  (`ID`),
-  KEY `ID_TOURNAMENT` (`ID_TOURNAMENT`)
-) ENGINE=MyISAM AUTO_INCREMENT=557 DEFAULT CHARSET=utf8 COMMENT='одна игра в составе турнира' AUTO_INCREMENT=557 ;");
-		$this->parent->database->query(
-		"CREATE TABLE IF NOT EXISTS ?_gplayers (
-  `ID` int(11) NOT NULL auto_increment,
-  `ID_PLAYER` int(11) NOT NULL default '0',
-  `ID_GAME` int(11) NOT NULL default '0',
-  `SCORE` int(11) default NULL,
-  `SCORE1` int(11) NOT NULL,
-  `TRACE` text NOT NULL,
-  PRIMARY KEY  (`ID`),
-  KEY `ID_PLAYER` (`ID_PLAYER`,`ID_GAME`)
-) ENGINE=MyISAM AUTO_INCREMENT=1055 DEFAULT CHARSET=utf8 AUTO_INCREMENT=1055 ;");
-
-		$this->parent->database->query(
-		"CREATE TABLE IF NOT EXISTS ?_tplayers (
-  `ID_PLAYER` int(11) NOT NULL default '0',
-  `ID_TOURNAMENT` int(11) NOT NULL default '0',
-  `NUMB` int(11) NOT NULL,
-  KEY `ID_PLAYER` (`ID_PLAYER`,`ID_TOURNAMENT`),
-  KEY `NUMB` (`NUMB`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
-		$this->parent->database->query(
-		"CREATE TABLE IF NOT EXISTS ?_news (
-  `ID` int(11) NOT NULL auto_increment,
-  `text` text NOT NULL,
-  `CATEGORY` int(11) NOT NULL DEFAULT '0',
-  `PLACE` int(11) default NULL,
-  `DATE` timestamp NOT NULL default CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP,
-  PRIMARY KEY  (`ID`)
-) ENGINE=MyISAM AUTO_INCREMENT=11 DEFAULT CHARSET=utf8 AUTO_INCREMENT=11 ;");
-$this->parent->database->query(
-		"CREATE TABLE IF NOT EXISTS `darts_tourplayers` (
-  `ID_PLAYER` int(11) NOT NULL,
-  `ID_TOURNAMENT` int(11) NOT NULL,
-  `GAME` int(11) DEFAULT 0,
-  `NUMBER` int(11) NOT NULL,
-  `RES1` int(11) DEFAULT '0',
-  `RES2` int(11) DEFAULT '0',
-  `RES3` int(11) DEFAULT '0',
-  `RES4` int(11) DEFAULT '0',
-  `RES5` int(11) DEFAULT '0',
-  `RES6` int(11) DEFAULT '0'
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;");
-	}			
+	}
 }
 
 //<% insert_point('plugin_body');%>

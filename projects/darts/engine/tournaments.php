@@ -4,33 +4,257 @@
  */
 
 /**
+ * хелпер для работы с таблицей ?_tourplayers. Заодно и кеширует
+ */
+class tPlayer {
+    /**
+     * @var array
+     */
+    private static $cache=array();
+    /**
+     * базовые поля турнирной таблицы
+     */
+    private static $base_fields=array('ID_PLAYER','ID_TOURNAMENT','NUMBER','RES1','RES2');
+
+    static function delete_from_trn($trn,$pl=0){
+        if(empty($trn)) return ;
+        $cond=array();
+        if(is_array($trn)){
+            foreach($trn as $t) unset(self::$cache[$t]);
+            $cond []='`ID_TOURNAMENT` in ('.implode(',',$trn).')';
+        } else {
+            unset(self::$cache[$trn]);
+            $cond []='`ID_TOURNAMENT`='.intval($trn);
+        };
+        if(empty($pl)){
+        } elseif(is_array($pl)){
+            $cond []='`ID_PLAYER` in ('.implode(',',$pl).')';
+        } else {
+            $cond []='`ID_PLAYER`='.intval($pl);
+        };
+        DATABASE()->query(
+            'DELETE FROM ?_tourplayers where '.implode(' and ',$cond).';'
+        );
+    }
+
+    static function players_by_trn($trn=0){
+        $trn=ppi($trn,$_SESSION['lastclub']);
+        if (isset(self::$cache[$trn])) return self::$cache[$trn] ;
+        return self::$cache[$trn]=self::unpack(DATABASE()->select(
+            'SELECT * FROM ?_tourplayers where `ID_TOURNAMENT`=? order by `NUMBER`;'
+            ,$trn
+            ));
+    }
+
+    static function pack($key){
+        if(empty($key)) return null;
+        $diff=array_diff (array_keys($key),self::$base_fields);
+        if(!empty($diff)){
+            unset($key['DESCR']);
+            $descr=array();
+            foreach($diff as $d){
+                if(!empty($key[$d]))
+                    $descr[$d]=$key[$d];
+                unset($key[$d]);
+            };
+            $key['DESCR']=serialize($descr);
+        }
+    }
+    /**
+     * переложить значения упакованных полей в сам массив
+     * @static
+     * @param $key
+     * @return array
+     */
+    static function unpack($key){
+        if(!empty($key['DESCR'])){
+			$x=@unserialize($key['DESCR']);
+			if(!empty($x)){
+				$key=array_merge($key,$x);
+			}
+		}
+        unset($key['DESCR']);
+        return $key;
+    }
+}
+
+/**
+ * хелпер для работы с таблицей игроков
+ */
+
+class plr {
+    static function select($id=0){
+        if(empty($id))
+            return DATABASE()->selectRow('select * from ?_players');
+        else
+            return DATABASE()->selectRow('select * from ?_players where id=?',$id);
+    }
+
+    /**
+     * @static
+     * @param string $name1
+     * @param string $name2
+     * @return int
+     */
+    static function find_by_name($name1,$name2){
+        $res= DATABASE()->selectRow('select * from ?_players where NAME=? and NAME1=?'
+			,trim(pps($name1)),trim(pps($name2)));
+        if(!empty($res))
+            return $res['ID_PLAYER'];
+        else
+            return 0;
+    }
+
+    static function insert($name1,$name2=''){
+        if(is_array($name1)){
+            return DATABASE()->query('INSERT INTO ?_players (?#) VALUES(?a);',array_keys($name1),array_values($name1));
+        } else
+            return DATABASE()->query('insert into ?_players set NAME=?,NAME1=?'
+				,trim($name1),trim($name2));
+    }
+
+    static function update($name1,$name2,$id=0){
+        if(is_array($name1))
+            DATABASE()->query('UPDATE  ?_players set ?a where `ID`=?;',$name1,$name2);
+        else
+            DATABASE()->query('update ?_players set NAME=?, NAME1=? where ID=?'
+                ,pps($name1),pps($name2),ppi($id));
+    }
+
+}
+/**
+  * хелпер работы с таблицей турниров
+  */
+class trn {
+
+    /**
+     * базовые поля турнирной таблицы
+     */
+    static $base_fields=array('ID','PARENT','DATE','LEVEL','NAME','STATUS','RULE');
+
+    /**
+     * переложить значения упакованных полей в сам массив
+     * @static
+     * @param $key
+     * @return array
+     */
+    static function unpack(&$key){
+        if(!empty($key['DESCR'])){
+			$x=@unserialize($key['DESCR']);
+			if(!empty($x)){
+				$key=array_merge($key,$x);
+			}
+		}
+        unset($key['DESCR']);
+        return $key;
+    }
+    /**
+     * сохранить массив данных как строчку таблицы
+     * @static
+     * @param null $key
+     * @return array|null
+     */
+    static function store($key=null){
+        if(empty($key)) return null;
+        $diff=array_diff (array_keys($key),self::$base_fields);
+		if(!empty($diff)){
+			unset($key['DESCR']);
+			$descr=array();
+			foreach($diff as $d){
+				if(!empty($key[$d]))
+					$descr[$d]=$key[$d];
+				unset($key[$d]);
+			};
+			$key['DESCR']=serialize($descr);
+		}
+
+        if(isset($key['ID'])){
+            trn::update($key);
+            return 0;
+        } else {
+            return trn::insert($key);
+        }
+    }
+
+    /**
+     * проверить наличие строчки 0 уровня с таким-же именем
+     * @TODO: а оно мне дейстительно нужно?
+     * @static
+     * @param $name
+     * @return bool
+     */
+    static function name_exists($name){
+        $res=DATABASE()->selectRow('select ID from ?_tournaments where `LEVEL`=0 '
+					.'and `NAME`=?;',$name);
+        return !empty($res);
+    }
+
+    /**
+     * выбрать турнир по ID
+     * @static
+     * @param $id
+     * @return
+     */
+    static function select($id){
+        return DATABASE()->selectRow('select * from ?_tournaments where `ID`=?;',$id) ;
+    }
+
+    static function select_childs($id){
+        return DATABASE()->select('select * from ?_tournaments where `PARENT`=?  ORDER BY `NAME`;',$id) ;
+    }
+
+    static function delete($trn){
+        $cond=array();
+        if(empty($trn))
+            return;
+        elseif(is_array($trn)){
+            $cond []='`ID` in ('.implode(',',$trn).')';
+        } else {
+            $cond[] ='`ID`='.intval($trn);
+        };
+        DATABASE()->query(
+            'DELETE FROM ?_tournaments where '.implode(' and ',$cond).';'
+        );
+    }
+
+    static function insert(&$key){
+        return DATABASE()->query('INSERT INTO ?_tournaments (?#) VALUES(?a);',array_keys($key),array_values($key));
+    }
+
+    static function update(&$key){
+        $k=$key['ID'];
+        unset($key['ID']);
+        DATABASE()->query('UPDATE  ?_tournaments set ?a where `ID`=?;',$key,$k);
+    }
+}
+/**
  * базовый класс, определяющий интерфейс
  * @author RMO
  *
  */
 class tournament {
-		
-	public	
+
+    public
 	/**
 	 * турнир-предок
-	 */
-		$parent
-		
-	/**
-	 * базовые поля турнирной таблицы
-	 */	
-		,$base_fields=array('ID','PARENT','DATE','LEVEL','NAME','STATUS','RULE','AGPARAM')
-		
+     * @var tournament	 */
+ 		 $parent = null,
+
 	/**
 	 * собствено данные из таблицы
+     * @var boolean
 	 */	
-		,$changed = false
-		,$tournament
-		,$childs=null
+		$changed = false,
+    /**
+     * @var array
+     */
+		$data,
+    /* @var array of tournaments */
+		$childs=null,
 	/**
 	 * результаты турнира
 	 */	
-		,$tresult
+		$tresult
 		;
 		
 	/**
@@ -38,18 +262,17 @@ class tournament {
 	 * @param array $trn
 	 */
 	function __construct($trn){
-		$this->tournament=$trn;
-		// читаем список участников
+		$this->data=$trn;
+        // читаем список участников
 		if(!empty($trn['ID'])){
-			$this->tresult = DATABASE()->select(
-				'SELECT * FROM ?_tourplayers where `ID_TOURNAMENT`=? order by `NUMBER`;'
-				,$trn['ID']);
+			$this->tresult = tPlayer::players_by_trn($trn['ID']);
 			$number = 0;	
 			foreach($this->tresult as &$v) {
 				$v['NUMBER']=++$number;
 			}
 		}	
 	}
+    
 	function __destruct(){
 		if($this->changed)
 			$this->save();
@@ -57,32 +280,50 @@ class tournament {
 	
 	function finished($val=null){// 2- идет 1 - завершен
 		if(is_null($val))
-			return $this->tournament['STATUS']==1;
-		if($this->tournament['STATUS']!=1 && $val){
-			$this->tournament['STATUS']=1;
-			$this->changed = true;
-		} else if ($this->tournament['STATUS']!=2 && !$val){
-			$this->tournament['STATUS']=2;
-			$this->changed = true;
+			return $this->get('STATUS')==1;
+		if($this->get('STATUS')!=1 && $val){
+			$this->set("STATUS",1);
+		} else if ($this->get("STATUS")!=2 && !$val){
+			$this->set("STATUS",2);
 		}
 	}
 	
-	function set($key){
-		if(empty($key)) return;
-		if(!$this->changed)
-			foreach($key as $k=>$v){
-				if (pps($this->tournament[$k])!=$v){
-					$this->changed=true; break;
-				}	
-			};
-		$this->tournament=array_merge($this->tournament,$key);
-	}
-	
+    function set($key,$value=null){
+        if(empty($key)) return;
+        if(is_array($key)){
+            if(!$this->changed)
+                foreach($key as $k=>$v){
+                    if ($this->get($k)!=$v){
+                        $this->changed=true; break;
+                    }
+                };
+            $this->data=array_merge($this->data,$key);
+        } else {
+            if ($this->get($key)!=$value){
+                $this->changed=true;
+                $this->data[$key]=$value;
+            }
+        }
+    }
+
+    /**
+     * @param string $key
+     * @return mixed
+     */
+    function get($key=null,$def=null){
+        if(is_null($key))
+            return $this->data;
+        if(isset($this->data[$key]))
+            return $this->data[$key];
+        else
+            return $def;
+    }
+
+    /**
+     * @return int
+     */
 	function getId(){
-		if(!empty($this->tournament['ID']))
-			return $this->tournament['ID'];
-		else 
-			return 0;	
+		return $this->get("ID",0);
 	}
 	
 	function deleteChilds(){
@@ -93,18 +334,12 @@ class tournament {
 			$child->deleteChilds();
 		}
 		if(!empty($child_idx))
-		DATABASE()->query(
-			'DELETE FROM ?_tourplayers where `ID_TOURNAMENT` in ('.implode(',',$child_idx).');'
-		);
-		DATABASE()->query(
-			'DELETE FROM ?_tournaments where `PARENT`=?;',$this->getId()
-		);
+            tPlayer::delete_from_trn($child_idx);
+        trn::delete($child_idx);
 	}
 	function delete(){
 		$this->deleteChilds();
-		DATABASE()->query(
-			'DELETE FROM ?_tournaments where `id`=?;',$this->getId()
-		);
+        trn::delete($this->getId());
 	}
 	
 	// очистить счетчик очков
@@ -127,28 +362,13 @@ class tournament {
 	 * сохранить турнир обратно
 	 */
 	function &save(){
-		$key=$this->tournament;
-        if(empty($key)) return;
-		$diff=array_diff (array_keys($key),$this->base_fields);
-		debug('this',$this,'key',$key);
-		if(!empty($diff)){
-			unset($key['DESCR']);
-			$descr=array();
-			foreach($diff as $d){
-				if(!empty($key[$d]))
-					$descr[$d]=$key[$d];
-				unset($key[$d]);
-			};
-			$key['DESCR']=serialize($descr);
-		}
-		if(!!($this->getId())){
-			unset($key['ID']);
-			DATABASE()->query('UPDATE  ?_tournaments set ?a where `ID`=?;',$key,$this->getId());
-		} else {
-			$this->tournament['ID']=
-			DATABASE()->query('INSERT INTO ?_tournaments (?#) VALUES(?a);',array_keys($key),array_values($key));
-		}
-		$id=$this->getId();
+		$id=trn::store($this->get());
+        if(is_null($id)) return ;
+        if(!empty($id))
+            $this->set(array("ID"=>$id));
+        else
+		    $id=$this->getId();
+        debug($id,$this);
 		// сохранить список игроков
 		/**
 		 * жеребьевка, если нужно
@@ -169,7 +389,7 @@ class tournament {
 			} 
 		}
 		if(!empty($delete))
-			DATABASE()->query('delete from ?_tourplayers where ID_PLAYER in ('.implode(',',array_keys($delete)).') and ID_TOURNAMENT=?',$id);
+            tPlayer::delete_from_trn($id,array_keys($delete));
 
 		foreach($insert as &$k){
 			$k['ID_TOURNAMENT']=$this->getId();
@@ -216,6 +436,7 @@ class tournament {
 			}	
 		} else 
 			if(isset($this->tresult[$idx1-1]))
+
 				return $this->tresult[$idx1-1]['RES'.$idx2];
 			else {
 				debug('xxx');
@@ -251,7 +472,7 @@ class tournament {
 	static function &getTournament($id){
 		static $cache;
 		if(empty($cache[$id])){
-			$tournament = DATABASE()->selectRow('select * from ?_tournaments where `ID`=?;',$id) ;
+			$tournament = trn::select($id);
 			//print_r($tournament);
 			$cache[$id]=tournament::createTournament($tournament);
 		}
@@ -260,12 +481,8 @@ class tournament {
 	
 	static function createTournament($tournament){
 		$classname='trn_'.$tournament['RULE'];
-		if(!empty($tournament['DESCR'])){
-			$x=@unserialize($tournament['DESCR']);
-			if(!empty($x)){
-				$tournament=array_merge($tournament,$x);
-			}
-		}
+        trn::unpack($tournament);
+		
 		if (class_exists($classname))
 			return new $classname($tournament);
 		else {
@@ -296,9 +513,7 @@ class tournament {
 	function deleteplayer($player){
 		if($this->changed)
 			$this->save();
-		DATABASE()->query(
-			'delete FROM ?_tourplayers where `ID_TOURNAMENT`=? and `ID_PLAYER`=?;'
-			,$this->getId(),$player);
+        tPlayer::delete_from_trn($this->getId(),$player);
 	}
 	
 	/**
@@ -307,7 +522,7 @@ class tournament {
 	 * @param unknown_type $y
 	 */
 	function getTable(){
-		return array('par'=>$this->tournament,'players'=>$this->tresult);
+		return array('par'=>$this->data,'players'=>$this->tresult);
 	}
 	
 	/**
@@ -315,33 +530,34 @@ class tournament {
 	 */
 	function prepChilds(){
 		if(is_null($this->childs)){
-			$childs = DATABASE()->select('select * from ?_tournaments where `PARENT`=? ORDER BY `NAME`;'
-			,$this->getId()) ;
+			$childs = trn::select_childs($this->getId()) ;
 			foreach($childs as $ch){
 				$this->childs[$ch['NAME']]=tournament::createTournament($ch);
 			}
 		}
 //		debug('childs-!',count($this->childs));
 	}
+    
 	/**
 	 * обеспечить чтение парента
 	 */
 	function prepParent(){
 		if(empty($this->parent))
-			$this->parent=tournament::getTournament($this->tournament['PARENT']);
+			$this->parent=tournament::getTournament($this->get("PARENT"));
 	}
 	
 }
 
 /**
  * класс с турнирной таблицей
+ *
  * @author RMO
  *
  */
 class trn_table extends tournament {
 	
 	function set($key){
-		if(ppi($key['ASCORE'])!=ppi($this->tournament['ASCORE'])){
+		if(ppi($key['ASCORE'])!=ppi($this->get("ASCORE"))){
 			$this->prepChilds();
 			foreach($this->childs as &$child){
 				$child->set(array('ASCORE'=>ppi($key['ASCORE'])));
@@ -359,11 +575,13 @@ class trn_table extends tournament {
 		$this->prepChilds();
 		// поискать турнир
 		$child=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
-			,'ASCORE'=>ppi($this->tournament['ASCORE'],1)
+			,'ASCORE'=>ppi($this->get("ASCORE"),1)
 			,'NAME'=>$this->childname($x-1,$y-1)));
+        //debug($x,$y,$child->get());
+        //$child->save();
 		$child->addplayer($this->getPlayerByNumber($x));
 		$child->addplayer($this->getPlayerByNumber($y));
 		$child->save();
@@ -449,7 +667,7 @@ class trn_meeting extends tournament {
 		$this->prepChilds();
 		// поискать турнир
 		$child=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'game'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>$this->childname($x-1,$y-1)));
@@ -470,7 +688,7 @@ class trn_group extends tournament {
 		$this->prepChilds();
 		// поискать турнир
 		$child=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'table'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'группа №'.(count($this->childs)+1)));
@@ -507,7 +725,7 @@ class trn_finn extends tournament {
 			
 			$ref=sprintf('?do=child&id=%s&x=%s'
 					,$this->getId(),$idx);
-			$x['title']=$child->tournament['NAME'];
+			$x['title']=$child->get("NAME");
 	/*		if ($rown==$celn) {
 				$table[$celn][$rown]=array('z'=>1);
 			};
@@ -528,14 +746,14 @@ class trn_finn extends tournament {
 		$this->deleteChilds();
 		// создаем финальный турнир
 		$x14=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'финал'))->save();
 		// ветка лузеров
 		// финальный турнир ветки лузеров
 		$x13=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'финал группы2'
@@ -544,7 +762,7 @@ class trn_finn extends tournament {
 		// ветка лузеров
 		// полуфинальный турнир ветки лузеров
 		$x12=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'12. полуфинал группы2'
@@ -553,7 +771,7 @@ class trn_finn extends tournament {
 		// ветка лузеров
 		// полуфинальный турнир ветки лузеров
 		$x11=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'11. полуфинал группы1'
@@ -562,7 +780,7 @@ class trn_finn extends tournament {
 		// ветка лузеров
 		// полуфинальный турнир ветки лузеров
 		$x10=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'10. четвертьфинал группы2'
@@ -571,7 +789,7 @@ class trn_finn extends tournament {
 		// ветка лузеров
 		// полуфинальный турнир ветки лузеров
 		$x9=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'9. четвертьфинал группы2'
@@ -580,7 +798,7 @@ class trn_finn extends tournament {
 		// ветка винеров
 		// полуфинальный турнир ветки лузеров
 		$x5=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'5. четвертьфинал группы1'
@@ -589,7 +807,7 @@ class trn_finn extends tournament {
 		// ветка винеров
 		// полуфинальный турнир ветки лузеров
 		$x6=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'6. четвертьфинал группы1'
@@ -598,14 +816,14 @@ class trn_finn extends tournament {
 		// ветка лузеров
 		// полуфинальный турнир ветки лузеров
 		$x7=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'7. 1/8 финала группы2'
 			// победитель уходит на следующую игру, проиграший в ветку лузеров
 			,'FINAL'=>'follow','param'=>'1>'.$x10->getId()))->save();
 		$x8=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'8. 1/8 финала группы2'
@@ -614,7 +832,7 @@ class trn_finn extends tournament {
 		// ветка винеров
 		// полуфинальный турнир ветки лузеров
 		$x1=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'1. 1/8 группы1'
@@ -623,7 +841,7 @@ class trn_finn extends tournament {
 		// ветка винеров
 		// полуфинальный турнир ветки лузеров
 		$x2=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'2. 1/8 группы1'
@@ -632,7 +850,7 @@ class trn_finn extends tournament {
 		// ветка винеров
 		// полуфинальный турнир ветки лузеров
 		$x3=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'3. 1/8 группы1'
@@ -641,7 +859,7 @@ class trn_finn extends tournament {
 		// ветка винеров
 		// полуфинальный турнир ветки лузеров
 		$x4=tournament::createTournament(array(
-			'LEVEL'=>$this->tournament['LEVEL']+1
+			'LEVEL'=>$this->get("LEVEL")+1
 			,'RULE'=>'meeting'
 			,'PARENT'=>$this->getId()
 			,'NAME'=>'4. 1/8 группы1'
@@ -650,15 +868,17 @@ class trn_finn extends tournament {
 	}
 }
 /**
- * заголовочный турнир
+ * заголовочный турнир - клуб или название группы турниров
+ *  смысл полей :
+ * STATUS
  */
 class trn_title extends tournament {
 
     function addChild($par){
         $this->prepChilds();
         // поискать турнир
-         $child=tournament::createTournament(array_merge(array(
-                'LEVEL'=>$this->tournament['LEVEL']+1
+        $child=tournament::createTournament(array_merge(array(
+                'LEVEL'=>$this->get("LEVEL")+1
                 ,'PARENT'=>$this->getId()
              ),$par));
         $child->save();

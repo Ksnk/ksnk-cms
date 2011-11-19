@@ -1,40 +1,23 @@
-#
-# иконизация ...
-# 
-AddType image/x-icon .ico
+#CharsetRecodeMultipartForms off
 
-#
-# защита, типа,  от порнолизаторов...
-# 
-php_value allow_url_fopen 0
-
-#
-# на хостинге умные люди его включили...
-#
+php_value allow_call_time_pass_reference on
 php_value register_globals off
+php_value upload_max_filesize 8M
 
-#
-#  как-то пригодилось... хай буде...
-#
-#php_value auto_prepend_file prepend.inc
+php_value display_errors on
+php_value log_errors on
 
-<IfModule mod_rewrite.c>
-	RewriteEngine On
-#
-# защита от порнолизаторов...
-# 
-	RewriteRule ((%3A|:)25|%0D%0A) - [G,L]
+<ifModule mod_rewrite.c>
 
-#
-#   darts.html посылаем на index не глядя
-# 
-	RewriteRule darts.html /darts/index.php?it=../darts/darts.2000.html [QSA,NE,L]
-#	RewriteCond %{DOCUMENT_ROOT}/%{REQUEST_URI} !-f
+RewriteEngine On
+RewriteBase <%=$target_dir%>/
 
-#
-#   ЧПУ. Все, что не знаем - обрабатываем index.php
-# 
-	RewriteCond %{REQUEST_FILENAME} !-f
-	RewriteCond %{REQUEST_FILENAME} !-d
-	RewriteRule ^(.*)$ /darts/index.php?it=$1 [QSA,NE,L]
-</IfModule>
+ErrorDocument 401 /401.html
+ErrorDocument 403 /403.html
+ErrorDocument 404 /404.html
+ErrorDocument 500 /500.html
+
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^([a-zA-Z_0-9/]+)$ index.php?url=$1 [L,QSA]
+
+</ifModule>
