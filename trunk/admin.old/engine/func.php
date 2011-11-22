@@ -138,6 +138,27 @@ class SUPER {
         else
             return $mess ;
     }
+
+    /**
+     * @static
+     * @param $x
+     * @return SysPar
+     */
+    static function init($x){
+        if(isset($x['classes']))
+            SUPER::classes($x['classes']);
+        if(isset($x['options']))
+            SUPER::set_options($x['options']);
+        $main=$x['main'];
+        $engine=new $main(
+                    'darts_Auth','darts_Tourn','darts_Players'
+                );
+        $_GLOBAL['engine']=&$engine;
+/**
+ *   Just a simple call
+ */
+        return $engine;
+    }
 }
 
 /**
