@@ -617,35 +617,36 @@ class sysPar extends plugins {
 		if (!$_qresult) {
 			debug('Invalid query: '.__FILE__.':'.__LINE__.' '. mysql_error() . "\n".'Whole query: ' . $sql.' ORDER BY u.id;');
 		} else {
-		$_result=array();
-		$id=0;
-		while (($row = mysql_fetch_array($_qresult,MYSQL_NUM))) {
-			//debug($row);
-			if($row[0]!=$id){
-				if($cnt--<=0)
-					break;
-				if(!empty($id)) {
-					$_result[]=$result;
-				}	
-				$id=$row[0];
-				$result=array('id'=>$id);
-				if(isset($row[3])){
-					$result['node']=$row[3];
-				}
-				if(isset($row[4])){
-					$result['level']=$row[4];
-				}
-				if(isset($row[5])){
-					$result['childs']=$row[5];
-				}
-			}		
-			if(!empty($row[2]) && $row[2]{0}=='a' && $row[2]{1}==':'){
-				$result[$row[1]]=unserialize($row[2]);
-			} else {
-				$result[$row[1]]=$row[2];
-			}
-		}
-		mysql_free_result($_qresult);
+            $_result=array();
+            $result=null;
+            $id=0;
+            while (($row = mysql_fetch_array($_qresult,MYSQL_NUM))) {
+                //debug($row);
+                if($row[0]!=$id){
+                    if($cnt--<=0)
+                        break;
+                    if(!empty($id)) {
+                        $_result[]=$result;
+                    }
+                    $id=$row[0];
+                    $result=array('id'=>$id);
+                    if(isset($row[3])){
+                        $result['node']=$row[3];
+                    }
+                    if(isset($row[4])){
+                        $result['level']=$row[4];
+                    }
+                    if(isset($row[5])){
+                        $result['childs']=$row[5];
+                    }
+                }
+                if(!empty($row[2]) && $row[2]{0}=='a' && $row[2]{1}==':'){
+                    $result[$row[1]]=unserialize($row[2]);
+                } else {
+                    $result[$row[1]]=$row[2];
+                }
+            }
+            mysql_free_result($_qresult);
 		}
 		//debug($result);
 		if(!empty($id)) {
@@ -734,9 +735,9 @@ class sysPar extends plugins {
 		
 		reset($param);
 		if(list($key, $val) = each($param)){
-			$result=mysql_query('insert into '.TAB_PREF.'_flesh (name,ival,sval,tval) values '.
-				'("'.mysql_real_escape_string($key).'",'.$this->_db_insert($val,$key).')'
-			);
+            $sql='insert into '.TAB_PREF.'_flesh (name,ival,sval,tval) values '.
+				'("'.mysql_real_escape_string($key).'",'.$this->_db_insert($val,$key).')';
+			$result=mysql_query($sql);
 			$this->req_cnt++;
 			if (!$result) {
 		   		debug('Invalid query: '.mysql_error() 
@@ -1893,6 +1894,10 @@ LIMIT 100;';
 		$form->var["captcha"]="";
 		return $form->getHtml(' ');
 	}
+
+    function do_it_all(){
+        DO_IT_ALL();
+    }
 	
 }
 /**
