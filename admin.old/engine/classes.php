@@ -1881,7 +1881,7 @@ class xTable extends xElement {
 		for($i=1;$i<count($this->el);$i++){
 			$colnumber=count($this->el[$i]->el);
 			$row = $this->el[$i]->getText($keys,'td');
-			if($this->v['type'] == type_KATALOG1 && !ereg('.+admin/index.php', $_SERVER['SCRIPT_FILENAME']))
+			if($this->v['type'] == type_KATALOG1 && !ereg('.+admin/index.html', $_SERVER['SCRIPT_FILENAME']))
 				$opisanie = array('colnumber'=>$colnumber, 'opisanie_text'=>$this->v['opisanie'], 'id'=>$this->el[$i]->v['id']);
 			else
 				$opisanie = '';
@@ -2167,7 +2167,7 @@ class xRow extends xElement {
 					else
 						$x['pic_big'] = '';
 					$x['class_r'] = "nopage uploader action_both";
-					if(ereg('.+admin/index.php', $_SERVER['SCRIPT_FILENAME'])) {
+					if(ereg('.+admin/index.html', $_SERVER['SCRIPT_FILENAME'])) {
 						if ($x['pic_small'] == '')
 							$x['pic_small'] = 'admin/img/1x1t.gif';
 						$x['text'] = "<div style=\"display:none;\"><div> <input type=\"button\" onclick=\"ReplaceImg(this)\"> </div></div> <input name=\"pic_small_".$x['id']."\" type=\"text\" value=\"".$x['pic_small']."\"  style=\"display:none;\"> <input name=\"pic_big_".$x['id']."\" type=\"text\" value=\"".$x['pic_big']."\"  style=\"display:none;\"> <img src=\"../".$x['pic_small']."\" alt=\"\" onload=\"checkImg(this,80,60)\">";
@@ -2177,14 +2177,14 @@ class xRow extends xElement {
 					else
 						$x['text'] = "&nbsp;";
 				}
-				if($this->parent->v['type'] == type_KATALOG1 && $i==$this->parent->osn_col && (!ereg('.+admin/index.php', $_SERVER['SCRIPT_FILENAME']) && $x['td'] == 'td') && !empty($this->el[$this->parent->op_col]->v['text'])) {
+				if($this->parent->v['type'] == type_KATALOG1 && $i==$this->parent->osn_col && (!ereg('.+admin/index.html', $_SERVER['SCRIPT_FILENAME']) && $x['td'] == 'td') && !empty($this->el[$this->parent->op_col]->v['text'])) {
 					$x['text'] = '<a href="javascript:show_op('.$this->v['id'].');">'.$x['text'].'</a>';
 				}
-				if($this->parent->v['type'] == type_KATALOG1 && $i==$this->parent->op_col && !ereg('.+admin/index.php', $_SERVER['SCRIPT_FILENAME'])) {
+				if($this->parent->v['type'] == type_KATALOG1 && $i==$this->parent->op_col && !ereg('.+admin/index.html', $_SERVER['SCRIPT_FILENAME'])) {
 					$this->parent->v['opisanie'] = $x['text'];
 					continue;
 				}
-				if($this->parent->v['type'] == type_KATALOG1 && $i==$this->parent->op_col && ereg('.+admin/index.php', $_SERVER['SCRIPT_FILENAME']) && $x['td'] == 'td') {
+				if($this->parent->v['type'] == type_KATALOG1 && $i==$this->parent->op_col && ereg('.+admin/index.html', $_SERVER['SCRIPT_FILENAME']) && $x['td'] == 'td') {
 					$x['class_r'] = "html_edit";
 				}
 

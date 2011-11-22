@@ -8,7 +8,11 @@
 class sysPar extends plugins {
 
 	var $parameters,
-		$special_words=array('root','record','name','password','url');
+		$special_words=array('root','record','name','password','url'),
+    /**
+     * @var  array
+     */
+        $user=array();
 
 		// формирование URL из подручных материалов
 	var $url=FALSE;
@@ -19,7 +23,7 @@ class sysPar extends plugins {
 	function setUrl($arr){
 		if ($this->url===FALSE) {
 			parse_str(htmlspecialchars_decode ($_SERVER['QUERY_STRING']),$this->url);
-			$this->root=preg_replace('/index.php$/i','',$_SERVER['PHP_SELF']);
+			$this->root=preg_replace('/index.html$/i','',$_SERVER['PHP_SELF']);
 		}
 		$this->url=array_merge($this->url,$arr);
 	}
@@ -98,7 +102,7 @@ class sysPar extends plugins {
  *		сливаем его в один урл
  */ 
 		if(empty($this->root))
-			$this->root=preg_replace('/index.php$/i','',$_SERVER['PHP_SELF']);
+			$this->root=preg_replace('/index.html$/i','',$_SERVER['PHP_SELF']);
 		$x=rtrim($this->root,'/');
 		if(!defined('IS_ADMIN') && class_exists('altname')){
 			if ($res=$this->export('altname','getrealaddr',$id)){
@@ -1972,7 +1976,7 @@ if (isset($_GET['phpinfo'])){
 }
 $url=pps($_GET['url']);
 if (empty($url))
-	$url=preg_replace('#^(/|.*/index.php/)#','',$_SERVER['REQUEST_URI']);
+	$url=preg_replace('#^(/|.*/index.html/)#','',$_SERVER['REQUEST_URI']);
 //printf('"%s" "%s"',$_SERVER['REQUEST_URI'],$url);
 
 if(!empty($url)){
@@ -2099,7 +2103,7 @@ if(isset($_POST['login_name']) && isset($_POST['login_pass']) ){
         SUPER::$engine->ffirst('onJustLogin');
 		SUPER::$engine->go(SUPER::$engine->curl());
 	} else {
-        SUPER::$engine->error(self::_l(mess_wrong_password));
+        SUPER::$engine->error(SUPER::_l(mess_wrong_password));
     }
 }
 if(isset($_REQUEST[session_name()])){
