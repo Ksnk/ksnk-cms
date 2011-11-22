@@ -7,7 +7,7 @@ class plugin
 
     /**
      * ссылка на элемент-хоз€ин
-     * @var engine
+     * @var SysPar
      */
     var $parent;
     /**
@@ -29,6 +29,11 @@ class plugin
  */
 class plugins extends SUPER
 {
+    /**
+     * ссылка на элемент-хоз€ин
+     * @var SysPar
+     */
+    var $parent;
     var $par = array('error' => ''),
     $tpl = MAIN_TPL,
     $exports = array(),
@@ -57,7 +62,7 @@ class plugins extends SUPER
         $changed_handlers=array();
     }
 
-    function __construct()
+    function __construct($args=null)
     {
         global $DATABASE;
         $this->RIGHT = new rights();
@@ -66,8 +71,12 @@ class plugins extends SUPER
         $this->parent->par['error'] = pps($_SESSION['error_msg']);
         if (isset($_SESSION['error_msg'])) unset($_SESSION['error_msg']);
         $this->database =& $DATABASE; //DATABASE();
-        $arg_list = func_get_args();
-        foreach ($arg_list as $v) $this->export($v);
+        if(is_array($args)){
+            foreach ($args as $v) $this->export($v);
+        } else {
+            $arg_list = func_get_args();
+            foreach ($arg_list as $v) $this->export($v);
+        }
         self::$engine=$this;
     }
 

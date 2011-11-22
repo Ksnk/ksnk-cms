@@ -35,6 +35,7 @@ SUPER::classes(array(
 	'ml_plugin'=>'engine/news.php',
     'form'=>'engine/html.class.php',
     'Auth'=>'engine/rights.php',
+    'template_compiler'=>'compiler.class.php',
 ));
 SUPER::set_option(array(
     'path'=>'engine/',

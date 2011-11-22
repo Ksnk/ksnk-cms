@@ -329,7 +329,7 @@ data-complete="reload();"
 ##    right - отмеченные права, allow - доступные права
 ##	
 ##
-{%- macro userrights(right,allow,columns=3,columnswidth=240) %}
+{%- macro userrights(right,allow,columns=3,columnswidth=200) %}
 <div style="display:inline-block;width:{{columns * columnswidth}}px">
 
 {% for r in [
@@ -337,11 +337,12 @@ data-complete="reload();"
 	'Изменять турниры',
 	'Добавлять новости','Отвечать',
 	'',
-	'Просматривать турнирную таблицу',
+	'Просматривать турниры',
 	'',
 	'','',
 	'',
-	'Администратор'] %}
+	'Администратор',
+    'Смена пароля','Создать клуб','Редактировать профиль'] %}
 {% set rr =1<<loop.index0 %}
 
 {% if (allow & rr) %} 
@@ -493,8 +494,9 @@ data-complete="reload();"
 	data-complete="reload();"
 >
 {% if user.right %}{% set right = user.right %} <ul> ## 29,31
-{% for r in right|keys %}<li> {{r}} {{'=>'|e}} {{ userrights(right[r],1024+31-16+32) }}
-<input type="button" class="ajax" value="сменить"
+{% for r in right|keys %}<li> {{r}} {{'=>'|e}}
+      {% if r=='*' %}{{ userrights(right[r],2048+4096+8192+1024+31-16+32) }}{% else %}{{ userrights(right[r],1024+31-16+32) }}{% endif%}
+<br><input type="button" class="ajax" value="сменить"
 	data-href="?do=setright&club={{r}}&id={{user.id}}"
 	data-form="$(this).parents('li').first()"
 	data-complete="reload();"
@@ -508,6 +510,8 @@ data-complete="reload();"
 ##<input type="submit" name="xxx" value="&raquo;">
 ##</form>
 {% endmacro -%}
+
+{#
 ##########################################################################
 ##
 ##  Structure - список всех пользователей системы с возможностью редактирвания
@@ -528,7 +532,7 @@ data-complete="reload();"
 >
 {% if user.right %}{% set right = user.right %} <ul> ## 29,31
 {% for r in right|keys %}<li> {{r}} {{'=>'|e}} {{ userrights(right[r],1024+31-16+32) }}
-<input type="button" class="ajax" value="сменить"
+<br><input type="button" class="ajax" value="сменить"
 	data-href="?do=setright&club={{r}}&id={{user.id}}"
 	data-form="$(this).parents('li').first()"
 	data-complete="reload();"
@@ -542,6 +546,7 @@ data-complete="reload();"
 ##<input type="submit" name="xxx" value="&raquo;">
 ##</form>
 {% endmacro -%}
+        #}
 ##########################################################################
 ##
 ##  ajax - форма вывода данных ajax'ом

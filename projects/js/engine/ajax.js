@@ -134,7 +134,7 @@ element.merge({
 		var th=this;
 		if (this.req) {
 			var cb=this.req_callback;
-			JsHttpRequest.query("GET index.php", this.req, function(result, errors){
+			JsHttpRequest.query("GET index.html", this.req, function(result, errors){
 				try {
 					if (cb)	cb(result, errors)
 				}

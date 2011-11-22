@@ -14,10 +14,11 @@ define("right_TABLE",32);
 //define("right_MULTY",64);
 //define("right_CHAT",128);
 //define("right_ADMIN",1024);
+define("right_CHANGE_PASSWORD",2048);
+define("right_CREATE_CLUB",4096);
+define("right_CHANGE_USER",8192);
 
 require_once('tournaments.php');
-
-
 
 /**
  *   не смешная авторизация 
@@ -212,17 +213,25 @@ class darts_Auth extends Auth {
  *
  */
 class darts_Players  extends plugin{
-	
+
+    /**
+     * ajax. Выдать информацию о игроке
+     * @return string
+     */
 	function do_playerinfo(){
 		if (!$this->parent->has_rights(right_WRITE)){
 			$this->parent->error(SUPER::_l(mess_sorry_you_have_no_right) );
 			return ' ';
 		}
-		$data=plr::select(ppi($_GET['id']));
+		$data=plr::select($_GET['id']);
 		$this->parent->ajaxdata=$this->parent->_tpl('tpl_main','_PlayerInfo',array('data'=>$data));
 		return 'ok';
 	}
-	
+
+    /**
+     * ajax. Изменить игрока
+     * @return string
+     */
 	function do_changeplayer(){
 		if (!$this->parent->has_rights(right_WRITE)){
 			$this->parent->error(SUPER::_l(mess_sorry_you_have_no_right) );
@@ -231,7 +240,11 @@ class darts_Players  extends plugin{
         plr::update($_POST['name1'],$_POST['name2'],$_POST['id']);
 		return 'ok';
 	}
-	
+
+    /**
+     * ajax. удалить игрока
+     * @return string
+     */
 	function do_delplayer(){
 		if (!$this->parent->has_rights(right_WRITE)){
 			$this->parent->error(SUPER::_l(mess_sorry_you_have_no_right) );
@@ -244,13 +257,17 @@ class darts_Players  extends plugin{
 		
 		return 'ok';
 	}
-	
+
+    /**
+     * ajax. Добавить игрока
+     * @return string
+     */
 	function do_addplayer(){
 		if (!$this->parent->has_rights(right_WRITE)){
 			$this->parent->error(SUPER::_l(mess_sorry_you_have_no_right) );
 			return ' ';
 		}
-		$id=pps($_GET['id']);
+		$id=ppi($_GET['id']);
 		$tournament=tournament::getTournament($id);
 		if(!$tournament) return 'Oops!'.$id;
 		// добавить юзера в адресную книгу + добавить юзера в клуб + добавить юзера в турнир
@@ -265,14 +282,20 @@ class darts_Players  extends plugin{
 			return 'ok';
 		$tournament->addplayer(intval($player));
 		$t=$tournament;
-		do{
+		do {
 			$t->prepParent();
 			$t=$t->parent;
-		}while(!empty($t) && $t->get('LEVEL')>0);
+		} while(!empty($t) && $t->get('LEVEL')>0);
 		if($t)$t->addplayer(intval($player));
 		return 'ok';
 	}
-	
+
+    /**
+     * шаблон.
+     * вернуть имя игрока по его ID
+     * @param $id
+     * @return
+     */
 	function playerById($id){ 
 		static $names;
 		if(empty($names)){
@@ -281,7 +304,9 @@ class darts_Players  extends plugin{
 				if(isset($x['ID']))
 				$names[$x['ID']]['name']=trim($x['NAME'].' '.$x['NAME1'].' '.$x['NAME2']);
 			}
+            debug ($names);
 		}
+        debug ($id);
 		return $names[$id]['name'];
 	}
 
@@ -338,13 +363,24 @@ class darts_Players  extends plugin{
 			return $clubs;
 //			return self::_l(mess_sorry_you_have_no_right);
 		} else {
-			$list=$this->parent->rights->list_right();
-			//debug('xxx',$list);
+			$list=&$this->parent->rights->list_right();
+			debug('xxx',$list);
 			$clubs=array();
+            $changed=false;
+            $user=$this->parent->user;
 			foreach($list as $k=>$v){
 				if(preg_match('/^tir_(\d+)$/',$k,$m)){
-					$clubs[]=$m[1];
+                    if(!tournament::getTournament($m[1])){
+                        if(is_array($user['right'])){
+                            unset($user['right']['tir_'.$m[1]]);
+                            $changed=true;
+                        }
+                    } else {
+					    $clubs[]=$m[1];
+                    }
 				}
+                if($changed)
+                    $this->parent->writeRecord($this->parent->user);
 			}
 			if(!empty($clubs)){
 				$clubs= DATABASE()->select('select ID,NAME,DESCR from ?_tournaments where `ID` in ('.implode(',',$clubs).') ORDER BY `NAME`;');
@@ -352,7 +388,6 @@ class darts_Players  extends plugin{
 					$_SESSION['lastclub']=$clubs[0]['ID'];
 					$this->parent->par['lastclub']=$_SESSION['lastclub'];
 				}
-				//debug($clubs);
 				return $clubs;
 			}
 		}
@@ -389,7 +424,11 @@ class darts_Players  extends plugin{
 		return $res[$trn][$style];
 	}
 
-	function do_player(){
+/**
+ * форма вывода информации и истории игр игрока в клубе
+ * @return string
+ */
+	function do_player(){ //TODO: мертвая форма - исправить
 		//return 'Hello!';
 		if (!$this->parent->has_rights(right_VIEW)) return self::_l(mess_sorry_you_have_no_right) ;
 		$form=new form('player');
@@ -427,10 +466,12 @@ class darts_Players  extends plugin{
 		if($id){
 			$form->var=array_merge($form->var,plr::select($id));
 		}
-		return $form->getHtml(' ')._export(__CLASS__,'_list_games');
+		return $form->getHtml(' ');//._export(__CLASS__,'_list_games');
 	}
 
 	/**
+     * вывод информации об играх игрока в клубе
+     * todo:: мертвая форма -
 	 * выдать список игр, в которых принимал участие игрок
 	 */
 	function _list_games(){
@@ -479,6 +520,11 @@ class darts_Players  extends plugin{
 //    ввести   результаты   игр   игроков   x   и   y.   SQL  для  игр  из  2-х
 //  игроков!!!!!!!!!!!!!!
 
+/**
+ * переход на калькулятор с заполнением информации об игроках
+ * todo: мертвая форма
+ * @return string
+ */
 	function do_play(){
 		$pnames=$this->_list('key');
 		
@@ -1438,7 +1484,7 @@ class config extends plugin {
         foreach(explode(';',$sql) as $s){
             $s=trim($s);
             if(!empty($s))
-                $this->parent->database->query($s);
+                RIGHT::$DATABASE->query($s);
         };
 
 		$this->parent->read_Parameters();

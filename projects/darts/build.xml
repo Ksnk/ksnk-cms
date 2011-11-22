@@ -9,14 +9,17 @@
     <property file="./darts.prop" />
 
     <target name="build.Darts.me" description="build project">
+        <property file="../env.prop"/>
+        <property name="dst" value="../darts/build"/>
         <exec
-            command="build.bat darts ../darts/build"
+            command="${php_exe} -q  ../preprocessor/preprocessor.php /Ddst=${dst} /Denv_common=${common} /Dtarget_host=darts.me  /Dtarget=debug ../darts/config.xml"
             checkreturn="true"
             logoutput="true"/>
+
         <jsMin targetDir="build/js"
                 failOnError="false"
                 suffix=".min"
-            >
+        >
             <fileset dir="build/js">
                 <include name="site.js"/>
             </fileset>

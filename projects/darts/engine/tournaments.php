@@ -85,7 +85,7 @@ class tPlayer {
 class plr {
     static function select($id=0){
         if(empty($id))
-            return DATABASE()->selectRow('select * from ?_players');
+            return DATABASE()->select('select * from ?_players');
         else
             return DATABASE()->selectRow('select * from ?_players where id=?',$id);
     }

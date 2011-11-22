@@ -124,7 +124,7 @@ class tunnel_mail extends html_mime_mail {
 		$subject = '=?koi8-r?B?'.base64_encode(convert_cyr_string($subject, "w","k")).'?=';
 		// тунель через другой сайт
 		$ch = curl_init(); 
-		curl_setopt($ch, CURLOPT_URL,$engine->getPar('mail_tunnel','http://test-x.ru/airis/admin/index.php?do=ajax_sendmail'));
+		curl_setopt($ch, CURLOPT_URL,$engine->getPar('mail_tunnel','http://test-x.ru/airis/admin/index.html?do=ajax_sendmail'));
 		curl_setopt($ch, CURLOPT_POST, 1);
 		curl_setopt($ch, CURLOPT_POSTFIELDS, 
 		"to=".urlencode($to)."&subj=".urlencode($subj)."&body=".$this->headers.$this->mime);

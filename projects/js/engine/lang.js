@@ -4,7 +4,7 @@
 	 * chain + 20 секунд на перформ запроса
 	 */
 	function Ajax(mod,content,callback){
-		url="index.php?query[]="+mod;
+		url="index.html?query[]="+mod;
 	    var req = new JsHttpRequest();
 	    req.caching = false;
 		

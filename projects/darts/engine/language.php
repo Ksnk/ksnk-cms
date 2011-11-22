@@ -6,14 +6,13 @@
  * Time: 19:33
  * To change this template use File | Settings | File Templates.
  */
-
+define('mess_your_name',0);
 define('mess_sorry_you_have_no_right',1);
 define('mess_page_was_build',2);
 define('mess_hello_user',3);
-define('mess_wrong_pasword',4);
+define('mess_wrong_password',4);
 define('mess_page_not_found',5);
 define('mess_query',6);
-define('mess_your_name',0);
 
  SUPER::setlang(array(
 mess_your_name=>
@@ -26,7 +25,7 @@ mess_hello_user=>
     array('en'=>'Hello "%s"',
           'ru'=>'Вы авторизованы<br>как &laquo;<a href="?do=logout" onclick="if(!confirm(\'Хотите закончить сеанс?\')) return false;">%s</a>&raquo;'),
 
-mess_wrong_pasword=>
+mess_wrong_password=>
     array('en'=>'wrong password','ru'=>'Неверный пароль'),
 mess_page_not_found=>
     array('en'=>'page not found, sorry!','ru'=>'Страница не найдена ;-('),

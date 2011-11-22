@@ -144,7 +144,7 @@ class SUPER {
      * @param $x
      * @return SysPar
      */
-    static function init($x){
+    static function _DO($x){
         if(isset($x['classes']))
             SUPER::classes($x['classes']);
         if(isset($x['options']))
@@ -386,7 +386,7 @@ function ppx($x,$def='') { return (!empty($x))?$x:$def;}
 function toUrl($z=''){
 	$dr = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
     $z = str_replace('\\', '/', $z);        
-    return preg_replace('~^(.\:|/usr)?'.preg_quote($dr,'~:').'|index.php(\?|\b)~is', '', $z);
+    return preg_replace('~^(.\:|/usr)?'.preg_quote($dr,'~:').'|index.html(\?|\b)~is', '', $z);
 }
 
 function toUrl_sf($z){
