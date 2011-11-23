@@ -10,14 +10,15 @@ $this->xml_read('
     <files  dstdir="$dst/engine" dir="../nat2php">
         <file>nat2php.class.php</file>
     </files>
-    <files  dstdir="$dst/templates" dir="../templater/templates">
+    <files  dstdir="$dst/engine" dir="../templater/templates">
         <file>tpl_base.php</file>
         <file>tpl_compiler.php</file>
     </files>
 </config>
 ');
 point_start('site_includes'); %>
-//include_once 'compiler.class.php';
+include_once 'engine/compiler.class.php';
 template_compiler::checktpl();
+
 <% point_finish(); %>
 
