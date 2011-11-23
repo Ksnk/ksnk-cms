@@ -72,8 +72,10 @@ class SUPER {
      * @param null $def - значение по умолчанию, если параметра нет
      * @return null
      */
-    static function option($opt,$def=null){
-        if(isset(self::$options[$opt]))
+    static function option($opt=null,$def=null){
+        if(is_null($opt))
+            return self::$options;
+        elseif (isset(self::$options[$opt]))
             return self::$options[$opt][0];
         else
             return $def;
