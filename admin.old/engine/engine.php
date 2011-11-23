@@ -156,17 +156,18 @@ class plugins extends SUPER
                 $name = $name[0];
             }
         }
+        $par = array_merge($this->par, $par);
         if (empty($cache[$name])) {
             if (!class_exists($name)) {
                 //echo TEMPLATE_PATH.DIRECTORY_SEPARATOR.$name.".php";
-                require_once TEMPLATE_PATH . DIRECTORY_SEPARATOR . $name . ".php";
+                include_once TEMPLATE_PATH . DIRECTORY_SEPARATOR . $name . ".php";
             }
             if (!class_exists($name)) {
-                return debug(sprintf('method %s::%s not found', $name, $method));
+                debug(sprintf('method %s::%s not found', $name, $method));
+                return '';
             }
             $cache[$name] = new $name();
         }
-        $par = array_merge($this->par, $par);
         //debug($name,$par);
         $x = $cache[$name]->$method($par);
         return $x;

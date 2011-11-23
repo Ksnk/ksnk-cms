@@ -781,7 +781,6 @@ class sysPar extends plugins {
 		}
 		if(empty($this->parameters))
 			return $def;
-		//*--*/print_r($this->parameters);
 		if(array_key_exists($name,$this->parameters))
 			return $this->parameters[$name];
 		else
@@ -1107,7 +1106,6 @@ function flash2($par='',$par2='',$par3=''){
 	 	if(pps($_GET['ajax'])){
 			$this->parent->ajaxdata['nav_bar']=$this->_first();
 		}
-		//print_r($article);
 		if(!empty($article))
 			return trim($text);
 		else
@@ -1315,7 +1313,7 @@ LIMIT 100;';
 			$this->par['data']=' '.$x;
 		else
 			exit ;
-		if($this->is_ajax){
+        if($this->is_ajax){
 			$this->tpl=array(ELEMENTS_TPL,'ajax');
 			$result=array('data'=>trim($this->template(array(),false)));
 			if(!empty($this->ajaxdata))
@@ -1334,14 +1332,16 @@ LIMIT 100;';
 				,mkt());
 			echo php2js($result);
            // debug('tpl',$this->tpl,MAIN_TPL);
-        } elseif (SUPER::option('jinja2')){
+        } elseif (!!SUPER::option('jinja2')){
             if($this->tpl==MAIN_TPL)
-                echo $this->_tpl ('tpl_jmain','_main',array_merge($this->par,array('param'=>$this->parent->parameters)));
+                $x= $this->_tpl ('tpl_jmain','_main',array_merge($this->par,array('param'=>$this->parent->parameters)));
             else
-                echo $this->_tpl ('tpl_jmain','_second',array('param'=>$this->parent->par));
+                $x= $this->_tpl ('tpl_jmain','_second',array('param'=>$this->parent->par));
+           // echo('111_'.count($x));
+            if(!trim($x)){$x='<html><head><title>Oops</title></head><body></body></html>';}
+            echo $x;
             //else echo '3-th temlate not supported';
         } else {
-           // debug('tplx',$this->tpl,MAIN_TPL);
 			$this->template();
         }
 		unset($_SESSION['errormsg']);
@@ -1587,7 +1587,6 @@ LIMIT 100;';
 				return
 					$x[$where]=$this->export($y[0],$y[1],$y[2],pps($y[3]),pps($y[4]),pps($y[5]),pps($y[5]));
 			else if (isset($y[0])) {
-				//print_r($x[$where]=$this->export($y[0],$y[1]));
 				return
 					$x[$where]=$this->export($y[0],$y[1]);
 			}
@@ -2015,8 +2014,6 @@ if(!empty($url)){
     ));
     
 	//debug($_GET);
-	//print_r($engine);
-	//print_r($_GET);
 	SUPER::$engine->setUrl(array('do'=>SUPER::option('action'),'id'=>SUPER::option('id')));
 }
 
