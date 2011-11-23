@@ -23,7 +23,7 @@ class sysPar extends plugins {
 	function setUrl($arr){
 		if ($this->url===FALSE) {
 			parse_str(htmlspecialchars_decode ($_SERVER['QUERY_STRING']),$this->url);
-			$this->root=preg_replace('/index.html$/i','',$_SERVER['PHP_SELF']);
+			$this->root=preg_replace('/index.jtpl$/i','',$_SERVER['PHP_SELF']);
 		}
 		$this->url=array_merge($this->url,$arr);
 	}
@@ -102,7 +102,7 @@ class sysPar extends plugins {
  *		сливаем его в один урл
  */ 
 		if(empty($this->root))
-			$this->root=preg_replace('/index.html$/i','',$_SERVER['PHP_SELF']);
+			$this->root=preg_replace('/index.jtpl$/i','',$_SERVER['PHP_SELF']);
 		$x=rtrim($this->root,'/');
 		if(!defined('IS_ADMIN') && class_exists('altname')){
 			if ($res=$this->export('altname','getrealaddr',$id)){
@@ -1898,8 +1898,11 @@ LIMIT 100;';
 		$form->var["captcha"]="";
 		return $form->getHtml(' ');
 	}
-
-    function do_it_all(){
+    
+    /**
+     * @return engine_Main
+     */
+    function &do_it_all(){
         DO_IT_ALL();
     }
 	
@@ -1976,7 +1979,7 @@ if (isset($_GET['phpinfo'])){
 }
 $url=pps($_GET['url']);
 if (empty($url))
-	$url=preg_replace('#^(/|.*/index.html/)#','',$_SERVER['REQUEST_URI']);
+	$url=preg_replace('#^(/|.*/index.jtpl/)#','',$_SERVER['REQUEST_URI']);
 //printf('"%s" "%s"',$_SERVER['REQUEST_URI'],$url);
 
 if(!empty($url)){
