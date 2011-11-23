@@ -24,7 +24,7 @@ $result.='include_once TEMPLATE_PATH.DIRECTORY_SEPARATOR.\'tpl_'
     .'.php\';
 ';
 } else {
-$result.='include_once TEMPLATE_PATH.DIRECTORY_SEPARATOR.\'tpl_base.php\';
+$result.='include_once \'tpl_base.php\';
 ';
 };    	
 $result.='';
