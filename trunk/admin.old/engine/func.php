@@ -148,12 +148,14 @@ class SUPER {
         if(isset($x['classes']))
             SUPER::classes($x['classes']);
         if(isset($x['options']))
-            SUPER::set_options($x['options']);
-        $main=$x['main'];
-        $engine=new $main(
-                    'darts_Auth','darts_Tourn','darts_Players'
-                );
+            SUPER::set_option($x['options']);
+        $main=pps($x['main'],'engine_Main');
+        $plugins=array();
+        if(isset($x['plugins']))
+            $plugins=$x['plugins'];
+        $engine=new $main($plugins);
         $_GLOBAL['engine']=&$engine;
+
 /**
  *   Just a simple call
  */
@@ -386,7 +388,7 @@ function ppx($x,$def='') { return (!empty($x))?$x:$def;}
 function toUrl($z=''){
 	$dr = str_replace('\\', '/', $_SERVER['DOCUMENT_ROOT']);
     $z = str_replace('\\', '/', $z);        
-    return preg_replace('~^(.\:|/usr)?'.preg_quote($dr,'~:').'|index.html(\?|\b)~is', '', $z);
+    return preg_replace('~^(.\:|/usr)?'.preg_quote($dr,'~:').'|index.jtpl(\?|\b)~is', '', $z);
 }
 
 function toUrl_sf($z){
