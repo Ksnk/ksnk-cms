@@ -18,7 +18,7 @@ echo "PHP Preprocessor, written by Ksnk (sergekoriakin@gmail.com). Ver : 1.0(bet
 ";
 
 for ($i=1;$i<$argc;$i++){
-	if(preg_match('/^\/D(\w+)\=(\S+)$/',$argv[$i],$m)){
+	if(preg_match('/^\/D([\.\w]+)\=(\S+)$/',$argv[$i],$m)){
 		$paths->export($m[1],$m[2]);
 	} else if (is_file($argv[$i])) {
 		$arg1=pathinfo($argv[$i]);
