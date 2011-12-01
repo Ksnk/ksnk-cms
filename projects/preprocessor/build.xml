@@ -5,46 +5,42 @@
 	   to make a SVN revision number by using TortoiseSVN installed.
 	   google with "TortoiseSVN SubWCRev" for detail.
 	-->
-	<macrodef name="SVNcheck">
-		<attribute name="src" default="../cms/rev.txt" />
-		<attribute name="dst" default="rev.tmp" />
-		<sequential>
-		<exec executable="SubWCRev" dir=".">
-			<arg file="."/>
-			<arg file="@{src}"/>
-			<arg file="@{dst}"/>	
-			<arg value="-f"/>
-		</exec>
-		</sequential>
-	</macrodef>
+    <target name="revision">
+        <echo file="rev.tmp" append="false"><![CDATA[----------------------------------------------------------------------------
+$Id: PHP Preprocessor, written by Ksnk (sergekoriakin@gmail.com)
+Ver : 1.1, Rev: $WCREV$, Modified: $WCDATE$$
+      $WCURL$
+----------------------------------------------------------------------------
+License GNU/LGPL - Serge Koriakin - Jule 2010
+----------------------------------------------------------------------------
+]]>        </echo>
+         <exec executable="SubWCRev" dir=".">
+          <arg file="." />
+             <arg file="rev.tmp" />
+             <arg file="rev.tmp" />
+             <arg value="-f" />
+          </exec>
+        <loadfile property="svn.lastrevision" file="rev.tmp"/>
 
-	<!--
-	   to run preprocessor
-	-->
-	<macrodef name="preprocess">
-		<attribute name="target" default="debug" />
-		<attribute name="dst" default="build/@{target}" />
-		<attribute name="config" default="config.xml" />
-		<sequential>
-		<exec executable="Z:/usr/local/php5/php.exe" dir=".">
-			<arg value="-f"/>
-			<arg file="z:/xilen/common/preprocessor/preprocessor.php"/>
-			<arg value="/Dtarget=@{target}"/>
-			<arg value="/Ddst=@{dst}"/>
-			<arg file="@{config}"/> 
-		</exec>
-		</sequential>
-	</macrodef>
+        <echo msg="revision=${svn.lastrevision}"/>
+    </target>
 
-	<target name="init">
-		<SVNcheck src="config.xml" dst="config.svn.xml"/>
-		<preprocess target="release" config="config.svn.xml" dst="build"/>
-		<delete file="config.svn.xml"/>
-		<zip duplicate="preserve" destfile="./preprocessor.zip">
+	<target name="init" depends="revision">
+        <property file="../env.prop"/>
+        <property name="target" value="release"/>
+        <property name="dst" value="build"/>
+        <property name="config" value="config.xml"/>
+        <exec
+            command="${php_exe} -q  ../preprocessor/preprocessor.php /Dtarget=${target} /Ddst=${dst} ${config}"
+            checkreturn="true"
+            logoutput="true"/>
+
+        <delete file="rev.tmp"/>
+<!--		<zip duplicate="preserve" destfile="./preprocessor.zip">
 			<fileset dir="build">
 				<include name="**/*.*"/>
 			</fileset>
-		</zip>
+		</zip>-->
 	</target>
 
 	<target name="test">

@@ -28,14 +28,8 @@ thanks contacto at lucasfonzalida.com.ar and php.net ;)
   
 <% point_start('hat');
 // шапка для вставки в файлы проекта
-%>
-----------------------------------------------------------------------------
-$Id: PHP Preprocessor, written by Ksnk (sergekoriakin@gmail.com)
-Ver : 1.0(beta), Rev: <%=$SVN_Revision%>, Modified: <%=$SVN_Date%>$
-----------------------------------------------------------------------------
-License GNU/LGPL - Serge Koriakin - Jule 2010
-----------------------------------------------------------------------------
-<% point_start('readme');
+include('rev.tmp');
+ point_start('readme');
 // readme в wiki-разметке. wiki пока усеченный. только параграфы, 
 // заголовки и участки кода
 %>

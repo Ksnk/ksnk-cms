@@ -1,11 +1,20 @@
 <?php
 /**
  * POINTS (MACRO OOP) mechanism for PHP preperocessor
- * <%=point('hat','jscomment');%>
+ * <%=point('hat','comment');%>
  */
+
 $points=array();
 $cur_point='';
 $ob_count=0;
+
+/**
+ * стартова€ метка "точки". ¬есь вывод после этого оператора попадает в
+ * именованный буфер $point_name
+ * @param string $point_name
+ * @return void
+ */
+
 function point_start($point_name){
 	global $ob_count,$cur_point,$points;
 	//echo "ob_start\n\r";
@@ -15,6 +24,10 @@ function point_start($point_name){
 	$ob_count++;
 }
 
+/**
+ * финишна€ метка точки. ѕосле этого оператора точка пополн€етс€.
+ * @return void
+ */
 function point_finish(){
 	global $ob_count,$cur_point,$points;
 	//echo "ob_finish\n\r";
@@ -30,12 +43,34 @@ function point_finish(){
 	$points[$cur_point][]=preg_replace('/^\s+|\s+$/','',$contents);  
 }
 
+/**
+ * вывод содержимого точки. ѕри выводе примен€ютс€ фильтры, которые позвол€ют вставл€тьс€
+ * в комментарии (пустой фильтр), как часть комментари€ (фильтр comment), с текстовой обработкой (wiki)
+ * @param $point_name
+ * @param string $filter
+ * @return mixed|string
+ */
 function point($point_name, $filter=''){
-	global $ob_count,$cur_point,$points;
+	global $ob_count,$cur_point,$points,$preprocessor;
 	//echo "insert_point $point_name */\n\r";
 	$s='';
 	if(isset($points[$point_name]))
 	  $s= join($points[$point_name],"\r\n");
+    if($filter=='' || $filter=='comment'){
+        $ss=$preprocessor->obget();
+        if(preg_match('~(\s+\*)\s*$|(/\*)\s*$|(//)\s*$~',$ss,$m)){
+            if(!empty($m[1])){
+                // javascript comment
+                $filter = $filter=='comment'?'jscomment':'php_comment';
+            } elseif(!empty($m[2])){
+                // javascript comment
+                $filter = $filter=='comment'?'jscomment':'php_comment';
+            } elseif(!empty($m[3])){
+                // javascript comment
+                $filter = $filter=='comment'?'everyline_comment':'line_comment';
+            }
+        }
+    }
 	switch($filter){
 		case 'wiki-txt':
 			include_once("wiki.ext.php");
@@ -44,6 +79,16 @@ function point($point_name, $filter=''){
 		case 'wiki-html':
 			include_once("wiki.ext.php");
 			return wiki_parcer::convert($s,'html');
+			break;
+        case 'line_comment':
+             // выводим php код в окружении закрывающего - открывающего комментари€
+             return "\r\n".$s."\r\n";
+        case 'everyline_comment':
+             // выводим php код в окружении закрывающего - открывающего комментари€
+             return trim(preg_replace(
+				array('/\n/'),
+				array("\n// "),
+				$s))."\r\n";
 			break;
 		case 'jscomment':
 			return trim(preg_replace(

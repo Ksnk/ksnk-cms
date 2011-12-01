@@ -9,7 +9,7 @@ $stderr = fopen('php://stderr', 'w');
  * http://ru2.php.net/manual/en/function.touch.php#88028
  * big thanks to author!
  */ 
-function betouch($file, $time, $offset = 0){ 
+function betouch($file, $time){
 	if(touch($file, $time)){ 
 		clearstatcache(); 
 		$stored_mtime = $time+$time-filemtime($file);
@@ -24,7 +24,8 @@ function betouch($file, $time, $offset = 0){
  
 class preprocessor{
 	var $obcnt=0,
-        $debug_str='';
+        $debug_str='',
+        $result='';
 	/**
 	 * error handling. donow what to do with them ;(
 	 */
@@ -81,9 +82,11 @@ class preprocessor{
 	 * eval string with dollar sign, internal function
 	 */
 	private function tmp_callback($m){
-		if(array_key_exists($m[1],$this->exported_var)) 
-			return $this->exported_var[$m[1]]; 
-		else 
+		if(isset($m[2]) && array_key_exists($m[2],$this->exported_var))
+			return $this->exported_var[$m[2]];
+		elseif(isset($m[1]) && array_key_exists($m[1],$this->exported_var))
+			return $this->exported_var[$m[1]];
+		else
 			return $m[0];
 	}
 	/** 
@@ -93,7 +96,7 @@ class preprocessor{
 	private function evd($s,$default=''){
 		if(empty($s)) return $default;
 		if(strpos($s,'$')===FALSE) return (string)$s;
-		return preg_replace_callback('/\$(\w*)/',array($this,'tmp_callback'),$s);
+		return preg_replace_callback('/\$(?:(\w*)|\{([\w\.\[\]]*)\})/',array($this,'tmp_callback'),$s);
 	}
 	
 	/**
@@ -162,7 +165,13 @@ class preprocessor{
     private function obend (){
         ob_end_clean();
         $this->obcnt--;
+        $this->result='';
         $this->debug();
+    }
+
+    public function obget (){
+        $res=ob_get_contents();
+        return $res;
     }
 
     private function obstart (){
@@ -281,7 +290,7 @@ class preprocessor{
 	 * @param $dst - file to store evaluated result
 	 */
 	private function post_process($dst='',$time=0){
-		$s=ob_get_contents();
+		$s=$this->obget();
 		$s=str_replace( // + final linefeed correcion
 		// replace LF with intel LF,
 		// all MAC's LF replaced on Intel
@@ -303,8 +312,7 @@ class preprocessor{
 	}
 
 
-	public function _handleNotice($errno, $errstr, $errfile, $errline)
-    {
+	public function _handleNotice($errno, $errstr, $errfile, $errline)    {
     	if(error_reporting()) return ;
         $trace = debug_backtrace();
         array_shift($trace);
@@ -312,8 +320,7 @@ class preprocessor{
         	,$errno, $errstr, $errfile, $errline, print_r($trace,true));
     }
     
-    public function _handleFatal()
-    {
+    public function _handleFatal()    {
         $error = error_get_last();
         if ( !is_array($error) || !in_array($error['type'], array(E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR))) {
             return;
