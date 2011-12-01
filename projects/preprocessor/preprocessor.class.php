@@ -1,7 +1,8 @@
 <?php
 /**
  * main preprocessor class + xml reader-parcer
- * <%=point('hat','jscomment');%>
+ *
+ * <%=point('hat','comment');%>
  */
 $stderr = fopen('php://stderr', 'w');
 /** 
@@ -37,13 +38,13 @@ class preprocessor{
 	 * array with variables exported from outer space 
 	 * (xml, command line and so on);
 	 */
-	private $exported_var=array();
+	public $exported_var=array();
 	
 	/**
 	 * to hold the modification time of all evaluated files we need
 	 * to store the last time source files was modified.
 	 */
-	private function cfg_time($n=null){
+	public function cfg_time($n=null){
 		static $cfg_time=0;
 		if (!is_null($n)){
 			if (is_file($n))
@@ -279,7 +280,7 @@ class preprocessor{
 		}
 		$s=str_replace(
 			array('<?','?>','<'.'%=','<'.'%','%'.'>'),
-			array('<@','@>','<'.'?php echo ','<'.'?php ','?'.'>'),$s
+			array('<'.'@','@'.'>','<'.'?php echo ','<'.'?php ','?'.'>'),$s
 		);
 		$this->obstart();
 		return '?'.'>'.$s;
@@ -295,8 +296,8 @@ class preprocessor{
 		// replace LF with intel LF,
 		// all MAC's LF replaced on Intel
 		// Replace Intel LF with Windows LF for my editor glitched with different  :(
-			array('<@','@>','%/>','</%', "\r\n","\r","\n"),
-			array('<?','?'.'>','<'.'%','%'.'>',"\n","\n","\r\n"),$s
+			array('<'.'@','@'.'>','%/'.'>','<'.'/%', "\r\n","\r","\n"),
+			array('<'.'?','?'.'>','<'.'%','%'.'>',"\n","\n","\r\n"),$s
 		);
 		$this->obend();
 		if(!empty($dst)){

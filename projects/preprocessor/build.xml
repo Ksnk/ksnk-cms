@@ -1,28 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="preprocessor" default="init">
 
+    <property name="version"
+        value="PHP Preprocessor, written by Ksnk (sergekoriakin@gmail.com). Ver : 1.1"/>
+    <property name="license"
+        value="License GNU/LGPL - Serge Koriakin - Jule 2010"/>
+
 	<!--
 	   to make a SVN revision number by using TortoiseSVN installed.
 	   google with "TortoiseSVN SubWCRev" for detail.
 	-->
     <target name="revision">
         <echo file="rev.tmp" append="false"><![CDATA[----------------------------------------------------------------------------
-$Id: PHP Preprocessor, written by Ksnk (sergekoriakin@gmail.com)
-Ver : 1.1, Rev: $WCREV$, Modified: $WCDATE$$
-      $WCURL$
+$Id: ${version}
+ Rev: $WCREV$, Modified: $WCDATE$
+ SVN: $WCURL$$
 ----------------------------------------------------------------------------
-License GNU/LGPL - Serge Koriakin - Jule 2010
+${license}
 ----------------------------------------------------------------------------
 ]]>        </echo>
-         <exec executable="SubWCRev" dir=".">
-          <arg file="." />
-             <arg file="rev.tmp" />
-             <arg file="rev.tmp" />
-             <arg value="-f" />
-          </exec>
-        <loadfile property="svn.lastrevision" file="rev.tmp"/>
-
-        <echo msg="revision=${svn.lastrevision}"/>
+        <exec executable="SubWCRev" dir=".">
+            <arg file="." />
+            <arg file="rev.tmp" />
+            <arg file="rev.tmp" />
+            <arg value="-f" />
+        </exec>
     </target>
 
 	<target name="init" depends="revision">
@@ -31,7 +33,7 @@ License GNU/LGPL - Serge Koriakin - Jule 2010
         <property name="dst" value="build"/>
         <property name="config" value="config.xml"/>
         <exec
-            command="${php_exe} -q  ../preprocessor/preprocessor.php /Dtarget=${target} /Ddst=${dst} ${config}"
+            command="${php_exe} -q ../preprocessor/build/preprocessor.php /Dversion='${version}' /force /Dtarget=${target} /Ddst=${dst} ${config}"
             checkreturn="true"
             logoutput="true"/>
 

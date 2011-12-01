@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <config>
-	<var name="SVN_Revision">$WCREV$</var>
-	<var name="SVN_Modified">$WCMODS?Modified:Not modified$</var>
-	<var name="SVN_Date">$WCDATE$</var>
-
-<!-- 
+<!--
 	complete set of source files
 -->
 	<files dstdir="$dst/src">
@@ -17,12 +13,23 @@
 <!-- 
 	preprocesor files ready to distribute
 -->
+    <files>
+        <echo><![CDATA[<%
+            point_start('hat');
+include('rev.tmp');
+       point_finish() ;%>]]></echo>
+    </files>
 	<files dstdir="$dst">
 		<file>readme.txt</file>
+
 		<echo name="history.txt"><![CDATA[
 preprocessor project history
 --------------------------------
 <%=point('history');%>]]></echo>
+        <echo name="howto.txt"><![CDATA[
+preprocessor cookbook
+--------------------------------
+<%=point('cookbook');%>]]></echo>
 		<file>*.php</file>
 	</files>
 
