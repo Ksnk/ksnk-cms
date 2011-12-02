@@ -84,7 +84,7 @@ class class_tree {
 			$this->data['id']=
 			DATABASE()->query('INSERT INTO ?_tree (?#) VALUES(?a);',array_keys($key),array_values($key));
 		}
-		$id=$this->getId();
+		//$id=$this->getId();
 		$this->changed = false;
 	}
 	
