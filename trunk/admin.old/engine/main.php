@@ -1805,7 +1805,7 @@ class engine extends engine_Main
 		$article=$article[0]['id'];
 		$form->scanHtml(smart_template(array(FORMS_TPL,'menuedit'),$res));
 		if($form->handle()){
-            /*<% insert_point('plugin_control1') %>*/
+            //<%=point('plugin_control1') %>
 			if(!!$item){
 				$item->serialize($form->var,true);
 			}
