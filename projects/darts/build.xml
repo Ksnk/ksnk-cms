@@ -12,7 +12,7 @@
         <property file="../env.prop"/>
         <property name="dst" value="../darts/build"/>
         <exec
-            command="${php_exe} -q  ../preprocessor/preprocessor.php /Ddst=${dst} /Denv_common=${common} /Dtarget_host=darts.me  /Dtarget=debug ../darts/config.xml"
+            command="${php_exe} -q  ../preprocessor/build/preprocessor.php /Ddst=${dst} /Denv_common=${common} /Dtarget_host=darts.me  /Dtarget=debug config.xml"
             checkreturn="true"
             logoutput="true"/>
 

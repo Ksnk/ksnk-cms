@@ -1507,4 +1507,4 @@ class config extends plugin {
 	}
 }
 
-//<% insert_point('plugin_body');%>
+//<%=point('plugin_body');%>

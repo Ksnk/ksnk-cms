@@ -46,7 +46,7 @@ SUPER::set_option(array(
 ########## Check if database exist #################################################
 // Код обработчика ошибок SQL.
 
-/*<% insert_point('site_includes');%>*/
+//<%=point('site_includes');%>
 
 // инициализация дефолтных параметров
 /**

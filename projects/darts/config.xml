@@ -60,7 +60,7 @@
 	<!-- **** jq UI integration **** -->
 	<!-- **************************** -->
 	<files>
-	  	<file>plugins/jquery.UI.php</file> 
+	  	<file>plugins.2/jquery.UI.php</file>
 	</files>
 	<!-- ************************************** -->
 	<!-- **** мелкий порт cms в darts      **** -->

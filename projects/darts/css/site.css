@@ -114,4 +114,4 @@ a.nodecoration {
 a:active, a:focus, img {
     outline: medium none;
 }*/
-/* <% insert_point("css_site"); %> */
+/* <%=point("css_site"); %> */
