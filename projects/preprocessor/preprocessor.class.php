@@ -232,6 +232,16 @@ class preprocessor{
                     foreach($file->attributes() as $k=>$v){
                         $attributes[$k]=(string)$v;
                     }
+                    if(!empty($file['depend'])){
+                        $xtime=strtotime($file['depend']);
+                        if(!$xtime || $xtime<0){
+                            $xtime=0;
+                            foreach(glob($file['depend']) as $a){
+                                $xtime=max($xtime,filemtime($a));
+                            }
+                        }
+                        $attributes['xtime']=$xtime;
+                    }
 					if ($file->getName()=='echo'){
                         $this->newpair(
 							(string)$file,
@@ -240,7 +250,7 @@ class preprocessor{
                             ,$attributes);
 					} else
 					foreach(glob($this->path(array((string)$file['dir'],(string)$files['dir']),(string)$file)) as $a){
-						$this->newpair(
+ 						$this->newpair(
 							realpath ($a),
 							!empty($dst)?$this->path($dst,array((string)$file['name'],basename($a))):'',
 							$file->getName()
@@ -297,14 +307,14 @@ class preprocessor{
 		// all MAC's LF replaced on Intel
 		// Replace Intel LF with Windows LF for my editor glitched with different  :(
 			array('<'.'@','@'.'>','%/'.'>','<'.'/%', "\r\n","\r","\n"),
-			array('<'.'?','?'.'>','<'.'%','%'.'>',"\n","\n","\r\n"),$s
+			array('<'.'?','?'.'>','%'.'>' ,'<'.'%' ,"\n","\n","\r\n"),$s
 		);
 		$this->obend();
 		if(!empty($dst)){
 			$x=pathinfo($dst);
 			if(!is_dir($x['dirname']))mkdir($x['dirname'], 0777 ,true);
 			if(!is_file($dst) || (filemtime($dst)<max($time,$this->cfg_time()))){
-				file_put_contents($dst,$s);
+                file_put_contents($dst,str_replace("\xEF\xBB\xBF", '',trim($s)));
 				betouch ($dst,max($time,$this->cfg_time() ));
 				return true;
 			}
@@ -357,6 +367,10 @@ class preprocessor{
                     $filemtime=0;
                     if(is_file($srcfile))
                         $filemtime=filemtime ($srcfile);
+                    if(!empty($___m[3]['xtime'])){
+                        $filemtime=max($filemtime,$___m[3]['xtime']);
+                        //$this->debug($___m[3]['xtime']);
+                    }
                     if(!empty($___m[3]))
                         if(!empty($___m[3]['force']))
                             $filemtime=time();
@@ -406,7 +420,8 @@ class preprocessor{
 		if(is_array($error)){
 			fwrite($GLOBALS['stderr'],
 	    	sprintf('Error: %s(%s) module raised "%s" '."\n\r"
-	        	,realpath($srcfile), $error['line'], $error['message']));
+	        	,realpath($srcfile), $error['line'], $error['message'])
+            .print_r(debug_backtrace(false,4),true));
 		}		
 		printf("
 total %s of %s files copied.\n\r",$___total_cnt,$___all_cnt);

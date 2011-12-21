@@ -14,23 +14,22 @@
 	preprocesor files ready to distribute
 -->
     <files>
-        <echo><![CDATA[<%
-            point_start('hat');
-include('rev.tmp');
-       point_finish() ;%>]]></echo>
-    </files>
-	<files dstdir="$dst">
-		<file>readme.txt</file>
+        <echo>
+            <![CDATA[<% point_start('hat');include('rev.tmp'); point_finish() ;%>]]>
+        </echo>
 
-		<echo name="history.txt"><![CDATA[
-preprocessor project history
---------------------------------
-<%=point('history');%>]]></echo>
-        <echo name="howto.txt"><![CDATA[
-preprocessor cookbook
---------------------------------
-<%=point('cookbook');%>]]></echo>
-		<file>*.php</file>
+    </files>
+    
+	<files dstdir="$dst">
+         <file>readme.txt</file>
+		<echo name="history.txt">
+            <![CDATA[<%=point('history');%>]]>
+        </echo>
+        <echo name="howto.txt">
+            <![CDATA[<%=point('cookbook','wiki-txt');%>]]>
+        </echo>
+        
+		<file depend='*.*'>*.php</file>
 	</files>
 
 </config>

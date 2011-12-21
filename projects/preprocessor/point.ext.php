@@ -76,6 +76,7 @@ function point($point_name, $filter=''){
 	switch($filter){
 		case 'wiki-txt':
 			include_once("wiki.ext.php");
+            $s=iconv('UTF-8', 'CP1251',$s);
 			return wiki_parcer::convert($s,'txt');
 			break;
 		case 'wiki-html':
@@ -84,7 +85,7 @@ function point($point_name, $filter=''){
 			break;
         case 'line_comment':
             // перед строкой стоит строковый комменарий - выводим с новой строки
-            return "\r\n".$s."\r\n";
+            return ' ----point::'.$point_name."----\r\n".$s."\r\n";
         case 'everyline_comment':
              // каждая строка начинается с комментария //
              return trim(preg_replace(
