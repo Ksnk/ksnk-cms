@@ -7,6 +7,8 @@
 include_once ("preprocessor.class.php");
 include_once ("point.ext.php");
 
+    date_default_timezone_set('Europe/Moscow');
+
 function pps(&$p,$def){return empty($p)?$def:$p;}
 
 $preprocessor=new preprocessor();
@@ -25,8 +27,22 @@ for ($i=1;$i<$argc;$i++)
 //echo $arg;
 
 while(!empty($arg)){
+    //$preprocessor->debug($arg);
     if(preg_match('/^\/force\s/',$arg,$m)){
 	    $preprocessor->cfg_time(time());
+        $arg=trim(substr($arg,strlen($m[0])));
+    } elseif(preg_match('/^\s*\/P\=(\S+)/',$arg,$m)){
+        if(is_readable($m[1])){
+            foreach(file($m[1]) as $v){
+                if(preg_match('/^(?:\;.*|\#.*|([^=]+)=(.*))$/',$v,$mm)){
+                    if(!empty($mm[1])){
+                        $preprocessor->export(trim($mm[1]),trim($mm[2]));
+                    }
+                }
+            }
+        } else {
+            $preprocessor->error('no such a file "'.$m[1].'"');
+        }
         $arg=trim(substr($arg,strlen($m[0])));
     } elseif(preg_match('/^\s*\/D([\.\w]+)\=\'([^\']+)\'/',$arg,$m)){
         $preprocessor->export($m[1],$m[2]);
@@ -41,13 +57,14 @@ while(!empty($arg)){
 	} else if (preg_match('~^([\.\\/\w]+)~',$arg,$m)){//is_file($argv[$i])) {
         $arg=trim(substr($arg,strlen($m[0])));
         if(is_file($m[0])){
-		$arg1=pathinfo($m[0]);
-		if ($arg1['extension']=='xml'){
-            echo "making ".$m[0]."
+            $arg1=pathinfo($m[0]);
+            if ($arg1['extension']=='xml'){
+                echo "making ".$m[0]."
 ";
-			$preprocessor->xml_read($m[0]);
-		} else {
-			$xmlstr = <<<XML
+                $xmlstr=$m[0];
+
+            } else {
+                $xmlstr = <<<XML
 <?xml version='1.0' standalone='yes'?>
 <config>
 	<files dstdir="build">
@@ -55,8 +72,9 @@ while(!empty($arg)){
 	</files>
 </config>
 XML;
-			$preprocessor->xml_read($xmlstr);
-		}
+
+		    }
+            $preprocessor->xml_read($xmlstr);
         }else {
            echo 'fail! wrong parameter-'.$m[0];
 		    exit;
