@@ -27,8 +27,15 @@ class SUPER {
         $lang=array();
     protected static
         $EXPORTS=array();
+
+     /**
+      * публичный доступ к папе
+      * @var engine_Main
+      */
     public static
-        $engine=null;
+           $engine=null;
+    public static
+           $debug  ='';
 
     //**********************************************************************
     /**
@@ -157,7 +164,7 @@ class SUPER {
             $plugins=$x['plugins'];
         $engine=new $main($plugins);
         $_GLOBAL['engine']=&$engine;
-
+        SUPER::$engine=&$engine;
 /**
  *   Just a simple call
  */
@@ -235,10 +242,7 @@ function databaseErrorHandler($message, $info)
 	if (!error_reporting()) return;
 	// Выводим подробную информацию об ошибке.
 	$s= "SQL Error: $message<br><pre>".print_r($info,true)."</pre>";
-	if (isset($_GET['JsHttpRequest']))
-		$_RESULT['debug'].= $s;
-	else
-		echo $s.'<hr>';
+	echo $s.'<hr>';
 	exit();
 }
 function myLogger($db, $sql)
