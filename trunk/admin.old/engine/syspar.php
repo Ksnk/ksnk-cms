@@ -1,7 +1,7 @@
 <?php
 /**
- *  - storePar(name,val,type) - поместить параметр с именем name на хранение
- *  - getPar(name) - получить параметр обратно.
+ *  - storePar(name,val,type) - РїРѕРјРµСЃС‚РёС‚СЊ РїР°СЂР°РјРµС‚СЂ СЃ РёРјРµРЅРµРј name РЅР° С…СЂР°РЅРµРЅРёРµ
+ *  - getPar(name) - РїРѕР»СѓС‡РёС‚СЊ РїР°СЂР°РјРµС‚СЂ РѕР±СЂР°С‚РЅРѕ.
  */
 
 
@@ -9,15 +9,16 @@ class sysPar extends plugins {
 
 	var $parameters,
 		$special_words=array('root','record','name','password','url'),
+        $root='',
     /**
      * @var  array
      */
         $user=array();
 
-		// формирование URL из подручных материалов
+		// С„РѕСЂРјРёСЂРѕРІР°РЅРёРµ URL РёР· РїРѕРґСЂСѓС‡РЅС‹С… РјР°С‚РµСЂРёР°Р»РѕРІ
 	var $url=FALSE;
 	/**
-	 * установка недостающих параметров в URL
+	 * СѓСЃС‚Р°РЅРѕРІРєР° РЅРµРґРѕСЃС‚Р°СЋС‰РёС… РїР°СЂР°РјРµС‚СЂРѕРІ РІ URL
 	 * @param $arr
 	 */
 	function setUrl($arr){
@@ -28,19 +29,20 @@ class sysPar extends plugins {
 		$this->url=array_merge($this->url,$arr);
 	}
 	/**
-	 * выдать адрес, начиная от рута
-	 * @param $arr - адрес от рута
-	 * @param $add - список параметров для импорта из старого урла
+	 * РІС‹РґР°С‚СЊ Р°РґСЂРµСЃ, РЅР°С‡РёРЅР°СЏ РѕС‚ СЂСѓС‚Р°
+	 * @param $arr - Р°РґСЂРµСЃ РѕС‚ СЂСѓС‚Р°
+	 * @param $add - СЃРїРёСЃРѕРє РїР°СЂР°РјРµС‚СЂРѕРІ РґР»СЏ РёРјРїРѕСЂС‚Р° РёР· СЃС‚Р°СЂРѕРіРѕ СѓСЂР»Р°
 	 */
 	function getRoot($addr=''){
 		return toUrl(INDEX_PATH.'/');
 	}
 
 	/**
-     * построить урл? получив параметрами парамеры
-     * @param array url - параметры урла.
+     * РїРѕСЃС‚СЂРѕРёС‚СЊ СѓСЂР»? РїРѕР»СѓС‡РёРІ РїР°СЂР°РјРµС‚СЂР°РјРё РїР°СЂР°РјРµСЂС‹
+     * @param array url - РїР°СЂР°РјРµС‚СЂС‹ СѓСЂР»Р°.
      *
-     * Чистка как для curl'а
+     * Р§РёСЃС‚РєР° РєР°Рє РґР»СЏ curl'Р°
+     * @return array|mixed|null|string
      */
     function url($par){
         static $url;
@@ -82,24 +84,24 @@ class sysPar extends plugins {
     }
 
 	/**
-	 * выдать адрес, начиная от рута
-	 * @param $arr - адрес от рута
-	 * @param $add - список параметров для импорта из старого урла
+	 * РІС‹РґР°С‚СЊ Р°РґСЂРµСЃ, РЅР°С‡РёРЅР°СЏ РѕС‚ СЂСѓС‚Р°
+	 * @param $arr - Р°РґСЂРµСЃ РѕС‚ СЂСѓС‚Р°
+	 * @param $add - СЃРїРёСЃРѕРє РїР°СЂР°РјРµС‚СЂРѕРІ РґР»СЏ РёРјРїРѕСЂС‚Р° РёР· СЃС‚Р°СЂРѕРіРѕ СѓСЂР»Р°
 	 */
 	function getRootUrl($do='',$id=FALSE){
-		// сокращение getUrl('search');
+		// СЃРѕРєСЂР°С‰РµРЅРёРµ getUrl('search');
 		if(empty($do)) $do='menu';
 		$arr=array('do'=>$do);
 		if(!empty($id)) $arr['id']=$id;
-// ЧПУ
+// Р§РџРЈ
 //		$x=array_merge($this->url;
 		
 /**
- * 		делаем новый массив параметров
+ * 		РґРµР»Р°РµРј РЅРѕРІС‹Р№ РјР°СЃСЃРёРІ РїР°СЂР°РјРµС‚СЂРѕРІ
  */		
 		
 /**
- *		сливаем его в один урл
+ *		СЃР»РёРІР°РµРј РµРіРѕ РІ РѕРґРёРЅ СѓСЂР»
  */ 
 		if(empty($this->root))
 			$this->root=preg_replace('/index.jtpl$/i','',$_SERVER['PHP_SELF']);
@@ -127,8 +129,8 @@ class sysPar extends plugins {
 	}//curl('do','id').'do=search');
 
 	/**
-	 * Интеграция с NestedSets
-	 * выдаем список ассоциативных массивов, по имени id'у ветки дерева.
+	 * РРЅС‚РµРіСЂР°С†РёСЏ СЃ NestedSets
+	 * РІС‹РґР°РµРј СЃРїРёСЃРѕРє Р°СЃСЃРѕС†РёР°С‚РёРІРЅС‹С… РјР°СЃСЃРёРІРѕРІ, РїРѕ РёРјРµРЅРё id'Сѓ РІРµС‚РєРё РґРµСЂРµРІР°.
 	 */	
 	//private function
 	function nodeGetInfo($node_id=0) {
@@ -171,7 +173,7 @@ class sysPar extends plugins {
 		if(!isset($row['id'])) return ;
 		$left_key=$row['lid'];
 		$right_key=$row['rid'];
-		//изолировать перемещаемую ветку
+		//РёР·РѕР»РёСЂРѕРІР°С‚СЊ РїРµСЂРµРјРµС‰Р°РµРјСѓСЋ РІРµС‚РєСѓ
 
 		$child_cnt=2*$this->database->query(
 			"DELETE FROM ?_tree WHERE lid >=$left_key AND rid <= $right_key"
@@ -188,7 +190,7 @@ class sysPar extends plugins {
 		}
 	}
 	
-	function nodeMoveUp($node_id) // поставить элемент первее в списке чилдов
+	function nodeMoveUp($node_id) // РїРѕСЃС‚Р°РІРёС‚СЊ СЌР»РµРјРµРЅС‚ РїРµСЂРІРµРµ РІ СЃРїРёСЃРєРµ С‡РёР»РґРѕРІ
 	{
 		$row = $this->nodeGetInfo($node_id);
 		$with = $this->database->selectRow(
@@ -201,7 +203,7 @@ class sysPar extends plugins {
 			return false;
 	}
 
-	function nodeMoveDn($node_id) // поставить элемент первее в списке чилдов
+	function nodeMoveDn($node_id) // РїРѕСЃС‚Р°РІРёС‚СЊ СЌР»РµРјРµРЅС‚ РїРµСЂРІРµРµ РІ СЃРїРёСЃРєРµ С‡РёР»РґРѕРІ
 	{
 		$row = $this->nodeGetInfo($node_id);
 		$with = $this->database->selectRow(
@@ -223,8 +225,8 @@ class sysPar extends plugins {
 			$row=$node_id;
 
 		if (!empty($parent_id)){
-			// пытаемся детектировать ситуацию, когда меняем
-			// местами 2 рядомстоящие позиции
+			// РїС‹С‚Р°РµРјСЃСЏ РґРµС‚РµРєС‚РёСЂРѕРІР°С‚СЊ СЃРёС‚СѓР°С†РёСЋ, РєРѕРіРґР° РјРµРЅСЏРµРј
+			// РјРµСЃС‚Р°РјРё 2 СЂСЏРґРѕРјСЃС‚РѕСЏС‰РёРµ РїРѕР·РёС†РёРё
 			if(!is_array($parent_id))
 				$ins_row = $this->nodeGetInfo($parent_id);
 			else
@@ -244,10 +246,10 @@ class sysPar extends plugins {
 		$level=$row['level'];
 		$left_key=$row['lid'];
 		$right_key=$row['rid'];
-		// изолируемсо
+		// РёР·РѕР»РёСЂСѓРµРјСЃРѕ
 		$child_cnt=$right_key-$left_key+1;
 
-	//чистим
+	//С‡РёСЃС‚РёРј
 		$child_cnt=2*$this->database->query(
 			"update ?_tree set `ignored`=1 where lid >=$left_key AND rid <= $right_key"
 		);
@@ -257,7 +259,7 @@ class sysPar extends plugins {
 			", lid), rid = rid-$child_cnt WHERE rid > $right_key"
 		);
 		if($parent_id<=0){
-			// вставляем как первый элемент родителя
+			// РІСЃС‚Р°РІР»СЏРµРј РєР°Рє РїРµСЂРІС‹Р№ СЌР»РµРјРµРЅС‚ СЂРѕРґРёС‚РµР»СЏ
 			$parent_id=-$parent_id;
 			$ins_row = $this->nodeGetInfo($parent_id);
 			$level_up=$ins_row['level'];
@@ -267,18 +269,18 @@ class sysPar extends plugins {
 			if(!$right_key_near) $right_key_near=$this->db->selectCell('select max(`rid`) from '.$this->tbl_name)+1;
 			$skew_level =$level_up-$level + 1 ;
 			$skew_tree =$right_key-$left_key + 1;
-			// бронируем место
+			// Р±СЂРѕРЅРёСЂСѓРµРј РјРµСЃС‚Рѕ
 			$rid=$ins_row['rid'];
 			$this->database->query(
 				"UPDATE ?_tree SET rid = rid + $child_cnt,  lid = IF(lid > $rid, lid + $child_cnt, lid) WHERE `ignored`=0 and rid >= $rid "
 			);
-		// вставляемсо
+		// РІСЃС‚Р°РІР»СЏРµРјСЃРѕ
 		    $child_cnt=$rid-$row['rid']+1;
 			$this->database->query(
 				"UPDATE ?_tree SET rid = rid + $child_cnt,  lid = lid + $child_cnt, level=level+$skew_level, `ignored`=0 WHERE `ignored`=1;"
 			);
 		} else {
-			// подставляем под элемент
+			// РїРѕРґСЃС‚Р°РІР»СЏРµРј РїРѕРґ СЌР»РµРјРµРЅС‚
 			$ins_row = $this->nodeGetInfo($parent_id);
 			$ins_row['rid']+=1;
 			$level_up=$ins_row['level']-1;
@@ -287,12 +289,12 @@ class sysPar extends plugins {
 			$parent=$ins_row['pid'];
 			$skew_level =$level_up-$level + 1 ;
 			$skew_tree =$right_key-$left_key + 1;
-			// бронируем место
+			// Р±СЂРѕРЅРёСЂСѓРµРј РјРµСЃС‚Рѕ
 			$rid=$ins_row['rid'];
 			$this->database->query(
 				"UPDATE ?_tree SET rid = rid + $child_cnt,  lid = IF(lid >= $rid, lid + $child_cnt, lid) WHERE `ignored`=0 and rid >= $rid "
 			);
-		// вставляемсо
+		// РІСЃС‚Р°РІР»СЏРµРјСЃРѕ
 		    $child_cnt=$ins_row['rid']-$row['lid'];
 			$this->database->query(
 				"UPDATE ?_tree SET rid = rid + $child_cnt,  lid = lid + $child_cnt, level=level+$skew_level, `ignored`=0 WHERE `ignored`=1;"
@@ -307,17 +309,17 @@ class sysPar extends plugins {
 	}
 
 	/**
-	 * Перекрасить массив NS под уровень, парент и начальный индекс
+	 * РџРµСЂРµРєСЂР°СЃРёС‚СЊ РјР°СЃСЃРёРІ NS РїРѕРґ СѓСЂРѕРІРµРЅСЊ, РїР°СЂРµРЅС‚ Рё РЅР°С‡Р°Р»СЊРЅС‹Р№ РёРЅРґРµРєСЃ
 	 *
 	 * @param array $res
-	 * @param int $ptr  - начальный lid
-	 * @param int level - уровень.
+	 * @param int $ptr  - РЅР°С‡Р°Р»СЊРЅС‹Р№ lid
+	 * @param int level - СѓСЂРѕРІРµРЅСЊ.
 	 */
 	
 	function prep_NS_array(&$res,$ptr=0,$level=0){
 		$st=array(0);
 		//debug($res);
-		// переделываем lid-rid, parent, level
+		// РїРµСЂРµРґРµР»С‹РІР°РµРј lid-rid, parent, level
 		$top=0;$lev=$res[0]['level']-1;$cur=0;
 		$id=0;
 		foreach($res as $k=>$v){
@@ -362,7 +364,7 @@ class sysPar extends plugins {
 		}
 	}
 	/**
-	 * Добавить целый массив последним ребенком к parent_id 
+	 * Р”РѕР±Р°РІРёС‚СЊ С†РµР»С‹Р№ РјР°СЃСЃРёРІ РїРѕСЃР»РµРґРЅРёРј СЂРµР±РµРЅРєРѕРј Рє parent_id 
 	 *
 	 * @param unknown_type $parent_id
 	 * @param unknown_type $res
@@ -527,7 +529,7 @@ class sysPar extends plugins {
 	}
 		
 	/**
-	 *  найти и прочитать запись по списку предъявленых параметров
+	 *  РЅР°Р№С‚Рё Рё РїСЂРѕС‡РёС‚Р°С‚СЊ Р·Р°РїРёСЃСЊ РїРѕ СЃРїРёСЃРєСѓ РїСЂРµРґСЉСЏРІР»РµРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 	 * 
 	 */
 	function readRecord($param){
@@ -539,7 +541,7 @@ class sysPar extends plugins {
 			return null;	
 	}	
 	/**
-	 *  найти и прочитать запись по списку предъявленых параметров
+	 *  РЅР°Р№С‚Рё Рё РїСЂРѕС‡РёС‚Р°С‚СЊ Р·Р°РїРёСЃСЊ РїРѕ СЃРїРёСЃРєСѓ РїСЂРµРґСЉСЏРІР»РµРЅС‹С… РїР°СЂР°РјРµС‚СЂРѕРІ
 	 * 
 	 */
 	function delRecord($param){
@@ -552,8 +554,8 @@ class sysPar extends plugins {
 	}
 	
 /**
- * Читать структурированный кэш по имени
- * (name=$name,tval - сериализованый массив, ival- индекс)
+ * Р§РёС‚Р°С‚СЊ СЃС‚СЂСѓРєС‚СѓСЂРёСЂРѕРІР°РЅРЅС‹Р№ РєСЌС€ РїРѕ РёРјРµРЅРё
+ * (name=$name,tval - СЃРµСЂРёР°Р»РёР·РѕРІР°РЅС‹Р№ РјР°СЃСЃРёРІ, ival- РёРЅРґРµРєСЃ)
  *
  * @param unknown_type $name
  */
@@ -572,8 +574,8 @@ class sysPar extends plugins {
 	}
 	
 /**
- * Читать структурированный кэш по имени
- * (name=$name,tval - сериализованый массив, ival- индекс)
+ * Р§РёС‚Р°С‚СЊ СЃС‚СЂСѓРєС‚СѓСЂРёСЂРѕРІР°РЅРЅС‹Р№ РєСЌС€ РїРѕ РёРјРµРЅРё
+ * (name=$name,tval - СЃРµСЂРёР°Р»РёР·РѕРІР°РЅС‹Р№ РјР°СЃСЃРёРІ, ival- РёРЅРґРµРєСЃ)
  *
  * @param unknown_type $name
  */
@@ -595,7 +597,7 @@ class sysPar extends plugins {
 	function readRecords($param,$cnt=6000,$xcnt=10000,$sql=''){
 		if(!is_array($param)) 
 			$param=array('root'=>$param);
-			// формируем первую строку записи record-name
+			// С„РѕСЂРјРёСЂСѓРµРј РїРµСЂРІСѓСЋ СЃС‚СЂРѕРєСѓ Р·Р°РїРёСЃРё record-name
 		if (empty($sql)){
 			//0:id,1:name,2:val, !!! 3:node,4:level,5:childs
 			$sql='SELECT u.id,u.name, if(isNull(u.ival),if(isNull(u.tval),u.sval,u.tval),u.ival) as `value` from '.TAB_PREF.'_flesh as u ';
@@ -672,7 +674,7 @@ class sysPar extends plugins {
 		return 'tval';
 	}
 	/**
-	 * дстрока для вставки в запрос insert (id,  %ival, sval ,tval%)
+	 * РґСЃС‚СЂРѕРєР° РґР»СЏ РІСЃС‚Р°РІРєРё РІ Р·Р°РїСЂРѕСЃ insert (id,  %ival, sval ,tval%)
 	 * @param $val
 	 * @param $name
 	 * @return unknown_type
@@ -686,16 +688,16 @@ class sysPar extends plugins {
 	}
 	
 	/**
-	 *  записать полную запись параметр с категорией
-	 *	в ведущий параметр входят
+	 *  Р·Р°РїРёСЃР°С‚СЊ РїРѕР»РЅСѓСЋ Р·Р°РїРёСЃСЊ РїР°СЂР°РјРµС‚СЂ СЃ РєР°С‚РµРіРѕСЂРёРµР№
+	 *	РІ РІРµРґСѓС‰РёР№ РїР°СЂР°РјРµС‚СЂ РІС…РѕРґСЏС‚
 	 *  - name:category, name- sval
-	 *  все остальные записываются как дополнительные параметры записи
+	 *  РІСЃРµ РѕСЃС‚Р°Р»СЊРЅС‹Рµ Р·Р°РїРёСЃС‹РІР°СЋС‚СЃСЏ РєР°Рє РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ РїР°СЂР°РјРµС‚СЂС‹ Р·Р°РїРёСЃРё
 	 */
 	function writeRecord($param){
-		// вставляем новую запись
+		// РІСЃС‚Р°РІР»СЏРµРј РЅРѕРІСѓСЋ Р·Р°РїРёСЃСЊ
 		unset($param['current'],$param['node'],$param['level'],$param['childs']);
 		if(isset($param['id'])){
-			// читаем запись, затем заменяем избранные куски
+			// С‡РёС‚Р°РµРј Р·Р°РїРёСЃСЊ, Р·Р°С‚РµРј Р·Р°РјРµРЅСЏРµРј РёР·Р±СЂР°РЅРЅС‹Рµ РєСѓСЃРєРё
 			$res=$this->database->select('select * from ?_flesh where `id`=?d',$param['id']);
 			unset($param['id']);
 			if(!empty($res)){
@@ -706,7 +708,7 @@ class sysPar extends plugins {
 					if(isset($param[$name])){
 						if(is_array($param[$name]))
 							$param[$name]=serialize($param[$name]);
-						// параметр есть!
+						// РїР°СЂР°РјРµС‚СЂ РµСЃС‚СЊ!
 						$tname=$this->_name($param[$v['name']],$name);
 						if($v[$tname]!=$param[$name]){
 							// update
@@ -717,12 +719,12 @@ class sysPar extends plugins {
 						}
 						unset($param[$name]);
 					} else {
-						// удаляем отсутствующие
+						// СѓРґР°Р»СЏРµРј РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёРµ
 						$this->database->select('delete from ?_flesh 
 							where `id`=?d and `name`=?;',$id,$name);
 					}
 				};
-			// вставляем оставшиеся.
+			// РІСЃС‚Р°РІР»СЏРµРј РѕСЃС‚Р°РІС€РёРµСЃСЏ.
 				foreach($param as $k=>$v) {
 					if(is_array($v))
 						$v=serialize($v);
@@ -769,7 +771,7 @@ class sysPar extends plugins {
 	   	return $id;
 	}
 /**
- *  функции работы с системными параметрами
+ *  С„СѓРЅРєС†РёРё СЂР°Р±РѕС‚С‹ СЃ СЃРёСЃС‚РµРјРЅС‹РјРё РїР°СЂР°РјРµС‚СЂР°РјРё
  */
 	function read_Parameters(){
 		$this->parameters=$this->readRecord('SysPar');
@@ -811,7 +813,7 @@ class sysPar extends plugins {
 class engine_Main extends sysPar {
 	var $rights, $defcat='*', $is_ajax=false,$ajaxdata=array();
 	/**
-	 * Текущий выводимый раздел
+	 * РўРµРєСѓС‰РёР№ РІС‹РІРѕРґРёРјС‹Р№ СЂР°Р·РґРµР»
 	 *
 	 * @var string||int
 	 */
@@ -826,7 +828,7 @@ class engine_Main extends sysPar {
 	
 /*
  ******************************************************* 
- *  Общий функционал common
+ *  РћР±С‰РёР№ С„СѓРЅРєС†РёРѕРЅР°Р» common
  ******************************************************* 
  */
 	
@@ -847,7 +849,7 @@ class engine_Main extends sysPar {
 	}
 	
 /**
- * Функция - врапер для writeus'а
+ * Р¤СѓРЅРєС†РёСЏ - РІСЂР°РїРµСЂ РґР»СЏ writeus'Р°
  *
  * @return unknown
  */
@@ -858,7 +860,7 @@ class engine_Main extends sysPar {
 		return $this->export('writeus','do_writeus');
 	}
 /**
- * Функция - врапер для qa'а
+ * Р¤СѓРЅРєС†РёСЏ - РІСЂР°РїРµСЂ РґР»СЏ qa'Р°
  *
  * @return unknown
  */
@@ -937,7 +939,7 @@ class engine_Main extends sysPar {
 		return $this->export('sitemap','do_sitemap');
 	}
 /*
- * Враппер для online-регистрации 
+ * Р’СЂР°РїРїРµСЂ РґР»СЏ online-СЂРµРіРёСЃС‚СЂР°С†РёРё 
  */	
 	function do_onlinereg(){
 		if (defined('SECOND_TPL')){
@@ -946,10 +948,10 @@ class engine_Main extends sysPar {
 		return $this->export('users','do_onlinereg');
 	}
 	/**
-	 * Поиск адреса по элементу страницы
+	 * РџРѕРёСЃРє Р°РґСЂРµСЃР° РїРѕ СЌР»РµРјРµРЅС‚Сѓ СЃС‚СЂР°РЅРёС†С‹
 	 */
 	function url_by_item($item){
-		// ищем самый верхний элемент дерева
+		// РёС‰РµРј СЃР°РјС‹Р№ РІРµСЂС…РЅРёР№ СЌР»РµРјРµРЅС‚ РґРµСЂРµРІР°
 		if(is_array($item)){
 			$sql='SELECT y.id,y.page '.
 				'FROM ?_tree as x, ?_tree AS y '.
@@ -963,14 +965,14 @@ class engine_Main extends sysPar {
 		}
 		$curlid=$this->database->select($sql,$item);
 		if(empty($curlid)) return '';
-		// у нас есть адрес do=page&id="?d";
+		// Сѓ РЅР°СЃ РµСЃС‚СЊ Р°РґСЂРµСЃ do=page&id="?d";
 		$cresult=array();
 		for($i=0;$i<count($curlid);$i++){
 			
 			$res=$this->readRecord(array('page'=>$curlid[$i]['id']));
 			if(isset($res['id'])){
 				/**
-				 * вычисляем полный путь меню.
+				 * РІС‹С‡РёСЃР»СЏРµРј РїРѕР»РЅС‹Р№ РїСѓС‚СЊ РјРµРЅСЋ.
 				 */
 				$back=$this->nodeGetBackPath($this->node($res));
 				//debug($back);
@@ -1014,7 +1016,7 @@ function flash2($par='',$par2='',$par3=''){
 }
 	
 	/**
-	 * Вывод флэшки на страницу из шаблона
+	 * Р’С‹РІРѕРґ С„Р»СЌС€РєРё РЅР° СЃС‚СЂР°РЅРёС†Сѓ РёР· С€Р°Р±Р»РѕРЅР°
 	 */
 	function flash($n,$wh=''){
 //		echo $n, $w,$h;
@@ -1027,11 +1029,11 @@ function flash2($par='',$par2='',$par3=''){
 	
 /*
  *******************************************************
- *  Общий функционал e-shop
+ *  РћР±С‰РёР№ С„СѓРЅРєС†РёРѕРЅР°Р» e-shop
  ******************************************************* 
  */
 	/**
-	 * Основная функция вывода контента
+	 * РћСЃРЅРѕРІРЅР°СЏ С„СѓРЅРєС†РёСЏ РІС‹РІРѕРґР° РєРѕРЅС‚РµРЅС‚Р°
 	 *
 	 * @return unknown
 	 */
@@ -1043,7 +1045,7 @@ function flash2($par='',$par2='',$par3=''){
         //debug($rsd);
 		$this->parent->cur_menu=$rsd;
 		$sm=$this->parent->export('sitemap','getSiteMap',$rsd);
-		// запомним в параметрах 0-й элемент меню.
+		// Р·Р°РїРѕРјРЅРёРј РІ РїР°СЂР°РјРµС‚СЂР°С… 0-Р№ СЌР»РµРјРµРЅС‚ РјРµРЅСЋ.
 	 	if($sm->el[0]->v['id']!=$rsd)
 	 		$this->parent->setPar('first_menu',$sm->el[0]->v['id']);
 	 	$element=$sm->scan($rsd);
@@ -1074,10 +1076,10 @@ function flash2($par='',$par2='',$par3=''){
 			if(!empty($tit)) $this->parent->par['title']=$tit;
 		 	}
 	 	}
-      // Отказ в просмотре для незарегистрированных пользователей.
+      // РћС‚РєР°Р· РІ РїСЂРѕСЃРјРѕС‚СЂРµ РґР»СЏ РЅРµР·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹С… РїРѕР»СЊР·РѕРІР°С‚РµР»РµР№.
       if(!$this->user['right']['*'] && isSet($keys['dostup_'.$article->v['id']]) && $keys['dostup_'.$article->v['id']]) {
 			return "<div style=\"padding-top:60px;\" class='red'>
-			<p><b>Эту страницу могут просматривать только зарегистрированные пользователи!</b></p>
+			<p><b>Р­С‚Сѓ СЃС‚СЂР°РЅРёС†Сѓ РјРѕРіСѓС‚ РїСЂРѕСЃРјР°С‚СЂРёРІР°С‚СЊ С‚РѕР»СЊРєРѕ Р·Р°СЂРµРіРёСЃС‚СЂРёСЂРѕРІР°РЅРЅС‹Рµ РїРѕР»СЊР·РѕРІР°С‚РµР»Рё!</b></p>
 			</div>";
 		}
 	 	if(!empty($element->v['url'])){
@@ -1087,7 +1089,7 @@ function flash2($par='',$par2='',$par3=''){
 			} 
 			// 
 	 	}
-	 	// поднимаемся вверх по дереву меню и вызываем первый param_url
+	 	// РїРѕРґРЅРёРјР°РµРјСЃСЏ РІРІРµСЂС… РїРѕ РґРµСЂРµРІСѓ РјРµРЅСЋ Рё РІС‹Р·С‹РІР°РµРј РїРµСЂРІС‹Р№ param_url
 	 	$cur=&$element;
 		while(!empty($cur)) {
 			//debug($cur);
@@ -1112,7 +1114,7 @@ function flash2($par='',$par2='',$par3=''){
 			return '';
 	}
 	/**
-	 * Основная функция вывода контента
+	 * РћСЃРЅРѕРІРЅР°СЏ С„СѓРЅРєС†РёСЏ РІС‹РІРѕРґР° РєРѕРЅС‚РµРЅС‚Р°
 	 *
 	 * @return unknown
 	 */
@@ -1120,13 +1122,13 @@ function flash2($par='',$par2='',$par3=''){
       if (defined('SECOND_TPL')){
 			$this->tpl=SECOND_TPL;
 		}
-		// ищем менюшный вход
+		// РёС‰РµРј РјРµРЅСЋС€РЅС‹Р№ РІС…РѕРґ
 		if(!$id)
 			$up_items=$this->parent->nodeGetBackPath($this->parent->node(pps($_GET['id'])));
 		else
 			$up_items=$this->parent->nodeGetBackPath($this->parent->node(pps($id)));
-		$item=array_pop($up_items); // мы!
-		if(count($up_items)) // top - верхний артикл
+		$item=array_pop($up_items); // РјС‹!
+		if(count($up_items)) // top - РІРµСЂС…РЅРёР№ Р°СЂС‚РёРєР»
 			$top=array_shift($up_items);
 		else	
 			$top=$item;
@@ -1148,7 +1150,7 @@ function flash2($par='',$par2='',$par3=''){
 		foreach($up_items as $v){
 			if(ppi($v['type'])==type_ARTICLE){
 				$sm->menu_push(
-					array('id'=>$v['id'],'menupage'=>'page','name' => pps($v['item_text'],'доп. страница'))
+					array('id'=>$v['id'],'menupage'=>'page','name' => pps($v['item_text'],'РґРѕРї. СЃС‚СЂР°РЅРёС†Р°'))
 				);
 			}	
 		}
@@ -1180,8 +1182,8 @@ function flash2($par='',$par2='',$par3=''){
 			return '';
 	}
 	/**
-	 * Вывод страницы подробного описания для каталог
-	 * Добавляется ссылка обратно в каталог
+	 * Р’С‹РІРѕРґ СЃС‚СЂР°РЅРёС†С‹ РїРѕРґСЂРѕР±РЅРѕРіРѕ РѕРїРёСЃР°РЅРёСЏ РґР»СЏ РєР°С‚Р°Р»РѕРі
+	 * Р”РѕР±Р°РІР»СЏРµС‚СЃСЏ СЃСЃС‹Р»РєР° РѕР±СЂР°С‚РЅРѕ РІ РєР°С‚Р°Р»РѕРі
 	 */	
 	function do_catalog() {
 		$return = $this->do_page();
@@ -1201,7 +1203,7 @@ function flash2($par='',$par2='',$par3=''){
 	}
 	
 	/**
-	 * Выход пользователя из системы
+	 * Р’С‹С…РѕРґ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РёР· СЃРёСЃС‚РµРјС‹
 	 */
 	function do_logout(){
 		global $cache;
@@ -1211,13 +1213,13 @@ function flash2($par='',$par2='',$par3=''){
         $this->go($this->curl('do'));
 	}
 	/**
-	 * Выход пользователя из системы
+	 * Р’С‹С…РѕРґ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ РёР· СЃРёСЃС‚РµРјС‹
 	 */
 	function do_profile(){
 		return $this->export('users','do_profile');
 	}
 	/**
-	 * Создание страницы описания для каталога
+	 * РЎРѕР·РґР°РЅРёРµ СЃС‚СЂР°РЅРёС†С‹ РѕРїРёСЃР°РЅРёСЏ РґР»СЏ РєР°С‚Р°Р»РѕРіР°
 	 */
 	function do_ajax_cat_opisanie(){
 		$sql = 'SELECT the_href, xarticle FROM ?_katalog WHERE id = '.$_POST['id'];
@@ -1231,7 +1233,7 @@ function flash2($par='',$par2='',$par3=''){
 	}
 	
 	/*
-	 * Поиск по всем 
+	 * РџРѕРёСЃРє РїРѕ РІСЃРµРј 
 	 */
 	function search($s){
 		$s=strtolower($s);
@@ -1265,7 +1267,7 @@ LIMIT 100;';
 		return $result;
 	}
 	/**
-	 * Функция добавления товара в корзинку
+	 * Р¤СѓРЅРєС†РёСЏ РґРѕР±Р°РІР»РµРЅРёСЏ С‚РѕРІР°СЂР° РІ РєРѕСЂР·РёРЅРєСѓ
 	 */
 	function do_add(){
 		$this->sessionstart();
@@ -1274,7 +1276,7 @@ LIMIT 100;';
 		if($this->is_ajax){
 			$this->parent->ajaxdata['basket']=$this->export('basket','_basket');
 			return 'Ok';		
-		} else { // Это не ajax
+		} else { // Р­С‚Рѕ РЅРµ ajax
 			$this->go();
 		}
 	}
@@ -1315,7 +1317,12 @@ LIMIT 100;';
 			exit ;
         if($this->is_ajax){
 			$this->tpl=array(ELEMENTS_TPL,'ajax');
-			$result=array('data'=>trim($this->template(array(),false)));
+            if(is_array($this->par['data']))
+                $result=pps($this->par['data']['result']).pps($this->par['data']['tval']);
+            else
+                $result=pps($this->par['data']);
+			$result=array('data'=>$result);
+
 			if(!empty($this->ajaxdata))
 				$result['result']=$this->ajaxdata;
 			if($this->par['error'])
@@ -1323,6 +1330,7 @@ LIMIT 100;';
 			if($x=ob_get_contents()){
 				$result['debug']=trim($x);
 			};
+            $result['debug'].=trim(SUPER::$debug);
 			ob_end_clean();
 			if(session_id() != ""){
 				$result['session']=array('name'=>session_name(),'value'=>session_id());
@@ -1474,13 +1482,13 @@ LIMIT 100;';
 	}
 
 /**
- *   функция перехода к стартовой странице.
+ *   С„СѓРЅРєС†РёСЏ РїРµСЂРµС…РѕРґР° Рє СЃС‚Р°СЂС‚РѕРІРѕР№ СЃС‚СЂР°РЅРёС†Рµ.
  */
 	function go($where='',$direct='') {
 		global $cache;
 		if(!empty($cache)){
 			if ($_SERVER['REQUEST_METHOD']!='GET'){
-		// сбрасываем весь кеш своей группы
+		// СЃР±СЂР°СЃС‹РІР°РµРј РІРµСЃСЊ РєРµС€ СЃРІРѕРµР№ РіСЂСѓРїРїС‹
 				$cache->cleanForGroup();
 			} 
 			$cache->setOptions(array('is_enabled'=>false));
@@ -1530,7 +1538,7 @@ LIMIT 100;';
 	 	//debug($name);
 	 	$xx=1;
 		if(!empty($sm->el))
-		foreach($sm->el as $v){ // без первого элемента!!!
+		foreach($sm->el as $v){ // Р±РµР· РїРµСЂРІРѕРіРѕ СЌР»РµРјРµРЅС‚Р°!!!
 			if(ppi($v->v['type'])<=$type){
 				$text=pps($v->v['descr'],$v->v['name']);
 		 		$x=array(
@@ -1544,10 +1552,10 @@ LIMIT 100;';
 		 		if(((($xx)%$cnt)==0) && ($xx<count($sm->el))) $x['break']=true;
 		 		if((($xx++)%$cnt)==1) $x['first']=true;
 		 		$x['_has_submenu']=true;
-		 		// вот тут - только для текущего раздела!!!
+		 		// РІРѕС‚ С‚СѓС‚ - С‚РѕР»СЊРєРѕ РґР»СЏ С‚РµРєСѓС‰РµРіРѕ СЂР°Р·РґРµР»Р°!!!
 				if(!empty($v->el) && $v->v['current']){
 					$x['submenu']=array();
-					foreach($v->el as $vv){ // без первого элемента!!!
+					foreach($v->el as $vv){ // Р±РµР· РїРµСЂРІРѕРіРѕ СЌР»РµРјРµРЅС‚Р°!!!
 						if(ppi($vv->v['type'])<=$type){
 					 		$xxx=array(
 					 			'current'=>pps($vv->v['current'])
@@ -1613,7 +1621,7 @@ LIMIT 100;';
 	}
 
 /**
- * генерировать строку страниц
+ * РіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ СЃС‚СЂРѕРєСѓ СЃС‚СЂР°РЅРёС†
  */
 	function calc_Pages($all_cnt,$perpage,$page,$by=4){
 
@@ -1651,7 +1659,7 @@ LIMIT 100;';
 		//debug($x);
 		$even=0;
 		foreach($x as $k=>$v){
-			if(is_int($k) && is_string($v)) // типо индекс
+			if(is_int($k) && is_string($v)) // С‚РёРїРѕ РёРЅРґРµРєСЃ
 			{
 				$k='';$v=array($v,'text');
 			} 
@@ -1719,7 +1727,7 @@ LIMIT 100;';
 		$hidden=array();
 		if(is_array($fields)){
 			foreach($fields as $k=>$v){
-				if(is_numeric($k) && is_string($v)) // типо индекс
+				if(is_numeric($k) && is_string($v)) // С‚РёРїРѕ РёРЅРґРµРєСЃ
 				{
                     $k='';$v=array($v,'text');
 				} 
@@ -1808,7 +1816,7 @@ LIMIT 100;';
         $form->scanHtml($this->_tpl('tpl_jelements','_callback',$res));
 		if($form->handle()){
 
-		// проверка обязательных полей		
+		// РїСЂРѕРІРµСЂРєР° РѕР±СЏР·Р°С‚РµР»СЊРЅС‹С… РїРѕР»РµР№		
 			$error=false;
 			$encoding=false;
             //debug($fields);
@@ -1825,10 +1833,10 @@ LIMIT 100;';
                     case 'email':
                         if(isset($v['require']) && empty($form->var[$v[0]])){
                             $error=true;
-						    $this->error('поле "'.$k.'" не заполнено<br>');
+						    $this->error('РїРѕР»Рµ "'.$k.'" РЅРµ Р·Р°РїРѕР»РЅРµРЅРѕ<br>');
                         } elseif(!filter_var($form->var[$v[0]], FILTER_VALIDATE_EMAIL)){
                             $error=true;
-                            $this->error('поле "'.$k.'" не является email адресом<br>');
+                            $this->error('РїРѕР»Рµ "'.$k.'" РЅРµ СЏРІР»СЏРµС‚СЃСЏ email Р°РґСЂРµСЃРѕРј<br>');
                         };
                         break;
 
@@ -1842,18 +1850,18 @@ LIMIT 100;';
                             };
                         }
                     }
-                } else	if(!is_int($k) && isset($v['require'])) // типо индекс
+                } else	if(!is_int($k) && isset($v['require'])) // С‚РёРїРѕ РёРЅРґРµРєСЃ
 				{
 					if(empty($form->var[$v[0]])){
 						$error=true;
-						$this->error('поле "'.$k.'" не заполнено<br>');
+						$this->error('РїРѕР»Рµ "'.$k.'" РЅРµ Р·Р°РїРѕР»РЅРµРЅРѕ<br>');
 					}
 				}
 			}
 			if (isset($_SESSION["captcha"])){
 				if(!$_SESSION['human_user'] && ($_SESSION["captcha"]!==$form->var["captcha"])) {
 					$error=true;
-					$this->error('Неверно введен номер');
+					$this->error('РќРµРІРµСЂРЅРѕ РІРІРµРґРµРЅ РЅРѕРјРµСЂ');
 			   		$form->storevalues();
 				} else {
 					unset($_SESSION['captcha']);
@@ -1871,7 +1879,7 @@ LIMIT 100;';
 				}
 				if($changed)
 					$this->writeRecord($this->user);
-				// сохранить юзера
+				// СЃРѕС…СЂР°РЅРёС‚СЊ СЋР·РµСЂР°
 			} 
 			if($error)	
 				$this->go($this->curl());
@@ -1907,8 +1915,8 @@ LIMIT 100;';
 	
 }
 /**
- * ob-конвертация адресов в валидный вид
- * потенциальный рассадник ЧПУ
+ * ob-РєРѕРЅРІРµСЂС‚Р°С†РёСЏ Р°РґСЂРµСЃРѕРІ РІ РІР°Р»РёРґРЅС‹Р№ РІРёРґ
+ * РїРѕС‚РµРЅС†РёР°Р»СЊРЅС‹Р№ СЂР°СЃСЃР°РґРЅРёРє Р§РџРЈ
  *
  */
 
@@ -1953,10 +1961,10 @@ function convert_href($s){
 				,array(prop::sema(-(SUPER::$engine->req_cnt>>1),$ar[0])
 				,mkt()));
     }
-	// решение о сбросе кэша
+	// СЂРµС€РµРЅРёРµ Рѕ СЃР±СЂРѕСЃРµ РєСЌС€Р°
 	if(!empty($cache)){
 		if( $_SERVER['REQUEST_METHOD']!='GET'){
-			// сбрасываем весь кеш своей группы
+			// СЃР±СЂР°СЃС‹РІР°РµРј РІРµСЃСЊ РєРµС€ СЃРІРѕРµР№ РіСЂСѓРїРїС‹
 			$cache->cleanForGroup();  
 		} else {			
 			$cache->write($x);
@@ -1966,13 +1974,13 @@ function convert_href($s){
 }
 
 /**
- * Поехали работать
+ * РџРѕРµС…Р°Р»Рё СЂР°Р±РѕС‚Р°С‚СЊ
  */
 function DO_IT_ALL(){
 /**
- * ЧПУ для сайта
+ * Р§РџРЈ РґР»СЏ СЃР°Р№С‚Р°
  */
-//авторасшифровка
+//Р°РІС‚РѕСЂР°СЃС€РёС„СЂРѕРІРєР°
 if (isset($_GET['phpinfo'])){
 	phpinfo(); exit;
 }
@@ -2028,7 +2036,7 @@ if(!defined('INTERNAL')&& empty($_GET['noconvert'])){
 error_reporting(E_ALL ||E_STRICT);
 if(isset($_GET['debug'])) {
     if($_GET['debug'] && !isset($_COOKIE['debug'])){
-        setcookie('debug',$_GET['debug'],time()+10*60);
+        setcookie('debug',$_GET['debug'],time()+100*60);
     } else {
         setcookie ("debug", "", time() - 3600);
     }
@@ -2037,19 +2045,25 @@ if(isset($_GET['debug'])) {
 SUPER::$engine->debug=pps($_GET['debug'])|| pps($_COOKIE['debug']);
 
 if(SUPER::$engine->debug){
+    setcookie('debug','1',time()+100*60);
 	function backtrace(){
 		$x=debug_backtrace();
-		$z=array();
+        //print_r($x);
+		$z='';
 		$y=array_shift($x);
 //		$y=array_shift($x);
 		if($x[1]['function']=='myLogger'){
 			while (isset($x[0]) && $y['function']!='_query')
 				$y=array_shift($x);
-		}
+		} else if(preg_match('/^debug/i',$x[1]['function'])){
+            do{
+                $y=array_shift($x);
+            } while(isset($x[1]) && preg_match('/^debug/i',$x[1]['function']));
+        }
 		
 		//for($i=0;$i<3;$i++){
-			$y=array_shift($x);
-			$z=sprintf('file:%s,line:%s,func:%s',$y['file'],$y['line'],$y['function']);
+			$y=array_shift($x);//if(empty($y)) break;
+			$z.='>>'.sprintf('file:%s,line:%s,func:%s',$y['file'],$y['line'],$y['function']);
 		//}
 		return $z;
 	}		
@@ -2058,9 +2072,9 @@ if(SUPER::$engine->debug){
         function debug()
         {
             foreach(func_get_args() as $msg){
-                SUPER::$engine->ajaxdata['debug'].=is_string($msg)?$msg:print_r($msg,true)."<br>\n\r";
+                SUPER::$debug.=is_string($msg)?$msg:print_r($msg,true)."<br>\n\r";
             }
-            SUPER::$engine->ajaxdata['debug'].='>>>>>'.backtrace()."<br>\n\r";
+            SUPER::$debug.='>>>>>'.backtrace()."<br>\n\r";
         }
     } else {
         $d='Debug/HackerConsole/Main.php';
@@ -2092,7 +2106,7 @@ if(SUPER::$engine->getPar('UPLOAD_DIR')!=TMP_DIR)
 	SUPER::$engine->setPar('UPLOAD_DIR',TMP_DIR);
 
 SUPER::$engine->execute('init',pps($_GET['do']));
-// если можно стартовать сессию - стартуем
+// РµСЃР»Рё РјРѕР¶РЅРѕ СЃС‚Р°СЂС‚РѕРІР°С‚СЊ СЃРµСЃСЃРёСЋ - СЃС‚Р°СЂС‚СѓРµРј
 if(isset($_POST['login_name']) && isset($_POST['login_pass']) ){
 	SUPER::$engine->sessionstart();
 	if(SUPER::$engine->export('Auth','auth_check'
@@ -2123,7 +2137,7 @@ if(SUPER::$engine->has_rights(right_READ)){
 	SUPER::$engine->par['userhello2']= SUPER::_l(mess_your_name,SUPER::$engine->user['name']);
 }
 
-// продолжение инициализации
+// РїСЂРѕРґРѕР»Р¶РµРЅРёРµ РёРЅРёС†РёР°Р»РёР·Р°С†РёРё
 //debug($engine->rights);
 //if($engine->has_rights(right_READ)){
 	SUPER::$engine->menu['basket']=array('basket','_basket');
@@ -2131,9 +2145,9 @@ if(SUPER::$engine->has_rights(right_READ)){
 SUPER::$engine->par['user']=&SUPER::$engine->user;
 SUPER::$engine->execute('init2',pps($_GET['do']));
 if(!defined('INTERNAL')){
-    // отсюда не возвращаются праведные запросы
+    // РѕС‚СЃСЋРґР° РЅРµ РІРѕР·РІСЂР°С‰Р°СЋС‚СЃСЏ РїСЂР°РІРµРґРЅС‹Рµ Р·Р°РїСЂРѕСЃС‹
 	SUPER::$engine->act(pps($_GET['do']),pps($_GET['plugin']));
-	// а сюда отправляем остальной мусор
+	// Р° СЃСЋРґР° РѕС‚РїСЂР°РІР»СЏРµРј РѕСЃС‚Р°Р»СЊРЅРѕР№ РјСѓСЃРѕСЂ
 	
 	//$engine->go();
 }

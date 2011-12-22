@@ -34,6 +34,11 @@ class plugins extends SUPER
      * @var SysPar
      */
     var $parent;
+    /**
+     * ссылка на базу данных
+     * @var DbSimple_Generic_Database
+     */
+    var $database;
     var $par = array('error' => ''),
     $tpl = MAIN_TPL,
     $exports = array(),
@@ -59,7 +64,7 @@ class plugins extends SUPER
      * список измененных хандлеров опций
      */
     function __destruct() {
-        $changed_handlers=array();
+        //$changed_handlers=array();
     }
 
     function __construct($args=null)
