@@ -1,6 +1,9 @@
 <?php
 /**
  * плагин интеграции с jQuery.UI
+ * confirm:
+ * {txt - заголовок  окна
+ * yes - callback на нажатие кнопки Да
  */
 
 //<% define('WIN_CONFIRM_COMPLETE',1);point_start('html_header') ;%>
