@@ -28,10 +28,20 @@ for ($i=1;$i<$argc;$i++)
 
 while(!empty($arg)){
     //$preprocessor->debug($arg);
-    if(preg_match('/^\/force\s/',$arg,$m)){
-	    $preprocessor->cfg_time(time());
+    if(preg_match('#^/force(?:\s|\=\'([^\']+)\')#',$arg,$m)){
+        $time=false;
+        if(!empty($m[1])){
+            $time=strtotime($m[1]);
+            if(!$time){
+                $preprocessor->debug('wrong date "'.$m[1].'"');
+            }
+        }
+        if(!$time){
+            $time=time();
+        }
+	    $preprocessor->cfg_time($time);
         $arg=trim(substr($arg,strlen($m[0])));
-    } elseif(preg_match('/^\s*\/P\=(\S+)/',$arg,$m)){
+    } elseif(preg_match('/^\s*\/P\=?(\S+)/',$arg,$m)){
         if(is_readable($m[1])){
             foreach(file($m[1]) as $v){
                 if(preg_match('/^(?:\;.*|\#.*|([^=]+)=(.*))$/',$v,$mm)){
@@ -85,4 +95,5 @@ XML;
 	}
 }
 $preprocessor->process();
+
 ?>

@@ -36,7 +36,7 @@ $Id: '.$version.'
             <![CDATA[<%=point('cookbook','wiki-txt');%>]]>
         </echo>
         
-		<file depend='*.*'>*.php</file>
+		<file >*.php</file>
 	</files>
 
 </config>

@@ -22,11 +22,12 @@ svn_url=$WCURL$
 	-->
 	<target name="init" depends="property">
         <property file="../env.prop"/>
+        <property file="svn.prop"/>
         <property name="target" value="release"/>
         <property name="dst" value="build"/>
         <property name="config" value="config.xml"/>
         <exec
-            command="${php_exe} -q ../preprocessor/build/preprocessor.php /P=svn.prop /force /Dtarget=${target} /Ddst=${dst} ${config}"
+            command="${php_exe} -q ../preprocessor/build/preprocessor.php /Psvn.prop /force='${svn_modified}' /Dtarget=${target} /Ddst=${dst} ${config}"
             checkreturn="true"
             logoutput="true"/>
 
@@ -37,5 +38,23 @@ svn_url=$WCURL$
 			</fileset>
 		</zip>-->
 	</target>
+    <target name="prebuild" depends="property">
+           <property file="../env.prop"/>
+           <property file="svn.prop"/>
+           <property name="target" value="release"/>
+           <property name="dst" value="build"/>
+           <property name="config" value="config.xml"/>
+           <exec
+               command="${php_exe} -q ../preprocessor/preprocessor.php /Psvn.prop /force='${svn_modified}' /Dtarget=${target} /Ddst=${dst} ${config}"
+               checkreturn="true"
+               logoutput="true"/>
+
+               <delete file="svn.prop"/>
+   <!--		<zip duplicate="preserve" destfile="./preprocessor.zip">
+   			<fileset dir="build">
+   				<include name="**/*.*"/>
+   			</fileset>
+   		</zip>-->
+   	</target>
 
 </project>
