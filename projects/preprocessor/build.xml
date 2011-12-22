@@ -4,7 +4,7 @@
     <target name="property">
         <echo file="svn.prop" append="false"><![CDATA[
 version=PHP Preprocessor, written by Ksnk (sergekoriakin@gmail.com). Ver : 1.1
-license=License GNU/LGPL - Serge Koriakin - Jule 2010
+license=License GNU/LGPL - Serge Koriakin - Jule 2010-2012
 svn_revision=$WCREV$
 svn_modified=$WCDATE$
 svn_url=$WCURL$
