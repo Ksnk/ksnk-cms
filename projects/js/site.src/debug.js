@@ -1,7 +1,12 @@
 /**
  * debug function
+ * <% if($target!='debug') echo '
+window.debug=function(){};
+';
+ else { %>
  */
-if (console && console.debug){
+
+if (window.console && window.console.debug){
     window.debug=function(){
 	  for (var i = 0; i < debug.arguments.length; i++){
 	    var text='x3';
@@ -25,4 +30,4 @@ if (console && console.debug){
 	  $('<hr>').appendTo('#debug');
     };
 }
-
+//<% } %>

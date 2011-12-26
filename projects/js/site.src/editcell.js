@@ -46,25 +46,31 @@ jQuery.fn.carret=function(pos){
 
 $.fn.editcell=function(o){
     var options={
-        selector:'.editable', //
+        selector: '.editable', //
+        textarea:{
+            width: '100%',
+            height: '100%',
+            'font-size': '10pt',
+            outline: 0,
+            border: '1px #CCCCCC dotted',
+            resize: 'none',
+            margin:0,
+            overflow: 'hidden'
+        },
+        css:{
+            position: 'absolute',border:0
+        },
+        get_text:function(){return $(this).text()},
         empty:''
-    };
+     };
     if(!o) o={};
     else if (typeof(o)=='string')
         o={action:o};
     $.extend(options,o);
     if(!$(document).data('editcell-editor')){
-        $(document).data('editcell-editor',$('<div/>').append($('<textarea ></textarea>')
-                .css({
-                    width:'100%',
-                    height:'100%',
-                    'font-size':'10pt',
-                    outline: '0',
-                    border: '1px #CCCCCC dotted',
-                    resize:'none',
-                    overflow: 'hidden'
-                }))
-            .css({position:'absolute',border:0})
+        $(document).data('editcell-editor',$('<div/>').append(
+                $('<textarea></textarea>').css(options.textarea)
+            ).css(options.css)
             .appendTo(document.body));
     }
     options._editor=$(document).data('editcell-editor');
@@ -80,37 +86,42 @@ $.fn.editcell=function(o){
         cell_editor.internalScroll=false;
 
         /** @var jQuery $self */
-        $self=$(t);
+        var $self=$(t);
         //if(!$self.is(':visible'))t.scrollIntoView(true);
         // scroll into view
         var position,rect,$parent,prect,ppos;
-        for (var c=0;c<2;c++){
-            position=$self.position();
-            rect={
+        for (var c=0;c<2;c++) {
+            position = $self.position();
+            rect = {
                 height:$self.innerHeight(),
                 width:$self.innerWidth(),
-                top:position.top,
-                left:position.left
+                top:position.top - 1, //+parseInt($self.css('padding-top')),
+                left:position.left + parseInt($self.css('padding-left'))
             };
-            $parent=$(options.parent),ppos=$parent.position();
-            prect={
+            var tt = 1 + (($self.outerHeight() - $self.innerHeight()) >> 1);
+            rect.top -= tt;
+            tt = 1 + (($self.outerWidth() - $self.innerWidth()) >> 1);
+            rect.left -= tt;
+            $parent = $(options.parent);
+            ppos = $parent.position();
+            prect = {
                 height:$parent.innerHeight(),
                 width:$parent.innerWidth(),
                 top:ppos.top,
                 left:ppos.left
             };
-            var pst=$parent.scrollTop();
-            if (rect.top<prect.top+24 && pst>0) {
+            var pst = $parent.scrollTop();
+            if (rect.top < prect.top + 24 && pst > 0) {
                 // scroll down
-                cell_editor.internalScroll=true;
+                cell_editor.internalScroll = true;
                 $parent.scrollTop(
-                    pst+(rect.top-prect.top-24)
+                    pst + (rect.top - prect.top - 24)
                 );
-            } else if (rect.top+rect.height>prect.top+prect.height) {
+            } else if (rect.top + rect.height > prect.top + prect.height) {
                 // scroll up
-                cell_editor.internalScroll=true;
+                cell_editor.internalScroll = true;
                 $parent.scrollTop(
-                    pst+(rect.top+rect.height-prect.top-prect.height)
+                    pst + (rect.top + rect.height - prect.top - prect.height)
                 );
             } else {
                 break;
@@ -120,10 +131,10 @@ $.fn.editcell=function(o){
         options._editor.css(rect).show();
         $(t).parents().bind('scroll',scroll);
 
-        var txt=$self.text();
+        var txt=options.get_text.call(t);
         $('textarea',options._editor)
             .css({
-                'padding-left':$self.css('padding-left'),
+                'padding':'0 0 0 '+$self.css('padding-left'),
                 'font-size':$self.css('font-size'),
                 'font-style':$self.css('font-style'),
                 'font-family':$self.css('font-family')
@@ -137,8 +148,16 @@ $.fn.editcell=function(o){
 
             $('textarea',options._editor)
                 .blur(cell_editor.hide)
+                .keyup(function(){
+                   // console.log(this.scrollTop,this.scrollWidth,$(this).width());
+
+                    if(this.scrollTop>0 || this.scrollWidth>$(this).width()+10){
+                        $(options._editor).css('width',this.scrollWidth+10);
+                        this.scrollTop(0);
+                    }
+                })
                 .keydown(function(event){
-                    var $this=$(this),$x;
+                    var $this=$(this),$x,$y;
                     if (event.keyCode == '13') {//enter
                         event.preventDefault();
                         cell_editor.hide();
@@ -161,8 +180,8 @@ $.fn.editcell=function(o){
                     else if (event.keyCode == '38') {// up key
                         if($this.carret(0)){
                             // do_move upper cell
-                            $x=$self.prev(options.selector),
-                                $y=$self.parent('tr').prev().find(options.selector);
+                            $x=$self.prev(options.selector);
+                            $y=$self.parent('tr').prev().find(options.selector);
                             if($y.length) {
                                 cell_editor.hide();
                                 cell_editor($y[$x.length||0]);
@@ -186,8 +205,8 @@ $.fn.editcell=function(o){
                     else if (event.keyCode == '40') {// down
                         if($this.carret($this.val().length)){
                             // do_move downer cell
-                            $x=$self.prev(options.selector),
-                                $y=$self.parent('tr').next().find(options.selector);
+                            $x=$self.prev(options.selector);
+                            $y=$self.parent('tr').next().find(options.selector);
                             if($y.length) {
                                 cell_editor.hide();
                                 cell_editor($y[$x.length||0]);
