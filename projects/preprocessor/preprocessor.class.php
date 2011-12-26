@@ -2,7 +2,13 @@
 /**
  * main preprocessor class + xml reader-parcer
  *
- * <%=point('hat','comment');%>
+ * <%=point('hat','comment');
+
+
+
+
+
+ %>
  */
 $stderr = fopen('php://stderr', 'w');
 /** 
@@ -234,10 +240,13 @@ class preprocessor{
                     }
                     if(!empty($file['depend'])){
                         $xtime=strtotime($file['depend']);
-                        if(!$xtime || $xtime<0){
+                        if ( !$xtime || $xtime<0 ) {
+                            $filelist=explode(';',$file['depend']);
                             $xtime=0;
-                            foreach(glob($file['depend']) as $a){
-                                $xtime=max($xtime,filemtime($a));
+                            foreach($filelist as $filepath) {
+                                foreach(glob($filepath) as $a){
+                                    $xtime=max($xtime,filemtime($a));
+                                }
                             }
                         }
                         $attributes['xtime']=$xtime;

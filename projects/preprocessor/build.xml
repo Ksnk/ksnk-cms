@@ -49,7 +49,7 @@ svn_url=$WCURL$
                checkreturn="true"
                logoutput="true"/>
 
-               <delete file="svn.prop"/>
+           <delete file="svn.prop"/>
    <!--		<zip duplicate="preserve" destfile="./preprocessor.zip">
    			<fileset dir="build">
    				<include name="**/*.*"/>
