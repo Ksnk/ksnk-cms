@@ -1316,7 +1316,8 @@ LIMIT 100;';
 		else
 			exit ;
         if($this->is_ajax){
-			$this->tpl=array(ELEMENTS_TPL,'ajax');
+            header('Content-type: application/json; charset=UTF-8');
+            $this->tpl=array(ELEMENTS_TPL,'ajax');
             if(is_array($this->par['data']))
                 $result=pps($this->par['data']['result']).pps($this->par['data']['tval']);
             else
