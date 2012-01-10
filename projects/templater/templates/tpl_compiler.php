@@ -3,7 +3,7 @@
  * this file is created automatically at "01 Dec 2010 17:30". Never change anything, 
  * for your changes can be lost at any time.  
  */
-include_once TEMPLATE_PATH.DIRECTORY_SEPARATOR.'tpl_base.php';
+include_once 'tpl_base.php';
 
 class tpl_compiler extends tpl_base {
 function __construct(){
