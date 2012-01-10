@@ -1,12 +1,12 @@
 /**
- * Установка выпадающего меню
+ * РЈСЃС‚Р°РЅРѕРІРєР° РІС‹РїР°РґР°СЋС‰РµРіРѕ РјРµРЅСЋ
  */
 function menu(_self,param){
     if(!param) param={};
     else if(typeof(param)=='function')
     	param={show:param};
-    if(!(_self=$(_self)[0])) return;	
-    	
+    if(!(_self=$(_self)[0])) return;
+
 	function checkMouse (e){
 	     var el = e.target;
 	     while (true){
@@ -20,7 +20,7 @@ function menu(_self,param){
 			}
 		}
 	};
-	
+
 	function show_menu(){
 	  if(param.show) param.show.apply(_self);
 	  else $(_self).show();
@@ -28,9 +28,9 @@ function menu(_self,param){
 	  $(document).bind('mousedown', checkMouse);
 	  return false;
 	};
-	
+
 	function hide_menu(){
-	  $(document).unbind('mousedown', checkMouse);	
+	  $(document).unbind('mousedown', checkMouse);
 	  if(param.hide)
 	  	param.hide.apply(_self);
 	  else

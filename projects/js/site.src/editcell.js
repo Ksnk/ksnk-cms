@@ -5,7 +5,8 @@
  * Time: 14:22
  * To change this template use File | Settings | File Templates.
  */
-jQuery.fn.setSelectionRange=function ( selectionStart, selectionEnd) {
+
+$.fn.setSelectionRange=function ( selectionStart, selectionEnd) {
     var input=this[0];
     if (input.setSelectionRange) {
         input.focus();
@@ -21,11 +22,11 @@ jQuery.fn.setSelectionRange=function ( selectionStart, selectionEnd) {
     return this;
 };
 
-jQuery.fn.setCaretToPos =function(pos) {
+$.fn.setCaretToPos =function(pos) {
     this.setSelectionRange( pos, pos);
 };
 
-jQuery.fn.carret=function(pos){
+$.fn.carret=function(pos){
     var $self=this[0];
     if(!!$self){
         $($self).focus();
@@ -44,7 +45,7 @@ jQuery.fn.carret=function(pos){
     return 0;
 };
 
-$.fn.editcell=function(o){
+$.fn.editcell=function(action,o){
     var options={
         selector: '.editable', //
         textarea:{
@@ -61,6 +62,7 @@ $.fn.editcell=function(o){
             position: 'absolute',border:0
         },
         get_text:function(){return $(this).text()},
+        set_text:function(txt){$(this).text(txt);return txt},
         empty:''
      };
     if(!o) o={};
@@ -129,7 +131,7 @@ $.fn.editcell=function(o){
         }
         //console.log(rect.top-prect.top,rect.top+rect.height-prect.top-prect.height)
         options._editor.css(rect).show();
-        $(t).parents().bind('scroll',scroll);
+        $(t).parents('div,body').bind('scroll',scroll);
 
         var txt=options.get_text.call(t);
         $('textarea',options._editor)
@@ -157,65 +159,30 @@ $.fn.editcell=function(o){
                     }
                 })
                 .keydown(function(event){
-                    var $this=$(this),$x,$y;
+                    var $this=$(this);
                     if (event.keyCode == '13') {//enter
                         event.preventDefault();
                         cell_editor.hide();
                     } else if (event.keyCode == '27') {// esc
-                        $(this).val($self.text());
+                        options._cancel=true;
                         cell_editor.hide();
                     }
-                    else if (event.keyCode == '37') {// left key
-                        if($this.carret(0)){
-                            // do_move prev cell
-                            $x=$self.prev(options.selector);
-                            if($x.length) {
+                    switch (event.keyCode) {
+                        case 37:
+                        case 38:
+                            if($this.carret(0)){
+                                options.exit_key=event.keyCode;
                                 cell_editor.hide();
-                                cell_editor($x[0]);
-                                event.preventDefault();
                             }
-                            //alert('prev');
-                        }
-                    }
-                    else if (event.keyCode == '38') {// up key
-                        if($this.carret(0)){
-                            // do_move upper cell
-                            $x=$self.prev(options.selector);
-                            $y=$self.parent('tr').prev().find(options.selector);
-                            if($y.length) {
+                            break;
+                        case 39:
+                        case 40:
+                            if($this.carret($this.val().length)){
+                                options.exit_key=event.keyCode;
                                 cell_editor.hide();
-                                cell_editor($y[$x.length||0]);
-                                event.preventDefault();
                             }
-                            //alert('up');
-                        }
+                            break;
                     }
-                    else if (event.keyCode == '39') {// right key
-                        if($this.carret($this.val().length)){
-                            // do_move next cell
-                            $x=$self.next(options.selector);
-                            if($x.length) {
-                                cell_editor.hide();
-                                cell_editor($x[0]);
-                                event.preventDefault();
-                            }
-                           // alert('next');
-                        }
-                    }
-                    else if (event.keyCode == '40') {// down
-                        if($this.carret($this.val().length)){
-                            // do_move downer cell
-                            $x=$self.prev(options.selector);
-                            $y=$self.parent('tr').next().find(options.selector);
-                            if($y.length) {
-                                cell_editor.hide();
-                                cell_editor($y[$x.length||0]);
-                                event.preventDefault();
-                            }
-                            //alert('down');
-                        }
-                    }
-//*---*/            else alert(event.keyCode)
                 });
                 cell_editor.init=true;
         }
@@ -224,10 +191,15 @@ $.fn.editcell=function(o){
         if(cell_editor.control){
             //console.log('hide');
             var val = $('textarea', options._editor).val();
-            cell_editor.control.text(val);
+            if(!options._cancel){
+                options._cancel=false;
+                options.set_text.call(cell_editor.control,val);
+            }
+            if(options.exit)
+                options.exit.call(cell_editor.control);
             options._editor.hide();
+            $(cell_editor.control).parents('div,body').unbind('scroll',scroll);
             cell_editor.control=null;
-            $(cell_editor.control).parents().unbind('scroll',scroll);
         }
     };
 

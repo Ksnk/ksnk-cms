@@ -1,42 +1,34 @@
 /**
- * ïîääåðæêà ðàñøèðåíèÿ ýëåìåíòîâ íà âñþ äîñòóïíóþ áðîóçåðó âûñîò
+ * Ð¿Ð¾Ð´Ð´ÐµÑ€Ð¶ÐºÐ° Ñ€Ð°ÑÑˆÐ¸Ñ€ÐµÐ½Ð¸Ñ ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚Ð¾Ð² Ð½Ð° Ð²ÑÑŽ Ð´Ð¾ÑÑ‚ÑƒÐ¿Ð½ÑƒÑŽ Ð±Ñ€Ð¾ÑƒÐ·ÐµÑ€Ñƒ Ð²Ñ‹ÑÐ¾Ñ‚
  * .lofty
- * 
- * ýëåìåíò âûíèìàåòñÿ èç ëåéàóòà(hide), ïîñëå ÷åãî åìó ñòàâèòñÿ íóæíûé ðàçìåð(parent.client.height)
+ *
+ * ÑÐ»ÐµÐ¼ÐµÐ½Ñ‚ Ð²Ñ‹Ð½Ð¸Ð¼Ð°ÐµÑ‚ÑÑ Ð¸Ð· Ð»ÐµÐ¹Ð°ÑƒÑ‚Ð°(hide), Ð¿Ð¾ÑÐ»Ðµ Ñ‡ÐµÐ³Ð¾ ÐµÐ¼Ñƒ ÑÑ‚Ð°Ð²Ð¸Ñ‚ÑÑ Ð½ÑƒÐ¶Ð½Ñ‹Ð¹ Ñ€Ð°Ð·Ð¼ÐµÑ€(parent.client.height)
+ *
+ * todo: Ð²ÐµÐ´ÐµÑ‚ÑÑ ÐºÑ€Ð°Ñ‚ÐºÐ¾Ð²Ñ€ÐµÐ¼ÐµÐ½Ð½Ð¾Ðµ ÐºÑÑˆÐ¸Ñ€Ð¾Ð²Ð°Ð½Ð¸Ðµ Ð´Ð»Ñ Ð¾Ð±ÐµÑÐ¿ÐµÑ‡ÐµÐ½Ð¸Ñ Ð¾Ð¿ÐµÑ€Ð°Ñ†Ð¸Ð¹ ÑÐºÑ€Ð¾Ð»Ð»Ð°
  */
 
 $(function(){
-	setTimeout(function(){
-		$('.lofty').css({display:'none',overflow:'auto'});
-		setTimeout(function(){
-			$('.lofty').each(function(){
-				var prev,parent=this;
-				while(true){
-					prev=parent;
-					parent=parent.parentNode;
-					if(!parent) break;
-					if(parent.style.height=='100%'){
-						var $h=$(parent).innerHeight()-$(prev).innerHeight();
-						if($h>0){
-							$(this).css({height:$h,display:'block'})
-						}
-						break;
-					}
-				}
-				var oldheight=$(document.body).height();
-				$(window).bind('resize',function(){
-					var newheight=$(document.body).height()
-						,disp=newheight-oldheight
-						;
-					oldheight=newheight;
-					if(!!disp)
-					$('.lofty').each(function(){
-						$(this).css('height',$(this).height()+disp/2);
-					})
-				});
-			});
-		},10);
-	},10);
-	
-	
+    setTimeout(function(){
+        var oldheight=$(document.body).height();
+        $('.lofty').each(function(){
+            this.__oldheight=$(this).height();
+        });
+        $(window).bind('resize',function(){
+            var disp=$(document.body).height()-oldheight ;
+            //console.log(newheight);
+            //oldheight=newheight;
+            if(!!disp){
+                $('.lofty').each(function(){
+                    var min=parseInt($(this).css('min-height')),
+                        max=parseInt($(this).css('max-height')),
+                        val=this.__oldheight+disp;
+                    if(min && val<min)
+                        val=min;
+                    if(max && val>=max)
+                        val=max;
+                    $(this).css('height',val);
+                })
+            }
+        });
+    },10);
 })

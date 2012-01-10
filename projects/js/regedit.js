@@ -5,34 +5,30 @@
  * Time: 17:33
  * To change this template use File | Settings | File Templates.
  */
-$.fn.regedit = function (o) {
-    var options={
-        slowClick_timer:null,
-        slowClick_low: 400,
-        slowClick_high:3000,
-        empty:''
-    };
-    if(!o) o={};
-//      else if (typeof(o)=='string')
-//          o={action:o};
-    $.extend(options,o);
+$.fn.regedit = function (action,o) {
 
-    var keys = [], prefix = '';
+    var options;
+
+    if(typeof(action)!='string'){
+        if(typeof(o)=='undefined')
+            o=action;
+        action='create';
+    }
 
     function append_tr(xtree_body, row, level, hidden) {
         hidden = hidden || 0;
         // append one cell
         var child_cnt = row.children && row.children.length || 0;
         if (row.title && level.length > 0) {
-            keys[row.key] = prefix + row.title;
+            options._keys[row.key] = options._prefix + row.title;
             var $dig = '';
             var child_cnt = 0;
             if (row.children) {
-                for (var i = 0; i < row.children.length; i++) {
-                    var ii = row.children[i];
+                for (var i in row.children) {
+                    var ii=row.children[i];if(!ii) continue;
                     if (ii.type == 'right') {
                         $m = ii.value.match(/(\d+)\|(.*?)\|(.+)$/);
-                        $dig += keys[parseInt($m[1]) || 0] + ':' + ($m[2] == 0 ? '-' : '+') + $m[3] + ';';
+                        $dig += options._keys[parseInt($m[1]) || 0] + ':' + ($m[2] == 0 ? '-' : '+') + $m[3] + ';';
                     } else if (ii.type == 'action') {
                         $dig += ii.value + ';';
                     } else {
@@ -54,6 +50,7 @@ $.fn.regedit = function (o) {
                 row._status = 'hide';
                 $xxx = 'plus';
             }
+            row._level=level.length;
             //дорисовываем дерево
             if (level.length > 0 && level[level.length - 1] > 0) {
                 if (--level[level.length - 1] == 0)
@@ -74,7 +71,7 @@ $.fn.regedit = function (o) {
 
             var $result = '<tr' + (hidden > 0 ? ' style="display:none;"' : '') + '><td>' + $result;
 
-            $result += '<span class="dynatree-icon"/>';
+            $result += '<span class="regedit-icon-'+(row['type']||'common')+'"/>';
             $result += '<a href="#" class="regedit-title">' + row['title'] + '</a></td><td></td>';
 
             if ($dig != "")
@@ -88,217 +85,464 @@ $.fn.regedit = function (o) {
         if (child_cnt) {
             level.push(child_cnt);
             if (row.type == 'aro_prefix') {
-                prefix = row.title + '|';
+                options._prefix = row.title + '|';
             }
             for (var i = 0; i < row.children.length; i++) {
-                append_tr(xtree_body, row.children[i], level, hidden+(row._status == 'hide'?1:0));
+                var ii=row.children[i];if(!ii) continue;
+                ii._parent=row;
+                append_tr(xtree_body, ii, level, hidden+(row._status == 'hide'?1:0));
             }
             if (row.type == 'aro_prefix') {
-                prefix = '';
+                options._prefix = '';
             }
             level.pop();
         }
 
     }
 
-    function fill_table(childs) {
-        var tab = $('#regedit table').eq(3);
-        tab.find('tbody').find('tr').remove();
-        if (childs.length == 0) return;
-        var $html;
-        for (var i = 0; i < childs.length; i++) {
-            var $m = (childs[i].value || '').match(/(\d+)\|(.*?)\|(.+)$/);
-            if ($m) {
-                $html = '<tr><td class="regedit_propname">' + keys[parseInt($m[1]) || 0]
-                        + '</td><td></td>'
-                        + '<td class="regedit_propvalue">' + ($m[2] == 0 ? '-' : '+')
-                        + '</td><td></td>'
-                        + '<td class="regedit_propaction">' + $m[3]
-                        + '</td><td></td><td></td></tr>';
-                tab.find('tbody').append($html);
-            }
-        }
-    }
-
-    function recclose(data, $op) {
-        if (data._element)
-            $op = $op.add(data._element);
-        if (data.children && data._status != 'hide')
-            for (var i = 0; i < data.children.length; i++) {
-                $op = recclose(data.children[i], $op);
-            }
-        return $op;
-    }
-
     function getNode(element){
+        if($(element).is('tr')) return $(element);
         return $(element).parents('tr').eq(0);
     }
     function getRow(element){
-        return $(element).parents('tr').eq(0).data('row');
+        return getNode(element).data('row');
     }
 
-    function make_Active($tgt){
-        if (options.activeNode) {
-             options.activeNode.removeClass('active');
-         }
-         options.activeNode = getNode($tgt);
-         if (options.onActivate) {
-             options.onActivate(options.activeNode);
-         }
-         var row = options.activeNode.data('row'), childs = [];
-         if (row.children && row.children.length)
-             for (i = 0; i < row.children.length; i++) {
-                 var ii = row.children[i];
-                 if (ii.type == 'right' || ii.type == 'action') {
-                     childs.push(ii);
-                 }
-             }
-         fill_table(childs);
-         options.activeNode.addClass('active');
-         //console.log('selected');
-
-    }
-
-    function openSubtree(el){
-        var $tr=getNode(el);
-        var c = ['minus','lastminus','lastplus', 'plus'];
-        for (i = 0; i < c.length; i++) {
-            var $x=$tr.find('.regedit-tree-' + c[i]);
-            if ($x.length>0) {// 0-3 1-2
-                tree_close($x, 'regedit-tree-' + c[i], 'regedit-tree-' + c[3 - i]);
-            } else
-                continue;
-            break;
+    function deleteRow(el,row){
+        if(!row){
+            var e = $.Event("keydown", { keyCode: 38 }), r = getRow(el);
+            $(document).trigger( e );
+            row = r;
         }
-    }
-
-    function tree_close($tgt, classR, classA) {
-        //console.log($tgt,classR, classA);
-        var data = getRow($tgt);
-        if (data && data.children) {
-            var $op = $();
-            for (var i = 0; i < data.children.length; i++) {
-                $op = recclose(data.children[i], $op);
+        if(row.children){
+            for(var i in row.children){
+                var ii=row.children[i];if(!ii) continue;
+                deleteRow(null,ii);
+                delete(row.children[i]);
             }
-            var op = classR.match(/minus$/) ? 'hide' : 'show';
-            $op[op]();
-            data._status = op;
-        }
-        $tgt.removeClass(classR).addClass(classA);
+        };
+        if(row.key) // удаляем старую строку, иначе - вновьвставленную
+            options._delete[row.key]=row.key;
+        if(row._element)
+            row._element.remove();
     }
 
-    var tree = this.find('table').eq(1);
-    if (options.children) {
-        var xtree = tree.clone(true).find('tr').remove().end();
-        append_tr(xtree.find('tbody'), options, []);
-        var parent = tree.parent();
-        tree.remove();
-        parent.append(xtree);
+    function editcell(el){
+        $(document).contextMenu('keyboard',false);
+        $(el).editcell('go',{exit:function(){$(document).contextMenu('keyboard',true)}});
     }
-    this.click(function (event) {
-        var i,$tgt = $(event.target);
-        // отслеживаем двойной медленный клик
-        if (options.slowClick_timer)
-            clearTimeout(options.slowClick_timer);
-        if (!options._lasttgt!=event.target) {
-            options.slowClick_timer=(function(tgt){return setTimeout(function(){
-                options._lasttgt=tgt;
-                options.slowClick_timer=setTimeout(function(){
-                    options._lasttgt=null;
-                    options.slowClick_timer=null;
-                },options.slowClick_high)
-            },options.slowClick_low)})(event.target);
-        }
-        if(!!options._lasttgt && options._lasttgt==event.target){
-            // двойной неторопливый клик !
-            if ($tgt.is('.regedit-title')) {
-                $tgt.editcell('go');
-                return
-            } else
-            if ($tgt.is('.regedit_propname')) {
-                $tgt.editcell('go');
-                return
-            }
-        }
-        if ($tgt.is('.regedit-title')) {
-            make_Active($tgt);
-        }
-        if($tgt.is('.regedit-tree-plus,.regedit-tree-lastplus,.regedit-tree-minus,.regedit-tree-lastminus'))
-        if($tgt.is('.regedit-tree-plus,.regedit-tree-lastplus,.regedit-tree-minus,.regedit-tree-lastminus'))
-            openSubtree($tgt);
-    }).bind('dblclick',function(event){
-        if (options.slowClick_timer)
-            clearTimeout(options.slowClick_timer);
-        options._lasttgt=null;
-        openSubtree(event.target);
-    })
-    $(document).contextMenu({
-        menu:function(){
-            if($(this).is('.regedit-title')){
-                make_Active($(this));
-                var $result=['Переименовать#rename'],
-                    node=getRow(this);
-            //    console.log(node);
-                if(node.type=='axo_group' || node.type=='axo_prefix'){
-                    if(node._status=='hide')
-                        $result.push('Развернуть#open');
-                    else
-                        $result.push('Свернуть#open');
-                    $result.push('');
-                    if (node.level>0)
-                        $result.push('Добавить группу#add_group_down');
-                    $result.push('Добавить подгруппу#add_group');
-                   $result.push('Добавить пользователя#add_user');
+
+    function create(){
+
+        options={
+            _keys:[],
+            _prefix:'',
+            // массивы для слежения за редактированием дерева
+            _delete:[],
+            _update:[],
+            _append:[],
+            activeState:'tree',
+            // просто затычко
+            empty:''
+
+        };
+        if(!o) o={};
+    //      else if (typeof(o)=='string')
+    //          o={action:o};
+        $.extend(options,o);
+        $(this).data('regedit',options);
+
+        function fill_table(childs) {
+            var tab = $('#propdata');
+            tab.find('tbody').find('tr').remove();
+            if (childs.length == 0) return;
+            var $html;
+            for (var i in childs) {
+                var $m = (childs[i].value || '').match(/(\d+)\|(.*?)\|(.+)$/);
+                if ($m) {
+                    $html = '<tr><td class="regedit_propname">' + options._keys[parseInt($m[1]) || 0]
+                            + '</td><td></td>'
+                            + '<td class="regedit_propvalue">' + ($m[2] == 0 ? '-' : '+')
+                            + '</td><td></td>'
+                            + '<td class="regedit_propaction">' + $m[3]
+                            + '</td><td></td>'
+                            + '<td></td></tr>';
+                    tab.find('tbody').append($html);
                 }
-                $result.push('','Copy#copy','Paste#paste');
-                return $result;
             }
-            return false
+            $html = '<tr><td class="regedit_propname"></td><td></td>'
+                    + '<td class="regedit_propvalue"></td><td></td>'
+                    + '<td class="regedit_propaction"></td><td></td>'
+                    + '<td></td></tr>';
+            tab.find('tbody').append($html);
         }
-        ,action:function(act,event){
-            //console.log(event);
-            if ( act=='rename' ) {
-                $(this).editcell('go');
-            } else if ( act=="open" ) {
-                openSubtree(this);
-            } else
-                alert(act)
+
+        function recclose(row, $op) {
+            if (row._element)
+                $op = $op.add(row._element);
+            if (row.children && row._status != 'hide')
+                for (var i  in row.children) {
+                    var ii=row.children[i];
+                    $op = recclose(ii, $op);
+                }
+            return $op;
         }
+
+        function make_Active($tgt){
+            if (options.activeNode) {
+                 options.activeNode.removeClass('active');
+            }
+            options.activeNode = getNode($tgt);
+            if (options.onActivate) {
+                 options.onActivate(options.activeNode);
+            }
+            var row = options.activeNode.data('row'), childs = [];
+            if (row && row.children && row.children.length)
+                for (var i  in row.children) {
+                    var ii=row.children[i];
+                    if (ii.type == 'right' || ii.type == 'action') {
+                        childs.push(ii);
+                    }
+                 }
+            fill_table(childs);
+            var pos= options.activeNode.position(),
+                xx = options.activeNode.parents('div:eq(0)'),
+                xpos=xx.position();
+            pos.top-=xpos.top;
+            pos.left-=xpos.left;
+           // console.log(xx.scrollTop(),pos.top,xx.height());
+            if ( pos.top+20>xx.height() )
+                xx.scrollTop(xx.scrollTop() +20 + pos.top-xx.height() );
+            else if ( pos.top <0 )
+                xx.scrollTop(xx.scrollTop() + pos.top  );
+            options.activeNode.addClass('active');
+             //console.log('selected');
+
+        }
+
+        function openSubtree(el) {
+            if (!el || el == window) {
+                el = options.activeNode;
+            }
+            var $tr = getNode(el);
+            var c = ['minus', 'lastminus', 'lastplus', 'plus'];
+            for (var i = 0; i < c.length; i++) {
+                var $x = $tr.find('.regedit-tree-' + c[i]);
+                if ($x.length > 0) {// 0-3 1-2
+                    tree_close($x, 'regedit-tree-' + c[i], 'regedit-tree-' + c[3 - i]);
+                } else
+                    continue;
+                break;
+            }
+        }
+
+        function tree_close($tgt, classR, classA) {
+            //console.log($tgt,classR, classA);
+            var row = getRow($tgt);
+            if (row && row.children) {
+                var $op = $();
+                for (var i in row.children) {
+                   $op = recclose(row.children[i], $op);
+                }
+                var op = classR.match(/minus$/) ? 'hide' : 'show';
+                $op[op]();
+                row._status = op;
+            }
+            $tgt.removeClass(classR).addClass(classA);
+        }
+
+        this.click(function (event) {
+            var $tgt = $(event.target);
+            if ($tgt.is('.regedit-title')) {
+                make_Active($tgt);
+            }
+            if ($tgt.is('.regedit-tree-plus,.regedit-tree-lastplus,.regedit-tree-minus,.regedit-tree-lastminus'))
+                if ($tgt.is('.regedit-tree-plus,.regedit-tree-lastplus,.regedit-tree-minus,.regedit-tree-lastminus'))
+                    openSubtree($tgt);
+        });
+
+        $(document).contextMenu({
+            hotkey:{
+                32:'contextMenu',
+                93:'contextMenu',
+                37:'keyright',
+                38:'keyup',
+                39:'keyleft',
+                40:'keydown',
+                Del:'del',
+                'Alt-R':'rename',
+                'Enter':'open',
+                'default':'open'
+            },
+            menu:function () {
+                if(options.activeState=='prop'){
+                    return ['hello','is it me','you looking for'];
+                }
+                else if(options.activeState=='tree')
+                if ($(this).is('.regedit-title')) {
+                    make_Active($(this));
+                    var $result = ['Переименовать#rename'],
+                        node = getRow(this);
+                    //    console.log(node);
+                    if (node.type == 'axo_group' || node.type == 'axo_prefix') {
+                        if (node._status == 'hide')
+                            $result.push('Развернуть#open');
+                        else
+                            $result.push('Свернуть#open');
+                        $result.push('');
+                        $result.push({title:'Добавить', children:[
+                            'Группу#add_group_down',
+                            'префикс#add_group',
+                            'пользователя#add_user'
+                        ]});
+                    }
+                    $result.push('Удалить#del');
+                    $result.push('', 'Copy#copy', 'Paste#paste');
+                    return $result;
+                }
+                return false
+            }, action:function (act/*,event*/) {
+                //console.log(event);
+                if(options.activeState=='tree')
+                switch (act) {
+                    case 'contextMenu':
+                        $(document).contextMenu('show', options.activeNode.find('.regedit-title').eq(0));
+                        break;
+                    case 'keyleft':
+                        var row = options.activeNode.data('row');
+                        if (row && row._status && row._status == 'hide') {
+                            openSubtree(options.activeNode);
+                            break;
+                        }
+                    case 'keydown':
+                        var pos = 'first', func = 'nextAll';
+                        if ($('#tree tr.active').length == 0) {
+                            make_Active($('#tree tr:visible:' + pos));
+                        } else {
+                            var x = $('#tree tr.active')[func](':visible');
+                            if (x.length > 0)
+                                make_Active(x.eq(0));
+                        }
+                        break;
+                    case 'keyright':
+                        row = options.activeNode.data('row');
+                        if (row && (!row._status || row._status == 'hide')) {
+                            if (row._parent && row._parent._element)
+                                make_Active(row._parent._element);
+                            break;
+                        } else if (row && row._status && row._status != 'hide') {
+                            openSubtree(options.activeNode);
+                            break;
+                        }
+                    case 'keyup':
+                        var pos = 'last', func = 'prevAll';
+                        if ($('#tree tr.active').length == 0) {
+                            make_Active($('#tree tr:visible:' + pos));
+                        } else {
+                            var x = $('#tree tr.active')[func](':visible');
+                            if (x.length > 0)
+                                make_Active(x.eq(0));
+                        }
+                        break;
+                    case 'slowdbl':
+                    case 'rename':
+                        var x =  this;
+                        if(!x || x==window){
+                            x=options.activeNode.find('.regedit-title').eq(0);
+                        }
+                        if($(x).is('a.regedit-title'))
+                            editcell(x);
+                        break;
+                    case 'open':
+                        openSubtree(this);
+                        break;
+                    case 'del':
+                        deleteRow(options.activeNode);
+                        break;
+                    default:
+                        alert(act)
+
+                }
+                else if(options.activeState=='prop')
+                switch (act) {
+                    case 'contextMenu':
+                        $(document).contextMenu('show', ['hello','it\'sme']);
+                        break;
+                    case 'keyleft':
+                        var row = options.activeNode.data('row');
+                        if (row && row._status && row._status == 'hide') {
+                            openSubtree(options.activeNode);
+                            break;
+                        }
+                    case 'keydown':
+                        var pos = 'first', func = 'nextAll';
+                        if ($('#tree tr.active').length == 0) {
+                            make_Active($('#tree tr:visible:' + pos));
+                        } else {
+                            var x = $('#tree tr.active')[func](':visible');
+                            if (x.length > 0)
+                                make_Active(x.eq(0));
+                        }
+                        break;
+                    case 'keyright':
+                        row = options.activeNode.data('row');
+                        if (row && (!row._status || row._status == 'hide')) {
+                            if (row._parent && row._parent._element)
+                                make_Active(row._parent._element);
+                            break;
+                        } else if (row && row._status && row._status != 'hide') {
+                            openSubtree(options.activeNode);
+                            break;
+                        }
+                    case 'keyup':
+                        var pos = 'last', func = 'prevAll';
+                        if ($('#tree tr.active').length == 0) {
+                            make_Active($('#tree tr:visible:' + pos));
+                        } else {
+                            var x = $('#tree tr.active')[func](':visible');
+                            if (x.length > 0)
+                                make_Active(x.eq(0));
+                        }
+                        break;
+                    case 'slowdbl':
+                    case 'rename':
+                        var x =  this;
+                        if(!x || x==window){
+                            x=options.activeNode.find('.regedit-title').eq(0);
+                        }
+                        if($(x).is('a.regedit-title'))
+                            editcell(x);
+                        break;
+                    case 'open':
+                        openSubtree(this);
+                        break;
+                    case 'del':
+                        deleteRow(options.activeNode);
+                        break;
+                    default:
+                        alert(act)
+
+                }
+            }
+        });
+
+ //       .contextMenu('disable','rename');
+    }
+
+    function setActive(state,options){
+        if(options.activeState!=state){
+            if(options.activeState)
+                $('#regedit').removeClass('state_'+options.activeState)
+            options.activeState=state;
+            $('#regedit').addClass('state_'+options.activeState);
+        }
+    }
+
+    function update(){
+        var tree = $('#tree');
+        if (options && options.children) {
+            var xtree = tree.clone(true).find('tr').remove().end();
+            append_tr(xtree.find('tbody'), options, []);
+            var parent = tree.parent();
+            tree.remove();
+            parent.append(xtree);
+        }
+    }
+    if(action=='create'){
+        create.call(this);
+    } else {
+        options=$(this).data('regedit');
+        switch (action){
+            case 'setActive':// выделить дерево
+                setActive(o,options);
+                break;
+            case 'getActive':
+                return getRow(options.activeNode);
+            case 'serializeTree':
+               // сериализовать все кусочки данных
+                var result = [];
+                if(options._delete){
+                    for(var a in options._delete)
+                        result.push('delete[]='+a);
+                }
+                if(options._update){
+                    result.push('update='+options._update.join(','));
+                }
+                if(options._append){
+                    result.push('append='+options._append.join(','));
+                }
+                return result.join('&');
+            case 'delNode':
+                deleteRow(options.activeNode);
+                break;
+            case 'update':
+                $.extend(options,o);
+                update.call(this);
+                break;
+        }
+    }
+
+    return this;
+};
+$(function () {
+
+    $('#tree').parents('td:eq(0)').bind('mousedown mouseup',function(){
+        $('#regedit').regedit('setActive','tree');
+    });
+    $('#propdata').parents('td:eq(0)').bind('mousedown mouseup',function(){
+        $('#regedit').regedit('setActive','prop');
     });
 
-};
-$(function(){
     // do resize via table with fixed layout
     $('.hresizer').ddr({
         //drag_container:'#slider'
-        on_drag_start:function(event,options){
-            options.start=event.pageX;
+        on_drag_start:function (event, options) {
+            options.start = event.pageX;
             // считаем, что это td
             // найдем соответствующий col
-            var
-                cnt=$(this).prevAll(this.tagName).length,
-                col=$(this).parents('table').eq(0).find('col'),
-                childcol=$(this).parents('div').eq(0).find('table').eq(1).find('col');
-            if(col.eq(cnt-1).attr('width')){
-                options._col=$(col.eq(cnt-1));
-                options._childcol=$(childcol.eq(cnt-1));
-                options.sign=1;
-            } else {
-                options._col=$(col.eq(cnt+1));
-                options._childcol=$(childcol.eq(cnt+1));
-                options.sign=-1;
+            if (!$(this).data('hresizer')) {
+                var
+                    $self = $(this),
+                    cnt = $self.prevAll(this.tagName).length,
+                    col = $self.parents('table').eq(0).find('col'),
+                    childcol = this.tagName.toLowerCase() == 'td'
+                        ? $self.parents('div').eq(0).find('table').eq(1).find('col')
+                        : $('#' + $self.parents('table').eq(0).attr('id').substr(1)).find('col')
+                    ;
+
+                if (col.eq(cnt - 1).attr('width')) {
+                    $self.data('hresizer', [$(col.eq(cnt - 1)), $(childcol.eq(cnt - 1)), 1]);
+                } else {
+                    $self.data('hresizer', [$(col.eq(cnt + 1)), $(childcol.eq(cnt + 1)), -1])
+                }
             }
+        }, on_drag:function (event, options) {
+            var xxx = $(this).data('hresizer'),
+                w = parseInt(xxx[0].attr('width')) + (event.pageX - options.start) * xxx[2];
+
+            options.start = event.pageX;
+            xxx[0].attr('width', w);
+            xxx[1].attr('width', w);
         }
-        /*
-         ,on_drag_complete:function(event){
-         console.log('drag complete', this, event);
-         }
-         */
-        ,on_drag:function(event,options){
-            var w=parseInt(options._col.attr('width'))+(event.pageX-options.start)*options.sign;
-            options.start=event.pageX;
-            options._col.attr('width',w);
-            options._childcol.attr('width',w);
+    });
+    $('.vresizer').ddr({
+        on_drag_start:function (event, options) {
+            options.start = event.pageY;
+            var $self=$(this),data=$self.data('vresizer');
+            if(!data){
+                data=[$self.parents('tr:eq(0)').next('tr').find('td').eq(0),-1];
+                $self.data('vresizer',data);
+            }
+            options.startheight = parseInt(data[0].css('height'));
+        }
+        ,on_drag:function (event, options) {
+            var xxx=$(this).data('vresizer'),
+                w = options.startheight + (event.pageY - options.start) * xxx[1];
+            //console.log([xxx[0].css('height'),w,event.pageY,options.start]);
+           // options.start = event.pageY;
+            if(w>15 && w<400)
+                xxx[0].css('height', w);
         }
     })
-})
+
+});

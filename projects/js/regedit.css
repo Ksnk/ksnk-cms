@@ -1,5 +1,5 @@
 .hresizer {
-    cursor: ew-resize;
+    cursor: w-resize;
 }
 table.regedit th.hresizer {
     background: url(../img/bg_24.gif) 100% 0 no-repeat ;
@@ -9,6 +9,15 @@ table.regedit td.hresizer {
     border-right: 1px solid #e0e0e0; /*rgb(130, 135, 144) ;*/
     background: #f0f0f0;
 }
+.vresizer {
+    cursor: n-resize;
+}
+table.regedit td.vresizer {
+    border-top: 1px solid #e0e0e0; /*rgb(130, 135, 144) ;*/
+    border-bottom: 1px solid #e0e0e0; /*rgb(130, 135, 144) ;*/
+    background: #f0f0f0;
+}
+
 .down_border {
     border-bottom: 1px solid #e0e0e0; /*rgb(130, 135, 144) ;*/
 
@@ -27,7 +36,7 @@ table.regedit th {
 
 table.regedit td {
     vertical-align: top;
-    height:16px;
+  /* height:16px;*/
     padding:0;
     overflow:hidden;
     white-space: nowrap;
@@ -39,8 +48,7 @@ table.regedit td {
     padding-right: 3px;
     text-decoration: none;
     vertical-align: top;
-    margin: 0px;
-    margin-left: 3px;
+    margin: 0 0 0 3px;
 }
 .regedit .regedit-property {
     color: #c0c0c0;
@@ -52,14 +60,10 @@ table.regedit td {
     color: #c0c0c0;
 }
 .regedit .active a.regedit-title {
-    background-color: #3169C6 !important;
+    background-color: #808080 !important;
     color: white !important;
 }
-.regedit-first,        .regedit-last,        .regedit-void {
-    width: 16px;
-    height: 16px;
-    display: -moz-inline-box;
-    display: inline-block;
-    vertical-align: top;
-    background: url("../css/icons.gif") no-repeat 0 0;
+.state_tree .regedit .active a.regedit-title {
+    background-color: #3169C6 !important;
+    color: white !important;
 }
