@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>test case for editsell jquery plugin</title>
+    <script type="text/javascript" src="http://yandex.st/jquery/1.7.1/jquery.js"></script>
+    <script type="text/javascript" src="../debug.js"></script>
+    <script type="text/javascript" src="../editcell.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            // init action
+            $('p').editcell('init','span');
+
+            // runtime initialisation
+            $('#table').click(function (event) {
+                if ($(event.target).is('td'))
+                    $(event.target).editcell('go');
+            });
+
+            //Excel-like editor keyboard
+            function editnextcell(){
+                var xxx=$('#table2').data('temp'),cell=xxx[0];
+                switch(xxx[1]){
+                    case 38: // move up
+                        var cnt=$(cell).prevAll('td').length
+                            ,tr=$(cell).parents('tr').eq(0);
+                        if(tr.length){
+                            tr.prev().find('td').eq(cnt).trigger('click');
+                        }
+                        break;
+                    case 37: // move left
+                        var td=$(cell).prevAll('td').eq(0);
+                        if(td.length){
+                            td.trigger('click');
+                        } else {
+                            var tr=$(cell).parents('tr').eq(0);
+                            if(tr.length){
+                                tr.prev().find('td').last().trigger('click');
+                            }
+                        }
+                        break;
+                    case 39: // move right
+                        var td=$(cell).nextAll('td').eq(0);
+                        if(td.length){
+                            td.trigger('click');
+                        } else {
+                            var tr=$(cell).parents('tr').eq(0);
+                            if(tr.length){
+                             tr.next().find('td').eq(0).trigger('click');
+                            }
+                        }
+                        break;
+                     case 40: // move down
+                         var cnt=$(cell).prevAll('td').length
+                             ,tr=$(cell).parents('tr').eq(0);
+                         if(tr.length){
+                             tr.next().find('td').eq(cnt).trigger('click');
+                         }
+                         break;
+                }
+            }
+            $('#table2').editcell('init',{
+                selector:'td',
+                exit:function(options){
+                    if(options.exit_key){
+                        $('#table2').data('temp',[this,options.exit_key]);
+                        setTimeout(editnextcell,10);
+                    }
+                }
+            });
+
+        })
+    </script>
+</head>
+<body>
+
+<h3>Editor into the spans with different font sizes</h3>
+<p>
+    <span>The</span> <span style="font-size:30px;">quick</span> <span>brown</span> <span>fox</span> <span>jumps</span> <span>over</span> <span>the</span> <span>lazy</span> <span>dog</span>
+</p>
+<h3>Editor into the table</h3>
+    <table id='table'>
+    <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td style="font-size:20px;">1</td><td>1</td><td>1</td></tr>
+    <tr><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    <tr><td style="font-size:30px;">1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td><td>1</td></tr>
+    </table>
+
+<h3>Editor into the very hight table + Excel-like keyboard moving</h3>
+<div  id='table2' style="height:200px;overflow:auto">
+    <table>
+        <script type="text/javascript">
+            for(var i=0;i<20;i++) {
+                document.write('<tr>');
+                for(var j=0;j<5;j++) {
+
+                    document.write('<td>'+i+' '+j+'</td>');
+                }
+                document.write('</tr>')
+            }
+        </script>
+    </table>
+</div>
+<div  id='debug' style="height:100px;overflow:auto"></div>
+</body>
+</html>

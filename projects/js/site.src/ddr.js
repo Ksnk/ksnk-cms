@@ -13,7 +13,7 @@ var mousetgt=(window.execScript || window.opera)?document:window;
 $.fn.ddr=function(options){
     this.bind('mousedown',function(event){
         function drag_stop(){
-            $(mousetgt).unbind('mousemove',mousemove).unbind('mouseup',mouseup);
+            $(mousetgt).unbind('mousemove',mousemove).unbind('mouseup',mouseup);//.unbind('mousedown',mouseup);
             options._drag_target=null;
             options._dragging=false;
         }

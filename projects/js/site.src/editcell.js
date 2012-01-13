@@ -1,74 +1,131 @@
 /**
- * Created by JetBrains PhpStorm.
- * User: Сергей
- * Date: 05.12.11
- * Time: 14:22
- * To change this template use File | Settings | File Templates.
+ * .editcell & .carret jQuery plugins
+ *
+ * <%=point('hat','comment');%>
  */
-
-$.fn.setSelectionRange=function ( selectionStart, selectionEnd) {
+/**
+ * работа с курсором. Работаем с первым элементом коллекции.
+ * .carret('get')| .carret() - выдать позицию курсора, верхняя граница отмеченного участка
+ * .carret('sel') - выдать позицию курсора, верхняя и нижняя граница отмеченного участка в массиве
+ * .carret('set',X,Y)| carret(X,Y)| carret(X) - установить курсор в поззицию
+ * .carret('is',X) - проверить, что курсор в позиции X (отмеченая область считается курсором)
+ * @param act
+ * @param selectionStart
+ * @param selectionEnd
+ */
+$.fn.carret=function(act,selectionStart, selectionEnd){
     var input=this[0];
-    if (input.setSelectionRange) {
-        input.focus();
-        input.setSelectionRange(selectionStart, selectionEnd);
-    }
-    else if (input.createTextRange) {
-        var range = input.createTextRange();
-        range.collapse(true);
-        range.moveEnd('character', selectionEnd);
-        range.moveStart('character', selectionStart);
-        range.select();
-    }
-    return this;
-};
+    if(!input) return 0 ;
+    // анализ параметров
+    if(undefined==act){
+        act='get';
+    } else
+    if(typeof(act)=="number"){
+        selectionEnd=selectionStart;
+        selectionStart=act;
+        act='set';
+    } else
+    if(undefined==selectionEnd)selectionEnd=selectionStart;
 
-$.fn.setCaretToPos =function(pos) {
-    this.setSelectionRange( pos, pos);
-};
-
-$.fn.carret=function(pos){
-    var $self=this[0];
-    if(!!$self){
-        $($self).focus();
-        if(typeof($self.selectionStart)!='undefined'){
-            return $self.selectionStart<=pos && pos<=$self.selectionEnd;
+    if(act=='set'){
+        if (input.setSelectionRange) {
+            input.focus();
+            input.setSelectionRange(selectionStart, selectionEnd);
         }
+        else if (input.createTextRange) {
+            var range = input.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', selectionEnd);
+            range.moveStart('character', selectionStart);
+            range.select();
+        }
+        return this;
+    } else {
+        $(input).focus();
+        var cursor=[];
+        if(typeof(input.selectionStart)!='undefined'){
+            cursor=[ input.selectionStart,input.selectionEnd];
+        } else
         if (document.selection) {
             var sel=document.selection.createRange();
             var clone=sel.duplicate();
             sel.collapse(true);
-            clone.moveToElementText($self);
+            clone.moveToElementText(input);
+            clone.setEndPoint('EndToStart',sel);
+            cursor[0]=clone.text.length;
+
+            sel=document.selection.createRange();
+            clone=sel.duplicate();
+            sel.collapse(false);
+            clone.moveToElementText(input);
             clone.setEndPoint('EndToEnd',sel);
-            return clone.text.length;
+            cursor[1]=clone.text.length;
         }
+        if(act=='is'){
+            return cursor[0]<=selectionStart && selectionStart<=cursor[1];
+        }else if(act=='sel'){
+            return cursor;
+        } else
+            return cursor[0];
     }
-    return 0;
+
 };
 
 $.fn.editcell=function(action,o){
     var options={
-        selector: '.editable', //
+        // селектор для автоматической установки редактора
+        selector: '.editable',
+
+        /** примерный CSS для элемента textarea */
         textarea:{
             width: '100%',
             height: '100%',
-            'font-size': '10pt',
             outline: 0,
             border: '1px #CCCCCC dotted',
             resize: 'none',
             margin:0,
             overflow: 'hidden'
         },
+
+        /** примерный CSS для контейнера div */
         css:{
-            position: 'absolute',border:0
+            position: 'absolute',border:0,display:'none'
         },
-        get_text:function(){return $(this).text()},
-        set_text:function(txt){$(this).text(txt);return txt},
+
+        /**
+         * хандлер "дай редактируемый текст"
+         * @param object options - параметры вызова
+         * @return string - текст, который будет редактироваться
+         * this указывает на редактируемый объект, а не на устанавливаемый объект
+         */
+        get_text:function(/*options*/){return $(this).text()},
+
+        /**
+         * хандлер "получи отредактированный текст"
+         * @param string txt - отредактированный редактором текст
+         * @param object options - параметры вызова
+         * @return string - текст, который будет вставлен в .html элементу
+         * this указывает на редактируемый объект, а не на устанавливаемый объект
+         */
+        set_text:function(txt/*,options*/){$(this).text(txt);return txt},
+
+        /**
+         * хандлер "редактор закрывается"
+         * @param object options - параметры вызова
+         * this указывает на редактируемый объект, а не на устанавливаемый объект
+         */
+        //exit:function(options){},
+
         empty:''
      };
+
+    //magic! donov realy-realy :(
     if(!o) o={};
     else if (typeof(o)=='string')
-        o={action:o};
+        o={selector:o};
     $.extend(options,o);
+
+    // устанавливаем редактор. Только раз в жизни
     if(!$(document).data('editcell-editor')){
         $(document).data('editcell-editor',$('<div/>').append(
                 $('<textarea></textarea>').css(options.textarea)
@@ -83,13 +140,13 @@ $.fn.editcell=function(action,o){
         else
             cell_editor.internalScroll=false;
     }
-
+    /** scroll editor window into view */
     function cell_editor(t){
         cell_editor.internalScroll=false;
+        options.exit_key=false;
 
         /** @var jQuery $self */
         var $self=$(t);
-        //if(!$self.is(':visible'))t.scrollIntoView(true);
         // scroll into view
         var position,rect,$parent,prect,ppos;
         for (var c=0;c<2;c++) {
@@ -133,16 +190,16 @@ $.fn.editcell=function(action,o){
         options._editor.css(rect).show();
         $(t).parents('div,body').bind('scroll',scroll);
 
-        var txt=options.get_text.call(t);
+        var txt=options.get_text.call(t,options);
         $('textarea',options._editor)
             .css({
-                'padding':'0 0 0 '+$self.css('padding-left'),
+                'padding':$self.css('padding-top')+' 0 0 '+$self.css('padding-left'),
                 'font-size':$self.css('font-size'),
                 'font-style':$self.css('font-style'),
                 'font-family':$self.css('font-family')
             })
             .focus().val(txt)
-            .setSelectionRange(0,txt.length);
+            .carret('set',0,txt.length);
        // console.log('focus');
         cell_editor.control=$self;
         //one-time инициализация
@@ -150,14 +207,13 @@ $.fn.editcell=function(action,o){
 
             $('textarea',options._editor)
                 .blur(cell_editor.hide)
-                .keyup(function(){
-                   // console.log(this.scrollTop,this.scrollWidth,$(this).width());
-
+                //todo: не очень удачная попытка изменить размер поля редактирования
+  /*             .keyup(function(){
                     if(this.scrollTop>0 || this.scrollWidth>$(this).width()+10){
                         $(options._editor).css('width',this.scrollWidth+10);
                         this.scrollTop(0);
                     }
-                })
+                })*/
                 .keydown(function(event){
                     var $this=$(this);
                     if (event.keyCode == '13') {//enter
@@ -169,20 +225,21 @@ $.fn.editcell=function(action,o){
                     }
                     switch (event.keyCode) {
                         case 37:
+                            if(!$this.carret('is',0)) break;
                         case 38:
-                            if($this.carret(0)){
-                                options.exit_key=event.keyCode;
-                                cell_editor.hide();
-                            }
-                            break;
+                            options.exit_key=event.keyCode;
+                            cell_editor.hide();
+                            event.preventDefault();
+                             break;
                         case 39:
+                            if(!$this.carret('is',$this.val().length)) break;
                         case 40:
-                            if($this.carret($this.val().length)){
-                                options.exit_key=event.keyCode;
-                                cell_editor.hide();
-                            }
+                            options.exit_key=event.keyCode;
+                            cell_editor.hide();
+                            event.preventDefault();
                             break;
                     }
+                    return ;
                 });
                 cell_editor.init=true;
         }
@@ -193,10 +250,10 @@ $.fn.editcell=function(action,o){
             var val = $('textarea', options._editor).val();
             if(!options._cancel){
                 options._cancel=false;
-                options.set_text.call(cell_editor.control,val);
+                options.set_text.call(cell_editor.control,val,options);
             }
             if(options.exit)
-                options.exit.call(cell_editor.control);
+                options.exit.call(cell_editor.control,options);
             options._editor.hide();
             $(cell_editor.control).parents('div,body').unbind('scroll',scroll);
             cell_editor.control=null;
@@ -205,7 +262,7 @@ $.fn.editcell=function(action,o){
 
     options.parent=this;
 
-    if(options.action='go'){
+    if(action=='go' && this.length>0){
         cell_editor(this);
     } else {
         this.click(function(e)	{

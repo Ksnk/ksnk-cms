@@ -2,7 +2,7 @@
     cursor: w-resize;
 }
 table.regedit th.hresizer {
-    background: url(../img/bg_24.gif) 100% 0 no-repeat ;
+    background: url(../img/bg_24.<?=$buildtime?>.gif) 100% 0 no-repeat ;
 }
 table.regedit td.hresizer {
     border-left: 1px solid #e0e0e0; /*rgb(130, 135, 144) ;*/
@@ -24,12 +24,11 @@ table.regedit td.vresizer {
 }
 table.regedit {
     border:0; /* border="0" */
-    border-spacing: 0;
-    border-collapse:collapse; /* cellspacing="0" */
-    table-layout:fixed;width:100%;
+    table-layout:fixed;
+    width:100%;
 }
 table.regedit th {
-    background: url(../img/bg_24.gif) 0 -48px repeat ;
+    background: url(../img/bg_24.<?=$buildtime?>.gif) 0 -48px repeat ;
     height:24px;
     padding:0;
 }
@@ -41,12 +40,16 @@ table.regedit td {
     overflow:hidden;
     white-space: nowrap;
 }
-.regedit .regedit-title, .regedit .regedit-property {
+
+.regedit-title, .regedit-property, .regedit-propvalue,.regedit-propaction, .regedit-propname{
     font-size: 10pt;
+    text-decoration: none;
+}
+
+.regedit .regedit-title, .regedit .regedit-property {
     display: inline-block;
     padding-left: 3px;
     padding-right: 3px;
-    text-decoration: none;
     vertical-align: top;
     margin: 0 0 0 3px;
 }
@@ -67,3 +70,18 @@ table.regedit td {
     background-color: #3169C6 !important;
     color: white !important;
 }
+
+.regedit-propname {
+    position:relative;
+}
+
+span.regedit-icon-select{
+    position:absolute;
+    right:-8px;
+    top:0;
+    display:none;
+}
+.regedit-propname:hover .regedit-icon-select,.active .regedit-icon-select{
+    display:block;
+}
+/* треугольники */

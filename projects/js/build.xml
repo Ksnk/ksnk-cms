@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="common" default="build.editcell">
+    <taskdef name="minify" classname="phing.tasks.ext.kpMinTask" />
+    <!-- Sets the DSTAMP, TSTAMP and TODAY properties -->
+    <tstamp/>
+    <property file="../../env.prop" />
+        
+    <target name="property">
+        <echo file="svn.prop" append="false"><![CDATA[
+license=License GNU/LGPL - Serge Koriakin - Jule 2010-2012
+env_common=${common}
+svn_revision=$WCREV$
+svn_modified=$WCDATE$
+svn_url=$WCURL$
+]]>        </echo>
+        <exec executable="SubWCRev" dir=".">
+            <arg file="." />
+            <arg file="svn.prop" />
+            <arg file="svn.prop" />
+            <arg value="-f" />
+        </exec>
+    </target>
+
+    <target name="build.editcell" depends="property" description="build project">
+        <property name="dst" value="build" />
+        <property file="svn.prop" />
+        <exec command="${php_exe} -q ../../preprocessor/build/preprocessor.php /Dversion='.carret + .editcell jQuery plugins' /Psvn.prop /force='${svn_modified}' /Dmask=editcell config.xml"
+                checkreturn="true" logoutput="true" >
+        </exec>
+        <minify suffix='.min' yuiPath="${common}/tools/yuicompressor-2.4.5.jar">
+            <fileset dir="build/editcell">
+              <include name="*.js"/>
+              <exclude name="*.min.js"/>
+            </fileset>
+        </minify>
+ <!--       <delete file="svn.prop"/>-->
+
+    </target>
+
+    <target name="minify-css">
+        <echo>--------------------------------</echo>
+        <echo>| Minify CSS to release |</echo>
+        <echo>--------------------------------</echo>
+        <minify suffix='.min' yuiPath="${common}/tools/yuicompressor-2.4.5.jar">
+            <fileset dir="z:/home/localhost/www/rights/css">
+              <include name="*.css"/>
+              <exclude name="*.min.css"/>
+            </fileset>
+        </minify>
+    </target>
+
+</project>

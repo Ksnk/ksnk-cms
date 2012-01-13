@@ -140,6 +140,7 @@ $.fn.contextMenu = function (action, o) {
         }
         //console.log(e);
         //обрабатываем оставшиеся hotkey
+        if(!$(e.target).is('input,textarea')){
         if(options.hotkey[e.keyCode]){
             var action=options.hotkey[e.keyCode];
             if(!options._disabled[action.action]
@@ -154,8 +155,7 @@ $.fn.contextMenu = function (action, o) {
                 e.result=false;
                 return false;
             }
-        }
-
+        }}
     }
 
     function showMenu(tgtElement,X,Y){
@@ -311,7 +311,7 @@ $.fn.contextMenu = function (action, o) {
             // Hide context menus that may be showing
             //$(".contextMenu").hide();
             // Get this context menu
-            showMenu(tgtElement,event.pageX, event.pageY);
+            showMenu(tgtElement,event.pageX+1, event.pageY+1);
         }
 
         this.mousedown(function (e) {

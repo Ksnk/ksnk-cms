@@ -131,6 +131,11 @@ $.fn.regedit = function (action,o) {
         $(document).contextMenu('keyboard',false);
         $(el).editcell('go',{exit:function(){$(document).contextMenu('keyboard',true)}});
     }
+    function editselect(el,selmenu){
+        console.log(selmenu);
+        //$(document).contextMenu('keyboard',false);
+        //$(el).editcell('go',{exit:function(){$(document).contextMenu('keyboard',true)}});
+    }
 
     function create(){
 
@@ -160,19 +165,19 @@ $.fn.regedit = function (action,o) {
             for (var i in childs) {
                 var $m = (childs[i].value || '').match(/(\d+)\|(.*?)\|(.+)$/);
                 if ($m) {
-                    $html = '<tr><td class="regedit_propname">' + options._keys[parseInt($m[1]) || 0]
+                    $html = '<tr><td class="regedit-propname"><span class="regedit-icon-select"></span>' + options._keys[parseInt($m[1]) || 0]
                             + '</td><td></td>'
-                            + '<td class="regedit_propvalue">' + ($m[2] == 0 ? '-' : '+')
+                            + '<td class="regedit-propvalue">' + ($m[2] == 0 ? '-' : '+')
                             + '</td><td></td>'
-                            + '<td class="regedit_propaction">' + $m[3]
+                            + '<td class="regedit-propaction">' + $m[3]
                             + '</td><td></td>'
                             + '<td></td></tr>';
                     tab.find('tbody').append($html);
                 }
             }
-            $html = '<tr><td class="regedit_propname"></td><td></td>'
-                    + '<td class="regedit_propvalue"></td><td></td>'
-                    + '<td class="regedit_propaction"></td><td></td>'
+            $html = '<tr><td class="regedit-propname"></td><td></td>'
+                    + '<td class="regedit-propvalue"></td><td></td>'
+                    + '<td class="regedit-propaction"></td><td></td>'
                     + '<td></td></tr>';
             tab.find('tbody').append($html);
         }
@@ -210,14 +215,11 @@ $.fn.regedit = function (action,o) {
                 xpos=xx.position();
             pos.top-=xpos.top;
             pos.left-=xpos.left;
-           // console.log(xx.scrollTop(),pos.top,xx.height());
             if ( pos.top+20>xx.height() )
                 xx.scrollTop(xx.scrollTop() +20 + pos.top-xx.height() );
             else if ( pos.top <0 )
                 xx.scrollTop(xx.scrollTop() + pos.top  );
             options.activeNode.addClass('active');
-             //console.log('selected');
-
         }
 
         function openSubtree(el) {
@@ -237,7 +239,6 @@ $.fn.regedit = function (action,o) {
         }
 
         function tree_close($tgt, classR, classA) {
-            //console.log($tgt,classR, classA);
             var row = getRow($tgt);
             if (row && row.children) {
                 var $op = $();
@@ -255,11 +256,18 @@ $.fn.regedit = function (action,o) {
             var $tgt = $(event.target);
             if ($tgt.is('.regedit-title')) {
                 make_Active($tgt);
-            }
-            if ($tgt.is('.regedit-tree-plus,.regedit-tree-lastplus,.regedit-tree-minus,.regedit-tree-lastminus'))
+            } else
+            if ($tgt.is('.regedit-tree-plus,.regedit-tree-lastplus,.regedit-tree-minus,.regedit-tree-lastminus')){
                 if ($tgt.is('.regedit-tree-plus,.regedit-tree-lastplus,.regedit-tree-minus,.regedit-tree-lastminus'))
                     openSubtree($tgt);
-        });
+            } else
+            if ($tgt.is('.regedit-propname,.regedit-propvalue,.regedit-propaction'))
+                editcell($tgt);
+            else
+            if ($tgt.is('.regedit-icon-select'))
+                editselect($tgt,$tgt.parent()[0].className); //todo: исправить на более разумный выбор
+            }
+        );
 
         $(document).contextMenu({
             hotkey:{
@@ -283,7 +291,6 @@ $.fn.regedit = function (action,o) {
                     make_Active($(this));
                     var $result = ['Переименовать#rename'],
                         node = getRow(this);
-                    //    console.log(node);
                     if (node.type == 'axo_group' || node.type == 'axo_prefix') {
                         if (node._status == 'hide')
                             $result.push('Развернуть#open');
@@ -302,7 +309,6 @@ $.fn.regedit = function (action,o) {
                 }
                 return false
             }, action:function (act/*,event*/) {
-                //console.log(event);
                 if(options.activeState=='tree')
                 switch (act) {
                     case 'contextMenu':
@@ -368,6 +374,7 @@ $.fn.regedit = function (action,o) {
                     case 'contextMenu':
                         $(document).contextMenu('show', ['hello','it\'sme']);
                         break;
+                    /*
                     case 'keyleft':
                         var row = options.activeNode.data('row');
                         if (row && row._status && row._status == 'hide') {
@@ -419,6 +426,7 @@ $.fn.regedit = function (action,o) {
                     case 'del':
                         deleteRow(options.activeNode);
                         break;
+                        */
                     default:
                         alert(act)
 
@@ -521,8 +529,10 @@ $(function () {
                 w = parseInt(xxx[0].attr('width')) + (event.pageX - options.start) * xxx[2];
 
             options.start = event.pageX;
-            xxx[0].attr('width', w);
-            xxx[1].attr('width', w);
+            if(w>0 ){
+                xxx[0].attr('width', w);
+                xxx[1].attr('width', w);
+            }
         }
     });
     $('.vresizer').ddr({
@@ -530,7 +540,10 @@ $(function () {
             options.start = event.pageY;
             var $self=$(this),data=$self.data('vresizer');
             if(!data){
-                data=[$self.parents('tr:eq(0)').next('tr').find('td').eq(0),-1];
+                var $x=$self.parents('tr:eq(0)'),
+                    maxheight=$x.height()+$x.prev('tr').height()+$x.next('tr').height();
+                data=[
+                    $self.parents('tr:eq(0)').next('tr').find('td').eq(0),-1,maxheight];
                 $self.data('vresizer',data);
             }
             options.startheight = parseInt(data[0].css('height'));
@@ -538,9 +551,8 @@ $(function () {
         ,on_drag:function (event, options) {
             var xxx=$(this).data('vresizer'),
                 w = options.startheight + (event.pageY - options.start) * xxx[1];
-            //console.log([xxx[0].css('height'),w,event.pageY,options.start]);
-           // options.start = event.pageY;
-            if(w>15 && w<400)
+            console.log(xxx);
+            if(w>15 && w<xxx[2])
                 xxx[0].css('height', w);
         }
     })
