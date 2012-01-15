@@ -4,8 +4,9 @@
  * 
  * <%=point('hat','comment');%>
  */
-include_once ("preprocessor.class.php");
-include_once ("point.ext.php");
+$dir=dirname(__FILE__);
+include_once ($dir.DIRECTORY_SEPARATOR."preprocessor.class.php");
+include_once ($dir.DIRECTORY_SEPARATOR."point.ext.php");
 
     date_default_timezone_set('Europe/Moscow');
 

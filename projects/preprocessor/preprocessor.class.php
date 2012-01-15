@@ -74,7 +74,11 @@ class preprocessor{
 	 */	
     public function newpair($src,$dst='',$act='eval',$par=''){
         if(empty($par))$par=array();
-        //print_r($par);
+
+      /*  <% if($target=='debug') { %> */
+        print_r(array($src,$dst,$act,$par)); /*
+        <% } %>*/
+
         $this->store[]=array($src,$dst,$act,$par);
     }
 
@@ -310,6 +314,7 @@ class preprocessor{
 	 * @param $dst - file to store evaluated result
 	 */
 	private function post_process($dst='',$time=0){
+
 		$s=$this->obget();
 		$s=str_replace( // + final linefeed correcion
 		// replace LF with intel LF,
@@ -322,6 +327,9 @@ class preprocessor{
 		if(!empty($dst)){
 			$x=pathinfo($dst);
 			if(!is_dir($x['dirname']))mkdir($x['dirname'], 0777 ,true);
+            /*  <% if($target=='debug') { %> */
+            print_r(array(filemtime($dst),max($time,$this->cfg_time())));
+            /*  <% } %>*/
 			if(!is_file($dst) || (filemtime($dst)<max($time,$this->cfg_time()))){
                 file_put_contents($dst,str_replace("\xEF\xBB\xBF", '',trim($s)));
 				betouch ($dst,max($time,$this->cfg_time() ));
@@ -366,6 +374,9 @@ class preprocessor{
 			if(is_array($error)){
 				break;
 			}
+            /*  <% if($target=='debug') { %> */
+                    $this->debug('xxx-'.print_r($___m,true));
+                    /*  <% } %>*/
 			$srcfile=$___m[0];
 			$dstfile=$___m[1];
 			$___all_cnt++;
@@ -412,6 +423,9 @@ class preprocessor{
 					$___s=pathinfo($dstfile);//echo '"'.$dstfile.'" ';print_r($___s);
 					if(!empty($___s['dirname']) && !is_dir($___s['dirname']))
 						mkdir($___s['dirname'], 0777 ,true);
+                    /*  <% if($target=='debug') { %> */
+                    print_r(array(filemtime($dstfile),filemtime($srcfile)));
+                    /*  <% } %>*/
 					if(!is_file($dstfile) || (filemtime($dstfile)<filemtime($srcfile))){
 						echo "c>$srcfile";	
 						copy($srcfile,$dstfile);

@@ -104,11 +104,11 @@ thanks contacto at lucasfonzalida.com.ar and php.net ;)
 можно сделать так
 файл site.css
  /*
- <% point_start('css_site');
+ </% point_start('css_site');
   include_once('../common/regedit.css');
      point_finish();
- %>
- <% point("css_site"); %> */
+ %/>
+ </% point("css_site"); %/> */
  ...
 
 файл  config.xml
