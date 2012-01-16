@@ -207,12 +207,12 @@ $.fn.contextMenu = function (action, o) {
 
     function _getMenu(menu,el){
         if (typeof(menu) == 'function'){
-            menu=menu.call(el);
+            menu=menu.call(el,options);
         }
         if (menu instanceof Array) {
             // строим меню
             var xmenu=$('<ul/>').addClass("contextMenu");
-            for(var i=0;i<menu.length;i++){
+            for(var i in menu){
                 var line=menu[i];
                 if ( line=='' ) {
                     xmenu.append('<li class="separator"></li>');
@@ -232,7 +232,7 @@ $.fn.contextMenu = function (action, o) {
                          +'</li>').append(_getMenu(line.children,el)).appendTo(xmenu);
                 }
             }
-             return xmenu[0];
+            return xmenu[0];
 
         } else if (typeof(options.menu) == 'string') {
             // ищем селектор
@@ -382,8 +382,19 @@ $.fn.contextMenu = function (action, o) {
             for(a in x)
                 options._disabled[x[a]]=true;
             break;
+        case 'select': // показать меню в стиле select
+            options=$(this).data('contextMenu');
+            options._mode='select';
+            if(o instanceof $){
+                var pos=o.position();
+                showMenu.call(this,o,pos.left,pos.top+o.height());
+            } else {
+                console.log('Блин!');
+            }
+            break;
         case 'show': // показать меню
             options=$(this).data('contextMenu');
+            options._mode='contextmenu';
             if(o instanceof $){
                 var pos=o.position();
                 showMenu.call(this,o,pos.left+(o.width()>>1),pos.top+o.height()-3);

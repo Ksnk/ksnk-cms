@@ -19,17 +19,15 @@ function menu(_self,param){
 				el = el.parentNode;
 			}
 		}
-	};
-
-	function show_menu(){
+    }
+    function show_menu(){
 	  if(param.show) param.show.apply(_self);
 	  else $(_self).show();
 	  _self.shown=true;
 	  $(document).bind('mousedown', checkMouse);
 	  return false;
-	};
-
-	function hide_menu(){
+    }
+    function hide_menu(){
 	  $(document).unbind('mousedown', checkMouse);
 	  if(param.hide)
 	  	param.hide.apply(_self);
@@ -37,8 +35,8 @@ function menu(_self,param){
 	  	$(_self).hide();
 	  setTimeout(function(){_self.shown=false},500);
 	  return false;
-	};
-	_self.show_menu=show_menu;
+    }
+    _self.show_menu=show_menu;
 	_self.hide_menu=hide_menu;
 	$(window).bind('unload', function(){_self=null});
-};
+}

@@ -1,10 +1,15 @@
-// поставить куку cookie.
+/**
+ * РїРѕСЃС‚Р°РІРёС‚СЊ РєСѓРєСѓ cookie.
+ *
+ */
 function cookie(name,value,opt){
 	if (typeof value != 'undefined') { // name and value given, set cookie
 		if(typeof value == 'object' && !(value instanceof String)){
-			// сворачиваем простой одноуровневый объект в структуру
+			// СЃРІРѕСЂР°С‡РёРІР°РµРј РїСЂРѕСЃС‚РѕР№ РѕРґРЅРѕСѓСЂРѕРІРЅРµРІС‹Р№ РѕР±СЉРµРєС‚ РІ СЃС‚СЂСѓРєС‚СѓСЂСѓ
 			var str=[];
-			for(a in value) str.push(a+'='+encodeURIComponent(value[a]||0));
+            for (var a in value) {
+                str.push(a + '=' + encodeURIComponent(value[a] || 0));
+            }
 			value='&'+str.join('&');
 		}
 		opt = opt || {};
@@ -31,18 +36,18 @@ function cookie(name,value,opt){
 	}
 	else { // only name given, get cookie
 		if (document.cookie && document.cookie != '') {
-			var cook = (new RegExp(";\\s*" + name + "\\s*=([^;]+)")).exec(';' + document.cookie);
-			var cook=cook && decodeURIComponent(cook[1]),
-			reg=new RegExp("[\b|&]([^=]+)=([^&]+)","g"),resa=[],res={},obj=false;
+			var cook = (new RegExp(";\\s*" + name + "\\s*=([^;]+)")).exec(';' + document.cookie),
+                reg=new RegExp("[\b|&]([^=]+)=([^&]+)","g"),resa,res={},obj=false;
+            cook=cook && decodeURIComponent(cook[1]);
 			while((resa=reg.exec(cook))){
 				res[resa[1]]=resa[2];
 				obj=true;
-			};
-			if(obj) 
+            }
+            if(obj)
 				return res;
 			else 
 				return cook;
 		}
 		return null;
 	}
-};
+}

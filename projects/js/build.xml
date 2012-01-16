@@ -1,13 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="common" default="build.editcell">
     <taskdef name="minify" classname="phing.tasks.ext.kpMinTask" />
-    <!-- Sets the DSTAMP, TSTAMP and TODAY properties -->
+    <taskdef name="preprocess" classname="phing.tasks.ext.preprocessor.preprocessTask" />
+<!--    <taskdef name="minify" classname="phing.tasks.ext.kpMinTask" />
+     Sets the DSTAMP, TSTAMP and TODAY properties -->
     <tstamp/>
     <property file="../../env.prop" />
         
     <target name="property">
         <echo file="svn.prop" append="false"><![CDATA[
-license=License GNU/LGPL - Serge Koriakin - Jule 2010-2012
+license=License GNU/LGPL - Serge Koriakin<sergekoriakin@gmail.com> - Jule 2010-2012
 env_common=${common}
 svn_revision=$WCREV$
 svn_modified=$WCDATE$
@@ -24,29 +26,46 @@ svn_url=$WCURL$
     <target name="build.editcell" depends="property" description="build project">
         <property name="dst" value="build" />
         <property file="svn.prop" />
-        <exec command="${php_exe} -q ../../preprocessor/build/preprocessor.php /Dversion='.carret + .editcell jQuery plugins' /Psvn.prop /force='${svn_modified}' /Dmask=editcell config.xml"
-                checkreturn="true" logoutput="true" >
-        </exec>
+        <preprocess config="config.xml" force='force'>
+            <param name="dst" value="editcell"/>
+            <param name="version" value=".editcell jQuery plugin"/>
+            <param name="mask" value="editcell"/>
+            <param file="svn.prop"/>
+        </preprocess>
+        <preprocess config="config.xml" force='force'>
+            <param name="dst" value="editcell"/>
+            <param name="version" value=".carret jQuery plugin"/>
+            <param name="mask" value="select"/>
+            <param file="svn.prop"/>
+        </preprocess>
+
         <minify suffix='.min' yuiPath="${common}/tools/yuicompressor-2.4.5.jar">
             <fileset dir="build/editcell">
               <include name="*.js"/>
               <exclude name="*.min.js"/>
             </fileset>
         </minify>
- <!--       <delete file="svn.prop"/>-->
-
-    </target>
-
-    <target name="minify-css">
-        <echo>--------------------------------</echo>
-        <echo>| Minify CSS to release |</echo>
-        <echo>--------------------------------</echo>
-        <minify suffix='.min' yuiPath="${common}/tools/yuicompressor-2.4.5.jar">
-            <fileset dir="z:/home/localhost/www/rights/css">
-              <include name="*.css"/>
-              <exclude name="*.min.css"/>
+        <zip destfile="build/editcell.zip">
+            <fileset dir="build/editcell">
+                <include name="**/*.*"/>
             </fileset>
-        </minify>
+        </zip>
+        <delete file="svn.prop"/>
+
+        <phpdoc title="API Documentation"
+          destdir="apidocs"
+          sourcecode="false"
+          output="HTML:Smarty:PHP">
+           <fileset dir=".">
+              <include name="**/*.php" />
+           </fileset>
+           <projdocfileset dir=".">
+              <include name="README" />
+              <include name="INSTALL" />
+              <include name="CHANGELOG" />
+           </projdocfileset>
+        </phpdoc>
+
     </target>
 
 </project>

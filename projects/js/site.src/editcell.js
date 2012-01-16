@@ -1,75 +1,8 @@
 /**
- * .editcell & .carret jQuery plugins
+ * .editcell jQuery plugins
  *
  * <%=point('hat','comment');%>
  */
-/**
- * работа с курсором. Работаем с первым элементом коллекции.
- * .carret('get')| .carret() - выдать позицию курсора, верхняя граница отмеченного участка
- * .carret('sel') - выдать позицию курсора, верхняя и нижняя граница отмеченного участка в массиве
- * .carret('set',X,Y)| carret(X,Y)| carret(X) - установить курсор в поззицию
- * .carret('is',X) - проверить, что курсор в позиции X (отмеченая область считается курсором)
- * @param act
- * @param selectionStart
- * @param selectionEnd
- */
-$.fn.carret=function(act,selectionStart, selectionEnd){
-    var input=this[0];
-    if(!input) return 0 ;
-    // анализ параметров
-    if(undefined==act){
-        act='get';
-    } else
-    if(typeof(act)=="number"){
-        selectionEnd=selectionStart;
-        selectionStart=act;
-        act='set';
-    } else
-    if(undefined==selectionEnd)selectionEnd=selectionStart;
-
-    if(act=='set'){
-        if (input.setSelectionRange) {
-            input.focus();
-            input.setSelectionRange(selectionStart, selectionEnd);
-        }
-        else if (input.createTextRange) {
-            var range = input.createTextRange();
-            range.collapse(true);
-            range.moveEnd('character', selectionEnd);
-            range.moveStart('character', selectionStart);
-            range.select();
-        }
-        return this;
-    } else {
-        $(input).focus();
-        var cursor=[];
-        if(typeof(input.selectionStart)!='undefined'){
-            cursor=[ input.selectionStart,input.selectionEnd];
-        } else
-        if (document.selection) {
-            var sel=document.selection.createRange();
-            var clone=sel.duplicate();
-            sel.collapse(true);
-            clone.moveToElementText(input);
-            clone.setEndPoint('EndToStart',sel);
-            cursor[0]=clone.text.length;
-
-            sel=document.selection.createRange();
-            clone=sel.duplicate();
-            sel.collapse(false);
-            clone.moveToElementText(input);
-            clone.setEndPoint('EndToEnd',sel);
-            cursor[1]=clone.text.length;
-        }
-        if(act=='is'){
-            return cursor[0]<=selectionStart && selectionStart<=cursor[1];
-        }else if(act=='sel'){
-            return cursor;
-        } else
-            return cursor[0];
-    }
-
-};
 
 $.fn.editcell=function(action,o){
     var options={
@@ -134,12 +67,29 @@ $.fn.editcell=function(action,o){
     }
     options._editor=$(document).data('editcell-editor');
 
+    function hide(){
+        if(cell_editor.control){
+            //console.log('hide');
+            var val = $('textarea', options._editor).val();
+            if(!options._cancel){
+                options._cancel=false;
+                options.set_text.call(cell_editor.control,val,options);
+            }
+            if(options.exit)
+                options.exit.call(cell_editor.control,options);
+            options._editor.hide();
+            $(cell_editor.control).parents('div,body').unbind('scroll',scroll);
+            cell_editor.control=null;
+        }
+    }
+
     function scroll(){
         if(!cell_editor.internalScroll)
-            cell_editor.hide();
+            hide();
         else
             cell_editor.internalScroll=false;
     }
+
     /** scroll editor window into view */
     function cell_editor(t){
         cell_editor.internalScroll=false;
@@ -206,7 +156,7 @@ $.fn.editcell=function(action,o){
         if(!cell_editor.init){
 
             $('textarea',options._editor)
-                .blur(cell_editor.hide)
+                .blur(hide)
                 //todo: не очень удачная попытка изменить размер поля редактирования
   /*             .keyup(function(){
                     if(this.scrollTop>0 || this.scrollWidth>$(this).width()+10){
@@ -218,52 +168,37 @@ $.fn.editcell=function(action,o){
                     var $this=$(this);
                     if (event.keyCode == '13') {//enter
                         event.preventDefault();
-                        cell_editor.hide();
+                        hide();
                     } else if (event.keyCode == '27') {// esc
                         options._cancel=true;
-                        cell_editor.hide();
+                        hide();
                     }
                     switch (event.keyCode) {
                         case 37:
                             if(!$this.carret('is',0)) break;
                         case 38:
                             options.exit_key=event.keyCode;
-                            cell_editor.hide();
+                            hide();
                             event.preventDefault();
                              break;
                         case 39:
                             if(!$this.carret('is',$this.val().length)) break;
                         case 40:
                             options.exit_key=event.keyCode;
-                            cell_editor.hide();
+                            hide();
                             event.preventDefault();
                             break;
                     }
-                    return ;
                 });
                 cell_editor.init=true;
         }
     }
-    cell_editor.hide=function(){
-        if(cell_editor.control){
-            //console.log('hide');
-            var val = $('textarea', options._editor).val();
-            if(!options._cancel){
-                options._cancel=false;
-                options.set_text.call(cell_editor.control,val,options);
-            }
-            if(options.exit)
-                options.exit.call(cell_editor.control,options);
-            options._editor.hide();
-            $(cell_editor.control).parents('div,body').unbind('scroll',scroll);
-            cell_editor.control=null;
-        }
-    };
 
     options.parent=this;
 
-    if(action=='go' && this.length>0){
-        cell_editor(this);
+    if(action=='go'){
+        if(this.length>0)
+            cell_editor(this);
     } else {
         this.click(function(e)	{
             var t = e.target || e.srcElement;

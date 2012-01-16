@@ -133,7 +133,7 @@ $.fn.regedit = function (action,o) {
     }
     function editselect(el,selmenu){
         console.log(selmenu);
-        //$(document).contextMenu('keyboard',false);
+        $(document).contextMenu('select',el.parent());
         //$(el).editcell('go',{exit:function(){$(document).contextMenu('keyboard',true)}});
     }
 
@@ -175,7 +175,7 @@ $.fn.regedit = function (action,o) {
                     tab.find('tbody').append($html);
                 }
             }
-            $html = '<tr><td class="regedit-propname"></td><td></td>'
+            $html = '<tr><td class="regedit-propname"><span class="regedit-icon-select"></span>&nbsp;</td><td></td>'
                     + '<td class="regedit-propvalue"></td><td></td>'
                     + '<td class="regedit-propaction"></td><td></td>'
                     + '<td></td></tr>';
@@ -282,8 +282,18 @@ $.fn.regedit = function (action,o) {
                 'Enter':'open',
                 'default':'open'
             },
-            menu:function () {
+            menu:function (o) {
                 if(options.activeState=='prop'){
+                    if(o._mode=='select'){
+                        if($(this).is('.regedit-propname')){
+                            var xxx={};
+                            return $.map( options._keys, function (a) {
+                                if(xxx[a]) return null;
+                                xxx[a]=1;
+                                return a;
+                           } ).sort();
+                        }
+                    } else
                     return ['hello','is it me','you looking for'];
                 }
                 else if(options.activeState=='tree')
