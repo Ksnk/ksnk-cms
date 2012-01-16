@@ -1959,7 +1959,7 @@ function convert_href($s){
 		$x=preg_replace_callback('~<!--head-->~',array(SUPER::$engine,'get_head'),$x	);
 	if (!SUPER::$engine->is_ajax){
 		$x.=SUPER::_l(mess_page_was_build
-				,array(prop::sema(-(SUPER::$engine->req_cnt>>1),$ar[0])
+				,array(prop::sema(-SUPER::$engine->req_cnt,$ar[0])
 				,mkt()));
     }
 	// решение о сбросе кэша

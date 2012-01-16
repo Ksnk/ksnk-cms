@@ -595,6 +595,7 @@ class DbSimple_Generic_Database extends DbSimple_Generic_LastError
             // Run the query (counting time).
             $qStart = $this->_microtime();
             $result = $this->_performQuery($query);
+            SUPER::$engine->req_cnt++;
             $fetchTime = $firstFetchTime = 0;
 
             if (is_resource($result)) {

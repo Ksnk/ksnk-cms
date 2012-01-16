@@ -247,18 +247,18 @@ function databaseErrorHandler($message, $info)
 }
 function myLogger($db, $sql)
 {
-  global $engine,$DATABASE;
-  $engine->req_cnt++;
+  global $DATABASE;
   if(!empty($DATABASE->do_log)){
 	  // Находим контекст вызова этого запроса.
-	  $caller = $DATABASE->findLibraryCaller();
-	  $tip = "at ".@$caller['file'].' line '.@$caller['line'];
 	  // Печатаем запрос (конечно, Debug_HackerConsole лучше).
 	  //echo "<xmp title=\"$tip\">";
-	  if(preg_match('/$\s*--/',$sql))
-	  	debug($sql."\n".$tip);
-	  else
-	  	debug($sql);
+	  if(preg_match('/$\s*--/',$sql)){
+            debug($sql);
+      } else {
+            $caller = $DATABASE->findLibraryCaller();
+            $tip = "at ".@$caller['file'].' line '.@$caller['line'];
+            debug($sql);
+      }
 	  //echo "</xmp>";
   }
 }
