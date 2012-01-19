@@ -71,7 +71,7 @@ table.regedit td {
     color: white !important;
 }
 
-.regedit-propname {
+.regedit-propname,.regedit-propvalue, .regedit-propaction  {
     position:relative;
 }
 
@@ -81,7 +81,10 @@ span.regedit-icon-select{
     top:0;
     display:none;
 }
-.regedit-propname:hover .regedit-icon-select,.active .regedit-icon-select{
+.regedit-propname:hover .regedit-icon-select,.active .regedit-icon-select,
+.regedit-propvalue:hover .regedit-icon-select,
+.regedit-propaction:hover .regedit-icon-select
+{
     display:block;
 }
 /* треугольники */

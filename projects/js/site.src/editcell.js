@@ -1,5 +1,6 @@
 /**
  * .editcell jQuery plugins
+ * depends: jQuery, _scrollItoView
  *
  * <%=point('hat','comment');%>
  */
@@ -59,27 +60,30 @@ $.fn.editcell=function(action,o){
     $.extend(options,o);
 
     // устанавливаем редактор. Только раз в жизни
-    if(!$(document).data('editcell-editor')){
+    options._editor=$(document).data('editcell-editor')
+    if(!options._editor){
         $(document).data('editcell-editor',$('<div/>').append(
                 $('<textarea></textarea>').css(options.textarea)
             ).css(options.css)
             .appendTo(document.body));
+        options._editor=$(document).data('editcell-editor');
     }
-    options._editor=$(document).data('editcell-editor');
 
     function hide(){
-        if(cell_editor.control){
+        if(options._control){
             //console.log('hide');
             var val = $('textarea', options._editor).val();
             if(!options._cancel){
+                if(options.set_text.call(options._control,val,options)===false){
+                    return; // no any santaclause!
+                }
                 options._cancel=false;
-                options.set_text.call(cell_editor.control,val,options);
             }
             if(options.exit)
-                options.exit.call(cell_editor.control,options);
+                options.exit.call(options._control,options);
             options._editor.hide();
-            $(cell_editor.control).parents('div,body').unbind('scroll',scroll);
-            cell_editor.control=null;
+            $(options._control).parents('div,body').unbind('scroll',scroll);
+            options._control=null;
         }
     }
 
@@ -92,53 +96,27 @@ $.fn.editcell=function(action,o){
 
     /** scroll editor window into view */
     function cell_editor(t){
-        cell_editor.internalScroll=false;
+        //cell_editor.internalScroll=false;
         options.exit_key=false;
-
+        cell_editor.internalScroll = true;
+         _scrollIntoView(t);
         /** @var jQuery $self */
         var $self=$(t);
         // scroll into view
-        var position,rect,$parent,prect,ppos;
-        for (var c=0;c<2;c++) {
-            position = $self.position();
+        var position = $self.position(),
             rect = {
                 height:$self.innerHeight(),
                 width:$self.innerWidth(),
                 top:position.top - 1, //+parseInt($self.css('padding-top')),
                 left:position.left + parseInt($self.css('padding-left'))
-            };
-            var tt = 1 + (($self.outerHeight() - $self.innerHeight()) >> 1);
-            rect.top -= tt;
-            tt = 1 + (($self.outerWidth() - $self.innerWidth()) >> 1);
-            rect.left -= tt;
-            $parent = $(options.parent);
-            ppos = $parent.position();
-            prect = {
-                height:$parent.innerHeight(),
-                width:$parent.innerWidth(),
-                top:ppos.top,
-                left:ppos.left
-            };
-            var pst = $parent.scrollTop();
-            if (rect.top < prect.top + 24 && pst > 0) {
-                // scroll down
-                cell_editor.internalScroll = true;
-                $parent.scrollTop(
-                    pst + (rect.top - prect.top - 24)
-                );
-            } else if (rect.top + rect.height > prect.top + prect.height) {
-                // scroll up
-                cell_editor.internalScroll = true;
-                $parent.scrollTop(
-                    pst + (rect.top + rect.height - prect.top - prect.height)
-                );
-            } else {
-                break;
-            }
-        }
-        //console.log(rect.top-prect.top,rect.top+rect.height-prect.top-prect.height)
+            },
+            tt = 1 + (($self.outerHeight() - $self.innerHeight()) >> 1);
+        rect.top -= tt;
+        tt = 1 + (($self.outerWidth() - $self.innerWidth()) >> 1);
+        rect.left -= tt;
+
         options._editor.css(rect).show();
-        $(t).parents('div,body').bind('scroll',scroll);
+        $self.parents('div,body').bind('scroll',scroll);
 
         var txt=options.get_text.call(t,options);
         $('textarea',options._editor)
@@ -151,7 +129,7 @@ $.fn.editcell=function(action,o){
             .focus().val(txt)
             .carret('set',0,txt.length);
        // console.log('focus');
-        cell_editor.control=$self;
+        options._control=t;
         //one-time инициализация
         if(!cell_editor.init){
 

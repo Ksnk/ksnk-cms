@@ -25,7 +25,7 @@ function WindowO(e,s,w,h)
 		'onclick="self.close();">close</button><'+'/body><'+'/html>');
 	  wind.document.close();
 	} catch(e) {
-	  alert('Всплывающие окна заблокированы! Разрешите всплывающие окна для нормального функционирования.')
+	  alert('пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ! пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅ пїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ пїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅпїЅ.')
 	}
 	return false;
 };window.WindowO=WindowO;
@@ -34,7 +34,7 @@ function WindowO(e,s,w,h)
 		if(this.href && this.href.match(/\.(jpe?g|png|gif)/)) {
 		    this.__done=true;
 		    $(this).click(function(){ 
-				var t=$(this).parents('.galleryX').find('img')[0];
+				var t=$(this).closest('.galleryX').find('img')[0];
 				t.src=this.href;
 				return false
 			})

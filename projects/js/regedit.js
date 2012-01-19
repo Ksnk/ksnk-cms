@@ -18,21 +18,25 @@ $.fn.regedit = function (action,o) {
     function append_tr(xtree_body, row, level, hidden) {
         hidden = hidden || 0;
         // append one cell
-        var child_cnt = row.children && row.children.length || 0;
+        var i, ii, child_cnt = row.children && row.children.length || 0;
         if (row.title && level.length > 0) {
-            options._keys[row.key] = options._prefix + row.title;
+            if(row.type.match(/^aro/))
+                options._keys[row.key] = options._prefix + row.title;
             var $dig = '';
-            var child_cnt = 0;
-            if (row.children) {
-                for (var i in row.children) {
-                    var ii=row.children[i];if(!ii) continue;
+            child_cnt=0;
+            if(row.children){
+                for ( i in row.children) {
+                    ii=row.children[i];if(!ii) continue;
+                    child_cnt++;
+                }
+            }
+            if(row.prop){
+                for ( i in row.prop) {
+                    ii=row.prop[i];if(!ii) continue;
                     if (ii.type == 'right') {
-                        $m = ii.value.match(/(\d+)\|(.*?)\|(.+)$/);
-                        $dig += options._keys[parseInt($m[1]) || 0] + ':' + ($m[2] == 0 ? '-' : '+') + $m[3] + ';';
+                        $dig += options._keys[ii.id || 0] + ':' + (ii.allow == 0 ? '-' : '+') + ii.action + ';';
                     } else if (ii.type == 'action') {
                         $dig += ii.value + ';';
-                    } else {
-                        child_cnt++;
                     }
                 }
             }
@@ -41,7 +45,7 @@ $.fn.regedit = function (action,o) {
             }
             $result = '';
             // символ +-[] -
-            $xxx = '';
+            var $xxx = '';
             if (row._empty) {
                 $xxx = 'empty';
             } else if (row._status == 'show') {
@@ -60,7 +64,7 @@ $.fn.regedit = function (action,o) {
                     $result = '<span class="regedit-tree-' + $xxx + '"/>'
                             + $result;
             }
-            for (var i = level.length - 2; i >= 0; i--) {
+            for (i = level.length - 2; i >= 0; i--) {
                 if (level[i] == 0)
                     $result = '<span class="regedit-tree-void"/>'
                             + $result;
@@ -79,16 +83,15 @@ $.fn.regedit = function (action,o) {
             else
                 $result += '<td></td>';
             $result += '<td></td><td></td></tr>';
-            row._element = $($result).appendTo(xtree_body);
-            row._element.data('row', row);
-        }
+            row._element = $($result).appendTo(xtree_body).data('row', row);
+         }
         if (child_cnt) {
             level.push(child_cnt);
             if (row.type == 'aro_prefix') {
                 options._prefix = row.title + '|';
             }
-            for (var i = 0; i < row.children.length; i++) {
-                var ii=row.children[i];if(!ii) continue;
+            for ( i = 0; i < row.children.length; i++) {
+                 ii=row.children[i];if(!ii) continue;
                 ii._parent=row;
                 append_tr(xtree_body, ii, level, hidden+(row._status == 'hide'?1:0));
             }
@@ -102,39 +105,85 @@ $.fn.regedit = function (action,o) {
 
     function getNode(element){
         if($(element).is('tr')) return $(element);
-        return $(element).parents('tr').eq(0);
+        return $(element).closest('tr');
     }
     function getRow(element){
         return getNode(element).data('row');
     }
 
-    function deleteRow(el,row){
+    function deleteRow(el,row) {
+        var activeNode=false;
         if(!row){
-            var e = $.Event("keydown", { keyCode: 38 }), r = getRow(el);
-            $(document).trigger( e );
-            row = r;
+            var row = options.activeNode.data('row');
+            var x = $('#tree tr.active').prevAll(':visible:first');
+            if (x.length)
+                activeNode=x.data('row');
+            else
+                activeNode=$('#tree tr:visible:first').data('row');
+            options.activeNode.data('row',activeNode);
         }
-        if(row.children){
+        if(row.children) {
             for(var i in row.children){
                 var ii=row.children[i];if(!ii) continue;
                 deleteRow(null,ii);
                 delete(row.children[i]);
             }
-        };
+        }
         if(row.key) // удаляем старую строку, иначе - вновьвставленную
             options._delete[row.key]=row.key;
+        // удаляем из парента
+        if(el) {
+            var idx=$.inArray(row,row._parent.children);
+            if(idx>=0){
+                delete(row._parent.children[idx]);
+            }
+            update();
+        }
         if(row._element)
             row._element.remove();
     }
 
     function editcell(el){
-        $(document).contextMenu('keyboard',false);
-        $(el).editcell('go',{exit:function(){$(document).contextMenu('keyboard',true)}});
+       // $(document).contextMenu('keyboard',false);
+        $(el).editcell('go',options.editcell_data);
     }
-    function editselect(el,selmenu){
-        console.log(selmenu);
-        $(document).contextMenu('select',el.parent());
-        //$(el).editcell('go',{exit:function(){$(document).contextMenu('keyboard',true)}});
+    function editselect(el){
+        $(document).contextMenu('select',el.parent(),options.editcell_data);
+    }
+
+    function fill_table(childs) {
+        var tab = $('#propdata');
+        tab.find('tbody').find('tr').remove();
+        var $html;
+        for (var i in childs) {
+            $html = '<tr><td class="regedit-propname"><span class="regedit-icon-select"></span>' + options._keys[parseInt(childs[i].id) || 0]
+                    + '</td><td></td>'
+                    + '<td class="regedit-propvalue"><span class="regedit-icon-select"></span>' + (childs[i].allow == 0 ? '-' : '+')
+                    + '</td><td></td>'
+                    + '<td class="regedit-propaction"><span class="regedit-icon-select"></span>' + childs[i].action
+                    + '</td><td></td>'
+                    + '<td></td></tr>';
+            $($html).appendTo(tab.find('tbody')).data('row', childs[i]);
+        }
+        $html = '<tr><td class="regedit-propname"><span class="regedit-icon-select"></span>&nbsp;</td><td></td>'
+                + '<td class="regedit-propvalue"><span class="regedit-icon-select"></span></td><td></td>'
+                + '<td class="regedit-propaction"><span class="regedit-icon-select"></span></td><td></td>'
+                + '<td></td></tr>';
+        $($html).appendTo(tab.find('tbody'));
+    }
+
+    function make_Active($tgt){
+        if (options.activeNode) {
+             options.activeNode.removeClass('active');
+        }
+        options.activeNode = getNode($tgt);
+        if (options.onActivate) {
+             options.onActivate(options.activeNode);
+        }
+        var row = options.activeNode.data('row');
+        fill_table(row.prop||[]);
+        _scrollIntoView(options.activeNode);
+        options.activeNode.addClass('active');
     }
 
     function create(){
@@ -147,6 +196,49 @@ $.fn.regedit = function (action,o) {
             _update:[],
             _append:[],
             activeState:'tree',
+            activeNode:null,
+            /**
+             * постоянный параметр для editcell
+             */
+            editcell_data:{
+                set_text:function(txt){
+                    var row,regedit=$('#regedit'),options=regedit.data('regedit');
+                    if($(this).is('.regedit-title')){
+                        //делаем rename в дереве
+                        row=$(this).parent().parent().data('row');
+                        row.title=txt;
+                     } else if($(this).is('.regedit-propname,.regedit-propvalue,.regedit-propaction')){
+                        var parent=options.activeNode.data('row');
+                        //делаем rename в дереве
+                        row=$(this).parent().data('row');
+                        if(!row) var str ={id:0,allow:0,action:'read',type:'right'};
+                        if($(this).is('.regedit-propname')){
+                            (row||str)['id']=$.inArray(txt,options._keys);
+                        } else if($(this).is('.regedit-propvalue')){
+                            (row||str)['allow']=(0+(txt=='+'));
+                        } else
+                            (row||str)['action']=txt;
+                        if(!row) { // обновляем данные
+                            //добавляем новую строку
+                            if(parent=options.activeNode.data('row')){
+                                if(parent.prop){
+                                    parent.prop.push(str)
+                                } else {
+                                    parent.prop=[str]
+                                }
+                            }
+                        }
+
+                       // $(this).html('<span class="regedit-icon-select"></span>'+txt);
+                       // update.call($('#regedit'));
+                        update.call(regedit);
+                        make_Active(parent._element);
+                        setActive('prop',options);
+                        return true;
+                    }
+                    $(this).text(txt);
+                }
+            },
             // просто затычко
             empty:''
 
@@ -157,69 +249,14 @@ $.fn.regedit = function (action,o) {
         $.extend(options,o);
         $(this).data('regedit',options);
 
-        function fill_table(childs) {
-            var tab = $('#propdata');
-            tab.find('tbody').find('tr').remove();
-            if (childs.length == 0) return;
-            var $html;
-            for (var i in childs) {
-                var $m = (childs[i].value || '').match(/(\d+)\|(.*?)\|(.+)$/);
-                if ($m) {
-                    $html = '<tr><td class="regedit-propname"><span class="regedit-icon-select"></span>' + options._keys[parseInt($m[1]) || 0]
-                            + '</td><td></td>'
-                            + '<td class="regedit-propvalue">' + ($m[2] == 0 ? '-' : '+')
-                            + '</td><td></td>'
-                            + '<td class="regedit-propaction">' + $m[3]
-                            + '</td><td></td>'
-                            + '<td></td></tr>';
-                    tab.find('tbody').append($html);
-                }
-            }
-            $html = '<tr><td class="regedit-propname"><span class="regedit-icon-select"></span>&nbsp;</td><td></td>'
-                    + '<td class="regedit-propvalue"></td><td></td>'
-                    + '<td class="regedit-propaction"></td><td></td>'
-                    + '<td></td></tr>';
-            tab.find('tbody').append($html);
-        }
-
         function recclose(row, $op) {
             if (row._element)
                 $op = $op.add(row._element);
             if (row.children && row._status != 'hide')
                 for (var i  in row.children) {
-                    var ii=row.children[i];
-                    $op = recclose(ii, $op);
+                    $op = recclose(row.children[i], $op);
                 }
             return $op;
-        }
-
-        function make_Active($tgt){
-            if (options.activeNode) {
-                 options.activeNode.removeClass('active');
-            }
-            options.activeNode = getNode($tgt);
-            if (options.onActivate) {
-                 options.onActivate(options.activeNode);
-            }
-            var row = options.activeNode.data('row'), childs = [];
-            if (row && row.children && row.children.length)
-                for (var i  in row.children) {
-                    var ii=row.children[i];
-                    if (ii.type == 'right' || ii.type == 'action') {
-                        childs.push(ii);
-                    }
-                 }
-            fill_table(childs);
-            var pos= options.activeNode.position(),
-                xx = options.activeNode.parents('div:eq(0)'),
-                xpos=xx.position();
-            pos.top-=xpos.top;
-            pos.left-=xpos.left;
-            if ( pos.top+20>xx.height() )
-                xx.scrollTop(xx.scrollTop() +20 + pos.top-xx.height() );
-            else if ( pos.top <0 )
-                xx.scrollTop(xx.scrollTop() + pos.top  );
-            options.activeNode.addClass('active');
         }
 
         function openSubtree(el) {
@@ -265,7 +302,8 @@ $.fn.regedit = function (action,o) {
                 editcell($tgt);
             else
             if ($tgt.is('.regedit-icon-select'))
-                editselect($tgt,$tgt.parent()[0].className); //todo: исправить на более разумный выбор
+                editselect($tgt);
+                //todo: исправить на более разумный выбор
             }
         );
 
@@ -292,6 +330,10 @@ $.fn.regedit = function (action,o) {
                                 xxx[a]=1;
                                 return a;
                            } ).sort();
+                        } else if($(this).is('.regedit-propvalue')){
+                           return ['+','-']
+                        } else if($(this).is('.regedit-propaction')){
+                           return ['create','read','write','delete'];
                         }
                     } else
                     return ['hello','is it me','you looking for'];
@@ -319,23 +361,24 @@ $.fn.regedit = function (action,o) {
                 }
                 return false
             }, action:function (act/*,event*/) {
+                var x,row,pos,func;
                 if(options.activeState=='tree')
                 switch (act) {
                     case 'contextMenu':
                         $(document).contextMenu('show', options.activeNode.find('.regedit-title').eq(0));
                         break;
                     case 'keyleft':
-                        var row = options.activeNode.data('row');
+                        row = options.activeNode.data('row');
                         if (row && row._status && row._status == 'hide') {
                             openSubtree(options.activeNode);
                             break;
                         }
                     case 'keydown':
-                        var pos = 'first', func = 'nextAll';
+                        pos = 'first'; func = 'nextAll';
                         if ($('#tree tr.active').length == 0) {
                             make_Active($('#tree tr:visible:' + pos));
                         } else {
-                            var x = $('#tree tr.active')[func](':visible');
+                            x = $('#tree tr.active')[func](':visible');
                             if (x.length > 0)
                                 make_Active(x.eq(0));
                         }
@@ -351,18 +394,18 @@ $.fn.regedit = function (action,o) {
                             break;
                         }
                     case 'keyup':
-                        var pos = 'last', func = 'prevAll';
+                        pos = 'last'; func = 'prevAll';
                         if ($('#tree tr.active').length == 0) {
                             make_Active($('#tree tr:visible:' + pos));
                         } else {
-                            var x = $('#tree tr.active')[func](':visible');
+                            x = $('#tree tr.active')[func](':visible');
                             if (x.length > 0)
                                 make_Active(x.eq(0));
                         }
                         break;
                     case 'slowdbl':
                     case 'rename':
-                        var x =  this;
+                        x =  this;
                         if(!x || x==window){
                             x=options.activeNode.find('.regedit-title').eq(0);
                         }
@@ -450,7 +493,7 @@ $.fn.regedit = function (action,o) {
     function setActive(state,options){
         if(options.activeState!=state){
             if(options.activeState)
-                $('#regedit').removeClass('state_'+options.activeState)
+                $('#regedit').removeClass('state_' + options.activeState);
             options.activeState=state;
             $('#regedit').addClass('state_'+options.activeState);
         }
@@ -459,13 +502,17 @@ $.fn.regedit = function (action,o) {
     function update(){
         var tree = $('#tree');
         if (options && options.children) {
-            var xtree = tree.clone(true).find('tr').remove().end();
+            var row=options.activeNode && options.activeNode.data('row') || false,
+                xtree = tree.clone(true).find('tr').remove().end();
             append_tr(xtree.find('tbody'), options, []);
             var parent = tree.parent();
             tree.remove();
             parent.append(xtree);
+            if(row)
+                make_Active(row._element);
         }
     }
+
     if(action=='create'){
         create.call(this);
     } else {
@@ -504,10 +551,10 @@ $.fn.regedit = function (action,o) {
 };
 $(function () {
 
-    $('#tree').parents('td:eq(0)').bind('mousedown mouseup',function(){
+    $('#tree').closest('td').bind('mousedown mouseup',function(){
         $('#regedit').regedit('setActive','tree');
     });
-    $('#propdata').parents('td:eq(0)').bind('mousedown mouseup',function(){
+    $('#propdata').closest('td').bind('mousedown mouseup',function(){
         $('#regedit').regedit('setActive','prop');
     });
 
@@ -522,10 +569,10 @@ $(function () {
                 var
                     $self = $(this),
                     cnt = $self.prevAll(this.tagName).length,
-                    col = $self.parents('table').eq(0).find('col'),
+                    col = $self.closest('table').find('col'),
                     childcol = this.tagName.toLowerCase() == 'td'
-                        ? $self.parents('div').eq(0).find('table').eq(1).find('col')
-                        : $('#' + $self.parents('table').eq(0).attr('id').substr(1)).find('col')
+                        ? $self.closest('div').find('table').eq(1).find('col')
+                        : $('#' + $self.closest('table').attr('id').substr(1)).find('col')
                     ;
 
                 if (col.eq(cnt - 1).attr('width')) {
@@ -550,10 +597,10 @@ $(function () {
             options.start = event.pageY;
             var $self=$(this),data=$self.data('vresizer');
             if(!data){
-                var $x=$self.parents('tr:eq(0)'),
+                var $x=$self.closest('tr'),
                     maxheight=$x.height()+$x.prev('tr').height()+$x.next('tr').height();
                 data=[
-                    $self.parents('tr:eq(0)').next('tr').find('td').eq(0),-1,maxheight];
+                    $self.closest('tr').next('tr').find('td').eq(0),-1,maxheight];
                 $self.data('vresizer',data);
             }
             options.startheight = parseInt(data[0].css('height'));

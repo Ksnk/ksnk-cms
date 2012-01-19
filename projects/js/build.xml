@@ -38,6 +38,12 @@ svn_url=$WCURL$
             <param name="mask" value="select"/>
             <param file="svn.prop"/>
         </preprocess>
+        <preprocess config="config.xml" force='force'>
+            <param name="dst" value="editcell"/>
+            <param name="version" value=".scrollIntoView jQuery plugin"/>
+            <param name="mask" value="scrollIntoView"/>
+            <param file="svn.prop"/>
+        </preprocess>
 
         <minify suffix='.min' yuiPath="${common}/tools/yuicompressor-2.4.5.jar">
             <fileset dir="build/editcell">

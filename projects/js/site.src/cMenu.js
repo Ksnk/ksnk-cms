@@ -79,7 +79,7 @@ var CMenu_keymap =
     NumLock:144
 };
 
-$.fn.contextMenu = function (action, o) {
+$.fn.contextMenu = function (action, o,o2) {
 
     var options;
 
@@ -132,7 +132,7 @@ $.fn.contextMenu = function (action, o) {
                     break;
                 case 27: // esc
                     $(document).trigger('mousedown');
-                    break
+                    break;
                 default:
                   // e.keyCode=key;
             }
@@ -161,6 +161,7 @@ $.fn.contextMenu = function (action, o) {
     function showMenu(tgtElement,X,Y){
         var _menu = getMenu(tgtElement);//options.menu.call(srcElement);
         if(!_menu) return;
+        if(options._mode!='contextmenu') $(_menu).css('overflow-y','auto');
         $('li',_menu).removeClass('disabled');
         for(a in options._disabled){
             $('a',_menu).find('[href$="#' + a + '"]').parent().addClass('disabled');
@@ -192,13 +193,18 @@ $.fn.contextMenu = function (action, o) {
                  $(_menu).find('LI.hover').removeClass('hover');
                  $(this).parents('LI').addClass('hover');
             }).click(function(event){
-                 _menu.hide_menu() ;
-                 if( options.action )
-                     options.action.call(tgtElement,
-                         $(this).attr('href').substr(1),
-                         event
-                     );
-                 return false;
+                _menu.hide_menu() ;
+                if( options._mode=='select'){
+                    if (options.set_text){
+                        options.set_text.call(tgtElement,$(this).attr('href').substr(1))
+                    }
+                } else if( options.action ) {
+                    options.action.call(tgtElement,
+                        $(this).attr('href').substr(1),
+                        event
+                    )
+                }
+                return false;
             });
         }
         $(_menu).css({ top:Y, left:X });
@@ -221,7 +227,7 @@ $.fn.contextMenu = function (action, o) {
                 if(typeof(line)=='string'){
                     line=line.split('#');
                     line={'title':line[0],'href':line[1]||line[0]};
-                    var xx=$('<li><a href="#'+line.href+'">'+line.title.replace(' ','&nbsp;')+'</a></li>')
+                    var xx = $('<li><a href="#' + line.href + '">' + line.title.replace(' ', '&nbsp;') + '</a></li>');
                     if(line.href==options._defaultaction)
                         $('a',xx).addClass("default");
                     if(options._act_hk[line.href])
@@ -249,7 +255,7 @@ $.fn.contextMenu = function (action, o) {
         options = {
             slowClick_timer:null,
             slowClick_low: 400,
-            slowClick_high:3000,
+            slowClick_high:2000,
 
             inSpeed:150,
             outSpeed:75,
@@ -311,6 +317,7 @@ $.fn.contextMenu = function (action, o) {
             // Hide context menus that may be showing
             //$(".contextMenu").hide();
             // Get this context menu
+            options._mode='contextmenu';
             showMenu(tgtElement,event.pageX+1, event.pageY+1);
         }
 
@@ -320,7 +327,9 @@ $.fn.contextMenu = function (action, o) {
                 e.stopPropagation();
             }
         }).bind('contextmenu',function(e) {
-            if(e.ctrlKey) return; return false;
+            if($(e.target).is('input,textarea')) return ;
+            if(e.ctrlKey) return;
+            return false;
         });
         $(document)
             .bind('keydown',keypress)
@@ -352,7 +361,7 @@ $.fn.contextMenu = function (action, o) {
                     })(event.target);
                 }
                 if (!!options._lasttgt && options._lasttgt == event.target) {
-                    if( options.action )
+                    if(!options._displayed && options.action )
                         options.action.call($tgt,
                             'slowdbl',
                             event
@@ -360,7 +369,7 @@ $.fn.contextMenu = function (action, o) {
                 }
             });
     }
-
+    var a,x,pos;
     switch (action){
         case 'create': // создать меню и поставить хандлеры
             create.call(this);
@@ -371,22 +380,24 @@ $.fn.contextMenu = function (action, o) {
             break;
         case 'enable':
             options=$(this).data('contextMenu');
-            var x=o.split(',');
+            x=o.split(',');
             for(a in x)
                 if(options._disabled[a])
                     delete options._disabled[a];
             break;
         case 'disable':
             options=$(this).data('contextMenu');
-            var x=o.split(',');
+            x=o.split(',');
             for(a in x)
                 options._disabled[x[a]]=true;
             break;
         case 'select': // показать меню в стиле select
             options=$(this).data('contextMenu');
             options._mode='select';
+            if (!o2) o2 = {};
+            $.extend(options, o2);
             if(o instanceof $){
-                var pos=o.position();
+                pos=o.position();
                 showMenu.call(this,o,pos.left,pos.top+o.height());
             } else {
                 console.log('Блин!');
@@ -396,10 +407,10 @@ $.fn.contextMenu = function (action, o) {
             options=$(this).data('contextMenu');
             options._mode='contextmenu';
             if(o instanceof $){
-                var pos=o.position();
+                pos=o.position();
                 showMenu.call(this,o,pos.left+(o.width()>>1),pos.top+o.height()-3);
             } else {
-                var pos=o.position();
+                pos=o.position();
                 showMenu.call(this,o,pos.left+20,pos.top+20);
             }
             break;

@@ -1,6 +1,6 @@
 	$('a.url_page').click(function(){
 		if(this.href && !this.href.match(/javascript/i)){
-			var self=this,parent=$(this).parents('.para')[0];
+			var self=this,parent=$(this).closest('.para')[0];
 			function clickit(e){
 				if(e && self) return false;
 			    $(this).find('.back').toggleClass('hidden');
