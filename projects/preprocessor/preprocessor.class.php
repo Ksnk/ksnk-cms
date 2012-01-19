@@ -32,12 +32,20 @@ function betouch($file, $time){
 class preprocessor{
 	var $obcnt=0,
         $debug_str='',
-        $result='';
+        $result='',
+        $logLevel=2,
+        $logs=array('','','','','');
 	/**
 	 * error handling. donow what to do with them ;(
 	 */
-	function error ($mess){
-		echo $mess."\n" ;
+	function error (){
+        $na=func_num_args();
+        if($na>0){
+            for ($i=0; $i<$na;$i++){
+                $this->log(0,func_get_arg($i));
+            }
+        } else
+            $this->log(0);
 	}
 
 	/**
@@ -75,9 +83,7 @@ class preprocessor{
     public function newpair($src,$dst='',$act='eval',$par=''){
         if(empty($par))$par=array();
 
-      /*  <% if($target=='debug') { %> */
-        print_r(array($src,$dst,$act,$par)); /*
-        <% } %>*/
+        $this->debug(print_r(array($src,$dst,$act,$par),true));
 
         $this->store[]=array($src,$dst,$act,$par);
     }
@@ -192,20 +198,43 @@ class preprocessor{
 
     public function debug (){
         $na=func_num_args();
-        if($na>1){
+        if($na>0){
             for ($i=0; $i<$na;$i++){
-                $this->debug(func_get_arg($i));
+                $mess=func_get_arg($i);
+                $this->log(4,$mess);
+            }
+        } else
+            $this->log(4);
+    }
+
+    public function info (){
+        $na=func_num_args();
+        if($na>0){
+            for ($i=0; $i<$na;$i++){
+                $mess=func_get_arg($i);
+                $this->log(2,$mess);
+            }
+        } else
+            $this->log(2);
+    }
+
+    public function log ($level){
+        if($this->logLevel<$level) return ;
+        $na=func_num_args();
+        if($na>2){
+            for ($i=1; $i<$na;$i++){
+                $this->log($level,func_get_arg($i));
             }
         } else {
-            if ($na==1){
+            if ($na==2){
                 if ($this->obcnt){
-                    $this->debug_str.= "\n".func_get_arg(0);
+                    $this->logs[$level].= "\n".func_get_arg(0);
                 } else {
-                    echo ''.func_get_arg(0);
+                    echo ''.func_get_arg(1);
                 }
             } else {
-                echo $this->debug_str;
-                $this->debug_str='';
+                echo $this->logs[$level];
+                $this->logs[$level]='';
             }
         }
     }
@@ -217,10 +246,10 @@ class preprocessor{
 	 * @param $xml
 	 */
 	public function xml_read($xml,$insertbefore=false){
-        //$this->debug('xml_read:',getcwd());
+        $this->debug('xml_read:',getcwd());
 		$oldcwd= getcwd() ;
 		if (is_file($xml)){
-			chdir(dirname($xml));//$this->debug('xml_read:',getcwd());
+			chdir(dirname($xml));$this->debug('file:',$xml);
 			$this->cfg_time($xml);
 			$config=simplexml_load_file($xml);
 		} else {
@@ -327,10 +356,9 @@ class preprocessor{
 		if(!empty($dst)){
 			$x=pathinfo($dst);
 			if(!is_dir($x['dirname']))mkdir($x['dirname'], 0777 ,true);
-            /*  <% if($target=='debug') { %> */
-            print_r(array(filemtime($dst),max($time,$this->cfg_time())));
-            /*  <% } %>*/
-			if(!is_file($dst) || (filemtime($dst)<max($time,$this->cfg_time()))){
+            if(is_file($dst))
+                $this->debug(print_r(array(filemtime($dst),max($time,$this->cfg_time())),true));
+            if(!is_file($dst) || (filemtime($dst)<max($time,$this->cfg_time()))){
                 file_put_contents($dst,str_replace("\xEF\xBB\xBF", '',trim($s)));
 				betouch ($dst,max($time,$this->cfg_time() ));
 				return true;
@@ -374,9 +402,7 @@ class preprocessor{
 			if(is_array($error)){
 				break;
 			}
-            /*  <% if($target=='debug') { %> */
-                    $this->debug('xxx-'.print_r($___m,true));
-                    /*  <% } %>*/
+            $this->debug('xxx-'.print_r($___m,true));
 			$srcfile=$___m[0];
 			$dstfile=$___m[1];
 			$___all_cnt++;
@@ -389,7 +415,6 @@ class preprocessor{
                         $filemtime=filemtime ($srcfile);
                     if(!empty($___m[3]['xtime'])){
                         $filemtime=max($filemtime,$___m[3]['xtime']);
-                        //$this->debug($___m[3]['xtime']);
                     }
                     if(!empty($___m[3]))
                         if(!empty($___m[3]['force']))
@@ -407,13 +432,13 @@ class preprocessor{
 							$this->cfg_time($filemtime);
 						}
                         if($this->post_process($dstfile,$filemtime)){
-							echo "e>$srcfile";
+							$this->info( "e>$srcfile");
 							if (strlen($srcfile)+strlen($dstfile)>75){
-                                echo "\n\r  ";
+                                $this->info( "\n\r  ");
                             }
-                            echo "-->$dstfile";
+                            $this->info( "-->$dstfile");
 							$___total_cnt++;
-                            echo "\n\r";
+                            $this->info(  "\n\r");
 						}
 
 						break;
@@ -423,17 +448,15 @@ class preprocessor{
 					$___s=pathinfo($dstfile);//echo '"'.$dstfile.'" ';print_r($___s);
 					if(!empty($___s['dirname']) && !is_dir($___s['dirname']))
 						mkdir($___s['dirname'], 0777 ,true);
-                    /*  <% if($target=='debug') { %> */
-                    print_r(array(filemtime($dstfile),filemtime($srcfile)));
-                    /*  <% } %>*/
-					if(!is_file($dstfile) || (filemtime($dstfile)<filemtime($srcfile))){
-						echo "c>$srcfile";	
+                    $this->debug(print_r(array(filemtime($dstfile),filemtime($srcfile)),true));
+                    if(!is_file($dstfile) || (filemtime($dstfile)<filemtime($srcfile))){
+                        $this->info(  "c>$srcfile");
 						copy($srcfile,$dstfile);
 						betouch ($dstfile,filemtime($srcfile));
                         if (strlen($srcfile)+strlen($dstfile)>75){
-                           echo "\n\r  ";
+                            $this->info(  "\n\r  ");
                         }
-						echo "-->$dstfile"."\n\r";//  was last modified: " . date ("F d Y H:i:s.", filectime($srcfile));
+                        $this->info(  "-->$dstfile"."\n\r");//  was last modified: " . date ("F d Y H:i:s.", filectime($srcfile));
 						$___total_cnt++;
 					} 
 					break;	

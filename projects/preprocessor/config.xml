@@ -39,4 +39,11 @@ $Id: '.$version.'
 		<file >*.php</file>
 	</files>
 
+    <files dstdir="$dst/phing">
+        <file >point.ext.php</file>
+        <file >preprocessor.class.php</file>
+        <file >preprocessTask.php</file>
+        <file >wiki.ext.php</file>
+    </files>
+
 </config>

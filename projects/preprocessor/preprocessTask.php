@@ -78,7 +78,7 @@ require_once 'phing/Task.php';
         }
 
         public function main() {
-            $this->log('<%=$version%>', $this->logLevel);
+            $this->log('<%=$version%>', Project::MSG_INFO);
             // define a force tag
             $time=false;
             if($this->force){
@@ -92,6 +92,7 @@ require_once 'phing/Task.php';
             }
 
             $this->preprocessor->cfg_time($time);
+            $this->preprocessor->logLevel=$this->logLevel;
             // difine variable definitions
             foreach($this->parameters as $v){
                 $file=$v->getFile();
@@ -109,7 +110,7 @@ require_once 'phing/Task.php';
             }
             //run it!
             if(!!$this->config){
-                $this->log('making "'.$this->config.'"', $this->logLevel);
+                $this->log('making "'.$this->config.'"', Project::MSG_WARN);
                 $GLOBALS['preprocessor']=&$this->preprocessor;
                 $this->preprocessor->xml_read($this->config);
                 $this->preprocessor->process();

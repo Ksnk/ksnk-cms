@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="preprocessor" default="init">
+    <taskdef name="preprocess" classname="phing.tasks.ext.preprocessor.preprocessTask" />
 
     <target name="property">
         <echo file="svn.prop" append="false"><![CDATA[
@@ -38,19 +39,8 @@ svn_url=$WCURL$
             </fileset>
         </zip>
 	</target>
-    <target name="debug" depends="property">
-        <property file="../env.prop"/>
-        <property file="svn.prop"/>
-        <property name="target" value="debug"/>
-        <property name="dst" value="debug"/>
-        <property name="config" value="config.xml"/>
-        <exec
-            command="${php_exe} -q ../preprocessor/build/preprocessor.php /Psvn.prop /force='${svn_modified}' /Dtarget=${target} /Ddst=${dst} ${config}"
-            checkreturn="true"
-            logoutput="true"/>
 
-        <delete file="svn.prop"/>
-    </target>
+
     <target name="prebuild" depends="property">
         <property file="../env.prop"/>
         <property file="svn.prop"/>
@@ -80,7 +70,6 @@ svn_url=$WCURL$
     </target>
 
     <target name="test" depends="property,phing">
-        <taskdef name="preprocess" classname="phing.tasks.ext.preprocessor.preprocessTask" />
 
         <preprocess config="config.xml">
             <param name="dst" value="debug"/>
