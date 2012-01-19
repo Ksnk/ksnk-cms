@@ -1,10 +1,10 @@
 function komment(el,id){
 	try{
-		var $quote=$(el).parents('tr').eq(0),$x;
+		var $quote=$(el).closest('tr'),$x;
 		if (($x=$quote.next().find('.question')).length) $quote=$x.html();
 		else if(($x=$quote.next().next().find('.question')).length) $quote=$x.html();
 		else $quote=$quote.next().next().next().find('.question').html();
-		$form=$(el).parents('div').eq(0);
+		$form=$(el).closest('div');
 		$form.find('.quote_div').html($quote)[0].scrollIntoView();
 		$form.find('input[name=quote]').val($quote);
 		$form.find('input[name=quote_id]').attr('value', id);
