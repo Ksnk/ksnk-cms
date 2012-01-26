@@ -87,4 +87,16 @@ span.regedit-icon-select{
 {
     display:block;
 }
+.regedit-propname,
+.regedit-propvalue,
+.regedit-propaction
+{
+    border: 1px solid transparent;
+}
+.regedit-propname:hover,
+.regedit-propvalue:hover,
+.regedit-propaction:hover
+{
+    border: 1px dotted #c0c0c0;
+}
 /* треугольники */

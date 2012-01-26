@@ -26,19 +26,19 @@ svn_url=$WCURL$
     <target name="build.editcell" depends="property" description="build project">
         <property name="dst" value="build" />
         <property file="svn.prop" />
-        <preprocess config="config.xml" force='force'>
+        <preprocess config="config.xml">
             <param name="dst" value="editcell"/>
             <param name="version" value=".editcell jQuery plugin"/>
             <param name="mask" value="editcell"/>
             <param file="svn.prop"/>
         </preprocess>
-        <preprocess config="config.xml" force='force'>
+        <preprocess config="config.xml">
             <param name="dst" value="editcell"/>
             <param name="version" value=".carret jQuery plugin"/>
             <param name="mask" value="select"/>
             <param file="svn.prop"/>
         </preprocess>
-        <preprocess config="config.xml" force='force'>
+        <preprocess config="config.xml">
             <param name="dst" value="editcell"/>
             <param name="version" value=".scrollIntoView jQuery plugin"/>
             <param name="mask" value="scrollIntoView"/>
@@ -58,7 +58,7 @@ svn_url=$WCURL$
         </zip>
         <delete file="svn.prop"/>
 
-        <phpdoc title="API Documentation"
+<!--        <phpdoc title="API Documentation"
           destdir="apidocs"
           sourcecode="false"
           output="HTML:Smarty:PHP">
@@ -70,8 +70,52 @@ svn_url=$WCURL$
               <include name="INSTALL" />
               <include name="CHANGELOG" />
            </projdocfileset>
+        </phpdoc>-->
+
+    </target>
+
+    <target name="build.scrollIntoView" depends="property" description="build project">
+        <property name="dst" value="build" />
+        <property name="name" value="scroll" />
+        <property file="svn.prop" />
+        <preprocess config="config.xml" force='force'>
+            <param name="dst" value="${name}"/>
+            <param name="version" value=".scrollIntoView function"/>
+            <param name="mask" value="scroll"/>
+            <param file="svn.prop"/>
+        </preprocess>
+
+        <minify suffix='.min' yuiPath="${common}/tools/yuicompressor-2.4.5.jar">
+            <fileset dir="build/${name}">
+              <include name="*.js"/>
+              <exclude name="*.min.js"/>
+            </fileset>
+        </minify>
+        <zip destfile="build/${name}.zip">
+            <fileset dir="build/${name}">
+                <include name="**/*.*"/>
+            </fileset>
+        </zip>
+        <delete file="svn.prop"/>
+
+    </target>
+
+    <target name="doc" >
+        <phpdoc title="API Documentation"
+          destdir="apidocs"
+          sourcecode="false"
+          output="HTML:Smarty:PHP">
+           <fileset dir=".">
+              <include name="*.js" />
+           </fileset>
+           <projdocfileset dir=".">
+              <include name="README*" />
+              <include name="INSTALL" />
+              <include name="CHANGELOG" />
+           </projdocfileset>
         </phpdoc>
 
     </target>
+
 
 </project>
