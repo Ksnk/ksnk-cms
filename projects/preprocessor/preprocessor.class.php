@@ -5,48 +5,55 @@
  * <%=point('hat','comment');
 
 
-
-
-
  %>
  */
 $stderr = fopen('php://stderr', 'w');
-/** 
- * just stollen and slightly rewriten from  
- * http://ru2.php.net/manual/en/function.touch.php#88028
- * big thanks to author!
- */ 
-function betouch($file, $time){
-	if(touch($file, $time)){ 
-		clearstatcache(); 
-		$stored_mtime = $time+$time-filemtime($file);
-		if($time==$stored_mtime){ 
-			return true; 
-		}else{ 
-			return touch($file, $stored_mtime); 
-		} 
-	} 
-	return false; 
-}
- 
+
 class preprocessor{
 	var $obcnt=0,
         $debug_str='',
-        $result='',
+        //$result='',
+        $srcfile='',
         $logLevel=2,
-        $logs=array('','','','','');
-	/**
-	 * error handling. donow what to do with them ;(
-	 */
-	function error (){
-        $na=func_num_args();
-        if($na>0){
-            for ($i=0; $i<$na;$i++){
-                $this->log(0,func_get_arg($i));
+        $logs=array('');
+
+    static $attrStore=array();
+
+    /**
+     * function to hold info about atributes
+     * @param string $name - name of parameter to return
+     * @return string - value of attribute
+     */
+    public function attr($name,$default=''){
+        if('dstdir'==$name or 'dir'===$name){ // combine path with /
+            $x=array();
+            foreach(self::$attrStore as $v){
+                if(!empty($v[$name]) && ($v[$name]!='.')){
+                    array_unshift($x,rtrim($this->evd($v[$name]),'/\\'));
+                }
             }
-        } else
-            $this->log(0);
-	}
+            if(!empty($default))
+                $x[]=$this->evd($default);
+            return implode('/',$x);
+        } else if('depend'==$name){ // combine values with ;
+            $x=array();
+            foreach(self::$attrStore as $v){
+                if(!empty($v[$name]) && ($v[$name]!='.')){
+                    array_unshift($x,$this->evd($v[$name]));
+                }
+            }
+            if(!empty($default))
+                $x[]=$this->evd($default);
+            return implode(';',$x);
+        } else {  // first notempty
+            foreach(self::$attrStore as $v){
+                $vv=trim((string)$v[$name]);
+                if(!empty($vv))
+                    return $this->evd($vv);
+            }
+        }
+        return $default;
+    }
 
 	/**
 	 * array with variables exported from outer space 
@@ -70,7 +77,7 @@ class preprocessor{
 	}
 	
 	/**
-	 * here we can store our files list
+	 * here we can store our files list, Ну да!
 	 */
 	private $store=array();
 	
@@ -90,12 +97,33 @@ class preprocessor{
 
 	/**
 	 * store getter
-	 */
+     * @return mixed
+     */
 	private function getpair(){
 		return array_shift($this->store);
 	}
-	
-	/** 
+
+    /**
+     * just stollen and slightly rewriten from
+     * http://ru2.php.net/manual/en/function.touch.php#88028
+     * big thanks to author!
+     * @param $file
+     * @param $time
+     * @return bool
+     */
+    function betouch($file, $time){
+        if(touch($file, $time)){
+            clearstatcache();
+            $stored_mtime = $time+$time-filemtime($file);
+            if($time==$stored_mtime){
+                return true;
+            }else{
+                return touch($file, $stored_mtime);
+            }
+        }
+        return false;
+    }
+	/**
 	 * eval string with dollar sign, internal function
 	 */
 	private function tmp_callback($m){
@@ -158,7 +186,7 @@ class preprocessor{
 	 */
 	function handle_var(&$files){
 		if ((string)$files['name']=='') 
-			$this->error('XML: there is no NAME parameter of VAR tag.') ; // faked variable
+			$this->log(0,'XML: there is no NAME parameter of VAR tag.') ; // faked variable
 		if((string)$files =="") {// just assign a value if no values was a while
 			if (isset($this->exported_var[(string)$files['name']])) 
 				return ;
@@ -175,15 +203,13 @@ class preprocessor{
 	 */
 	function handle_import(&$files){
 		if ((string)$files['name']=='') 
-			$this->error('XML: there is no NAME parameter of IMPORT tag.') ; // faked variable
+			$this->log(0,'XML: there is no NAME parameter of IMPORT tag.') ; // faked variable
 		$this->xml_read((string)$files['name']);
 	}
 
     private function obend (){
         ob_end_clean();
         $this->obcnt--;
-        $this->result='';
-        $this->debug();
     }
 
     public function obget (){
@@ -203,41 +229,30 @@ class preprocessor{
                 $mess=func_get_arg($i);
                 $this->log(4,$mess);
             }
-        } else
-            $this->log(4);
-    }
-
-    public function info (){
-        $na=func_num_args();
-        if($na>0){
-            for ($i=0; $i<$na;$i++){
-                $mess=func_get_arg($i);
-                $this->log(2,$mess);
-            }
-        } else
-            $this->log(2);
-    }
-
-    public function log ($level){
-        if($this->logLevel<$level) return ;
-        $na=func_num_args();
-        if($na>2){
-            for ($i=1; $i<$na;$i++){
-                $this->log($level,func_get_arg($i));
-            }
-        } else {
-            if ($na==2){
-                if ($this->obcnt){
-                    $this->logs[$level].= "\n".func_get_arg(0);
-                } else {
-                    echo ''.func_get_arg(1);
-                }
-            } else {
-                echo $this->logs[$level];
-                $this->logs[$level]='';
-            }
         }
     }
+
+     public function log($level=-1){
+        if($this->logLevel<$level) return ;
+        $na=func_num_args();
+        if($na>1){
+            for ($i=1; $i<$na;$i++){
+                $v=func_get_arg($i);
+                if(is_array($v))
+                    $v=print_r($v,true);
+                $this->logs[]= array($level,$v);
+            }
+        }
+        //if($na==0){ print_r($this->logs);}
+        if(($this->obcnt==0) && count($this->logs)>0){
+            foreach($this->logs as $v){
+                if(!empty($v[1]))
+                    echo $v[1];
+            }
+            $this->logs=array();
+        }
+
+     }
 
 	
 	/**
@@ -258,26 +273,33 @@ class preprocessor{
 		if($insertbefore){
 			$sav=$this->store; $this->store=array();
 		}
+        array_unshift(self::$attrStore,$config->attributes());
 		foreach($config->children() as $files){
+            array_unshift(self::$attrStore,$files->attributes());
 			$name='handle_'.strtolower($files->getName());
 			if(method_exists($this,$name)){
 				call_user_func_array(array($this,$name),array(&$files));
 			} else
 			if ($files->getName()=='files'){
                 foreach ($files->children() as $file){
-					$dst=$this->path(array((string)$file['dstdir'],(string)$files['dstdir']));
-					if(!empty($dst)) $dst=$this->path($dst,dirname((string)$file));
+                    array_unshift(self::$attrStore,$file->attributes());
+                    $dst=$this->attr('dstdir');
                     $attributes=array();
                     foreach($file->attributes() as $k=>$v){
                         $attributes[$k]=(string)$v;
                     }
-                    if(!empty($file['depend'])){
-                        $xtime=strtotime($file['depend']);
-                        if ( !$xtime || $xtime<0 ) {
-                            $filelist=explode(';',$file['depend']);
-                            $xtime=0;
-                            foreach($filelist as $filepath) {
-                                foreach(glob($filepath) as $a){
+                    $attributes['code']=$this->attr('code');
+                    $attributes['force']=$this->attr('force');
+                    $depend=$this->attr('depend');
+                    if(!empty($depend)){
+                        $depends=explode(';',$depend);
+                        $xtime=0;
+                        foreach($depends as $d){
+                            $x=strtotime($d);
+                            if ( $x && $x>0 ) {
+                                $xtime=max($x,$xtime);
+                            } else {
+                                foreach(glob($d) as $a){
                                     $xtime=max($xtime,filemtime($a));
                                 }
                             }
@@ -287,29 +309,34 @@ class preprocessor{
 					if ($file->getName()=='echo'){
                         $this->newpair(
 							(string)$file,
-							!empty($dst)?$this->path($dst,(string)$file['name']):'',
+							!empty($dst)?$this->path($dst,$this->attr('name',(string)$file)):'',
 							$file->getName()
                             ,$attributes);
 					} else
-					foreach(glob($this->path(array((string)$file['dir'],(string)$files['dir']),(string)$file)) as $a){
+					foreach(glob($this->attr('dir',(string)$file)) as $a){
+                        $name=$this->attr('name',basename($a));
  						$this->newpair(
 							realpath ($a),
-							!empty($dst)?$this->path($dst,array((string)$file['name'],basename($a))):'',
+							!empty($dst)?$this->path($dst,$this->attr('name',basename($a))):'',
 							$file->getName()
                             ,$attributes);
 					}
+
+                    array_shift(self::$attrStore);
 				}
 			}
+            array_shift(self::$attrStore);
 		}
+        array_shift(self::$attrStore);
 		if($insertbefore){
-			$this->store=array_merge(sav,$this->store);
+			$this->store=array_merge($sav,$this->store);
 		}
         //$this->debug(print_r($this,true));
 		chdir($oldcwd);
 	}
 	/**
 	 * export variable from outer space (command line)
-	 * @param unknown_type $var
+	 * @param string $var
 	 * @param unknown_type $val
 	 */
 	public function export($var,$val){
@@ -342,7 +369,7 @@ class preprocessor{
 	 * switch php tags back
 	 * @param $dst - file to store evaluated result
 	 */
-	private function post_process($dst='',$time=0){
+	private function post_process($dst='',$time, $code=null){
 
 		$s=$this->obget();
 		$s=str_replace( // + final linefeed correcion
@@ -357,10 +384,19 @@ class preprocessor{
 			$x=pathinfo($dst);
 			if(!is_dir($x['dirname']))mkdir($x['dirname'], 0777 ,true);
             if(is_file($dst))
-                $this->debug(print_r(array(filemtime($dst),max($time,$this->cfg_time())),true));
+                $this->debug(array(filemtime($dst),max($time,$this->cfg_time()),true));
             if(!is_file($dst) || (filemtime($dst)<max($time,$this->cfg_time()))){
+                if(!empty($code)){// iconv conversion
+                    list($from,$to)=explode(':',$code.':');
+                    if(empty($from)){
+                        $from=mb_detect_encoding($s);
+                    }
+                    $this->debug("\n convert from '",$from,"' to '",$to,"'\n");
+                    if(!empty($from) && !empty($to))
+                        $s=iconv($from,$to.'//IGNORE',$s);
+                }
                 file_put_contents($dst,str_replace("\xEF\xBB\xBF", '',trim($s)));
-				betouch ($dst,max($time,$this->cfg_time() ));
+				$this->betouch ($dst,max($time,$this->cfg_time() ));
 				return true;
 			}
 		}
@@ -382,7 +418,7 @@ class preprocessor{
             return;
         }
         //if (!empty($GLOBAL['evaluated']))
-        print_r($this);
+        $this->log();
         $error['file']=$this->srcfile;
 						
         printf('fatal %s,%s,%s,%s'
@@ -393,6 +429,7 @@ class preprocessor{
 	 * execute all file-pairs in a row
 	 */
 	public function process(){
+        register_shutdown_function(array($this,'_handleFatal'));
 		if(!empty($this->exported_var)) 
 			extract($this->exported_var);
 		$___total_cnt=0;
@@ -411,8 +448,12 @@ class preprocessor{
 				case 'file':
 				case 'echo':
                     $filemtime=0;
-                    if(is_file($srcfile))
+                    if(is_file($srcfile)){
+                        $this->srcfile=$srcfile;
                         $filemtime=filemtime ($srcfile);
+                    } else {
+                        $this->srcfile='<-string->';
+                    }
                     if(!empty($___m[3]['xtime'])){
                         $filemtime=max($filemtime,$___m[3]['xtime']);
                     }
@@ -424,39 +465,45 @@ class preprocessor{
 						$srcfile='';
 					if(!is_null($___s)){
                         $oldcwd= getcwd() ;
-                        if (is_file($srcfile))
+                        if (is_file($srcfile)){
                             chdir(dirname($srcfile));//$this->debug('xml_read:',getcwd());
+                        }
                         eval($___s);
                         chdir($oldcwd)  ;
 						if (empty($dstfile)){
 							$this->cfg_time($filemtime);
 						}
-                        if($this->post_process($dstfile,$filemtime)){
-							$this->info( "e>$srcfile");
+                        if($this->post_process($dstfile,$filemtime,$___m[3]['code'])){
+							$this->log(2, "e>$srcfile");
 							if (strlen($srcfile)+strlen($dstfile)>75){
-                                $this->info( "\n\r  ");
+                                $this->log(2, "\n\r  ");
                             }
-                            $this->info( "-->$dstfile");
+                            $this->log(2, "-->$dstfile");
 							$___total_cnt++;
-                            $this->info(  "\n\r");
+                            $this->log(2,  "\n\r");
 						}
 
 						break;
 					}
 				case 'copy':
 					if(empty($dstfile))break;
-					$___s=pathinfo($dstfile);//echo '"'.$dstfile.'" ';print_r($___s);
+					$___s=pathinfo($dstfile);$this->debug( ' dst -"'.$dstfile.'" ',$___s);
+                    //print_r($___s);
 					if(!empty($___s['dirname']) && !is_dir($___s['dirname']))
 						mkdir($___s['dirname'], 0777 ,true);
-                    $this->debug(print_r(array(filemtime($dstfile),filemtime($srcfile)),true));
+                    if(is_file($dstfile))
+                        $mtime=@filemtime($dstfile);
+                    else
+                        $mtime=0;
+                    $this->debug(array($mtime,filemtime($srcfile)));
                     if(!is_file($dstfile) || (filemtime($dstfile)<filemtime($srcfile))){
-                        $this->info(  "c>$srcfile");
+                        $this->log(2,  "c>$srcfile");
 						copy($srcfile,$dstfile);
-						betouch ($dstfile,filemtime($srcfile));
+						$this->betouch ($dstfile,filemtime($srcfile));
                         if (strlen($srcfile)+strlen($dstfile)>75){
-                            $this->info(  "\n\r  ");
+                            $this->log(2,  "\n\r  ");
                         }
-                        $this->info(  "-->$dstfile"."\n\r");//  was last modified: " . date ("F d Y H:i:s.", filectime($srcfile));
+                        $this->log(2,  "-->$dstfile"."\n\r");//  was last modified: " . date ("F d Y H:i:s.", filectime($srcfile));
 						$___total_cnt++;
 					} 
 					break;	
@@ -466,10 +513,10 @@ class preprocessor{
 		if(is_array($error)){
 			fwrite($GLOBALS['stderr'],
 	    	sprintf('Error: %s(%s) module raised "%s" '."\n\r"
-	        	,realpath($srcfile), $error['line'], $error['message'])
+	        	,realpath($this->srcfile), $error['line'], $error['message'])
             .print_r(debug_backtrace(false,4),true));
-		}		
-		printf("
-total %s of %s files copied.\n\r",$___total_cnt,$___all_cnt);
+		}
+        $this->log(1,sprintf("
+total %s of %s files copied.\n\r",$___total_cnt,$___all_cnt));
 	}
 }

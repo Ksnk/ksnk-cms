@@ -3,13 +3,19 @@
  * to call preprocesor - type   php -f preprocessor.php file_name
  * 
  * <%=point('hat','comment');%>
+ *
  */
 $dir=dirname(__FILE__);
 include_once ($dir.DIRECTORY_SEPARATOR."preprocessor.class.php");
 include_once ($dir.DIRECTORY_SEPARATOR."point.ext.php");
 
     date_default_timezone_set('Europe/Moscow');
-
+/**
+ * @param $p
+ * @param $def
+ * @return mixed
+ * @tutorial preprocessor.pkg
+ */
 function pps(&$p,$def){return empty($p)?$def:$p;}
 
 $preprocessor=new preprocessor();
@@ -33,7 +39,7 @@ while(!empty($arg)){
         $time=false;
         if(!empty($m[1])){
             $time=strtotime($m[1]);
-            if(!$time){
+            if(!$time && $m[1]!='force'){
                 $preprocessor->debug('wrong date "'.$m[1].'"');
             }
         }
@@ -70,8 +76,7 @@ while(!empty($arg)){
         if(is_file($m[0])){
             $arg1=pathinfo($m[0]);
             if ($arg1['extension']=='xml'){
-                echo "making ".$m[0]."
-";
+                $preprocessor->log(1,"making ".$m[0]."\n");
                 $xmlstr=$m[0];
 
             } else {

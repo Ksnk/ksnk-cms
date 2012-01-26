@@ -28,7 +28,7 @@ svn_url=$WCURL$
         <property name="dst" value="build"/>
         <property name="config" value="config.xml"/>
         <exec
-            command="${php_exe} -q ../preprocessor/build/preprocessor.php /Psvn.prop /force='${svn_modified}' /Dtarget=${target} /Ddst=${dst} ${config}"
+            command="${php_exe} -q ../preprocessor/build/preprocessor.php /Psvn.prop /force='force' /Dtarget=${target} /Ddst=${dst} ${config}"
             checkreturn="true"
             logoutput="true"/>
 
@@ -73,9 +73,42 @@ svn_url=$WCURL$
 
         <preprocess config="config.xml">
             <param name="dst" value="debug"/>
+            <param name="level" value="debug"/>
             <param name="target" value="debug"/>
             <param file="svn.prop"/>
         </preprocess>
         <delete file="svn.prop"/>
+    </target>
+
+    <target name="doc" depends="init">
+        <phpdoc title="API Documentation"
+          destdir="apidocs"
+          sourcecode="false"
+          defaultpackagename="preprocessor"
+          output="HTML:Smarty:PHP">
+           <fileset dir=".">
+               <include name="build/*.php" />
+           </fileset>
+           <projdocfileset dir=".">
+              <include name="README" />
+              <include name="INSTALL" />
+              <include name="CHANGELOG" />
+           </projdocfileset>
+        </phpdoc>
+
+    </target>
+    <target name="NaturalDoc" depends="init">
+        <property name="srcpath" value="."/>
+        <resolvepath propertyName="srcpath" file="${srcpath}"/>
+
+        <property name="i" value="${srcpath}/build"/>
+        <property name="o" value="${srcpath}/nd_Output"/>
+        <property name="p" value="${srcpath}/nd"/>
+
+    <exec
+        command="d:\projects\tools\NaturalDocs\NaturalDocs.bat  -i ${i} -o HTML ${o} -p ${p}"
+        checkreturn="true"
+        logoutput="true"/>
+
     </target>
 </project>

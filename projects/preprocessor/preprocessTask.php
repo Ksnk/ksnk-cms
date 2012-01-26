@@ -4,6 +4,9 @@
  *
  * <%=point('hat','comment');%>
  */
+/**
+ * just a comment
+ */
 $dir=dirname(__FILE__);
 include_once ($dir.DIRECTORY_SEPARATOR."preprocessor.class.php");
 include_once ($dir.DIRECTORY_SEPARATOR."point.ext.php");
@@ -13,17 +16,16 @@ include_once ($dir.DIRECTORY_SEPARATOR."point.ext.php");
 require_once 'phing/Task.php';
     /**
      *
-     * prepare set of file for deploing by execute them with php.
+     * prepare set of file for deploying by execute them with php.
      *
-     * Example usage:
+     * <code>
      * <preprocess config="${config}">
      *      <property file="svn.prop"/>
      *      <property name="target" value="${target}"/>
      *      <property name="dst" value="${dst}"/>
      * </preprocessor>
-     *
-     * @author Serge Koriakin  <sergekoriakin at google dot com>
-     * @package  phing.tasks.ext
+     * </code>
+     * @subpackage  phing
      */
     class PreprocessTask extends Task
     {
@@ -85,7 +87,8 @@ require_once 'phing/Task.php';
                 $xtime=strtotime($this->force);
                 if(!$xtime){
                     $time=time();
-                    $this->log('wrong date "'.$this->force.'"' , Project::MSG_WARN);
+                    if ($this->force!='force')
+                        $this->log('wrong date "'.$this->force.'"' , Project::MSG_WARN);
                 } else {
                     $time=$xtime;
                 }
@@ -119,6 +122,10 @@ require_once 'phing/Task.php';
 
     }
 
+/**
+ * additional class to cover file parameter
+ * @subpackage  phing
+ */
 class Param extends Parameter {
 
     private $file=array();
