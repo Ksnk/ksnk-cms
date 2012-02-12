@@ -35,6 +35,8 @@ require_once 'phing/Task.php';
         private $config='';
         private $parameters = array();
         private $parameter;
+        private $files=array();
+        private $file;
 
         private $force=false;
 
@@ -75,8 +77,16 @@ require_once 'phing/Task.php';
             return $this->parameter;
         }
 
+        public function createFiles() {
+            $this->file = new Files();
+            $this->files[] = $this->file;
+            return $this->file;
+        }
+
         public function init() {
             $this->preprocessor=new preprocessor();
+            echo 'All clear!';
+            $_GLOBAL['points']=array();//$points
         }
 
         public function main() {
@@ -99,7 +109,7 @@ require_once 'phing/Task.php';
             // difine variable definitions
             foreach($this->parameters as $v){
                 $file=$v->getFile();
-                if(is_readable($file)){
+                if(@is_readable($file)){
                     foreach(file($file) as $vv){
                         if(preg_match('/^(?:\;.*|\#.*|([^=]+)=(.*))$/',$vv,$mm)){
                             if(!empty($mm[1])){
@@ -129,6 +139,15 @@ require_once 'phing/Task.php';
 class Param extends Parameter {
 
     private $file=array();
+    private $default='';
+
+    function setDefault($default) {
+        $this->default=$default;
+    }
+
+    function getDefault($default) {
+        return $this->default;
+    }
 
     function setFile($file) {
         $this->file=$file;
@@ -136,6 +155,60 @@ class Param extends Parameter {
 
     function getFile() {
         return $this->file;
+    }
+
+}
+
+/**
+ * additional class to cover file parameter
+ * @subpackage  phing
+ */
+class Files extends Parameter {
+
+    private $files=array();
+    private $file;
+    private $text='';
+    private $Dstdir='';
+    private $Dir='';
+
+    public function addText($text){
+        $this->text.=$text;
+    }
+
+    function createFile() {
+        $this->file = new Files();
+        $this->files[] = $this->file;
+        return $this->file;
+    }
+
+    function setDstdir($dstdir) {
+        return $this->dstdir=$dstdir;
+    }
+
+    function getDstdir() {
+        return $this->dstdir;
+    }
+
+    function setDir($dir) {
+        return $this->dir=$dir;
+    }
+
+    function getDir() {
+        return $this->dir;
+    }
+
+    function getFile() {
+        return $this->files;
+    }
+
+    function createEcho() {
+        $this->file = new Files();
+        $this->files[] = $this->file;
+        return $this->file;
+    }
+
+    function getEcho() {
+        return $this->files;
     }
 
 }

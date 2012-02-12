@@ -1,10 +1,12 @@
 <?php
-//require_once('/simpletest/autorun.php');
-    require_once('/simpletest/unit_tester.php');
-    require_once('/simpletest/shell_tester.php');
-    require_once('/simpletest/mock_objects.php');
-    require_once('/simpletest/reporter.php');
-    require_once('/simpletest/xml.php');
+define('SIMPLETEST','/projects/tools/simpletest/');
+//require_once(SIMPLETEST.'autorun.php');
+    require_once(SIMPLETEST.'test_case.php');
+    require_once(SIMPLETEST.'unit_tester.php');
+    require_once(SIMPLETEST.'shell_tester.php');
+    require_once(SIMPLETEST.'mock_objects.php');
+    require_once(SIMPLETEST.'reporter.php');
+    require_once(SIMPLETEST.'xml.php');
 
 ini_set('include_path',
   ini_get('include_path')

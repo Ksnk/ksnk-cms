@@ -40,7 +40,7 @@ function point_finish(){
 	if (empty($contents)) return;
 	if(!isset($points[$cur_point]))
 	  $points[$cur_point]=array();
-	$points[$cur_point][]=preg_replace('/^\s+|\s+$/','',$contents);  
+	$points[$cur_point][]=preg_replace('/^\s+|^\*\/|\s+$|\/\*$/','',$contents);
 }
 
 /**

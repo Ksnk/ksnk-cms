@@ -306,6 +306,9 @@ class preprocessor{
                         }
                         $attributes['xtime']=$xtime;
                     }
+                    if(!empty($dst) && dirname((string)$file)!=''){
+                        $dst.='/'.dirname((string)$file);
+                    }
 					if ($file->getName()=='echo'){
                         $this->newpair(
 							(string)$file,
@@ -395,7 +398,10 @@ class preprocessor{
                     if(!empty($from) && !empty($to))
                         $s=iconv($from,$to.'//IGNORE',$s);
                 }
-                file_put_contents($dst,str_replace("\xEF\xBB\xBF", '',trim($s)));
+                // удаляем пустые комментарии - последствия корявой обработки вставки секций
+                file_put_contents($dst,preg_replace(array('~^\s*/\*\*/\s*$~m','~\s*/\*\s*\*/~'),array('',''),
+                    str_replace("\xEF\xBB\xBF", '',trim($s))
+                ));
 				$this->betouch ($dst,max($time,$this->cfg_time() ));
 				return true;
 			}
