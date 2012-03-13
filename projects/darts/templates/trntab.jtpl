@@ -88,7 +88,7 @@
 	<td class="trntab{% if loop.index==loopindex %} gray{% endif %}">
 		{% if cell.add or is_reader %}
 		{%- if cell.name %}<a href="{{cell.name}}">{% endif -%}
-		{%- if cell.add %}<span style="font-size:14px;">{{cell.x}}:{{cell.y}}</span><br><span title="средний набор" style="font-size:10px;">{{cell.add}}</span>
+		{%- if cell.add %}<span style="{% if cell.x>cell.y %}color:red;{% endif %}font-size:14px;">{{cell.x}}:{{cell.y}}</span><br><span title="средний набор" style="font-size:10px;">{{cell.add}}</span>
 		{%endif-%}
 		{%- if cell.name %}</a> {% endif -%}
 		{% endif %}
