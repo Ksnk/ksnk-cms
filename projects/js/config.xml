@@ -2,7 +2,7 @@
 <config>
     <files>
             <echo>
-                <![CDATA[<% point_start('hat');echo
+                <![CDATA[<% POINT::start('hat');echo
 '****************************************************************************
 $Id: '.$version.'
  Rev: '.$svn_revision.', Modified: '.$svn_modified.'$

@@ -1,19 +1,19 @@
 function WindowO(e,s,w,h)
 {
 	if(typeof(e)!='string'){
-	var $x=$(e).attr('href');
-	if($x && ($x.length>2)) { return true;}
-	if(s.match(/\/$/)) return false ;
+        var $x=e.getAttribute('href');
+        if($x && ($x.length>2)) { return true;}
+        if(s.match(/\/$/)) return false ;
 	} else {
 		h=w;w=s;s=e;
 	}
 	try{
 	  var par="location=no,toolbar=no,resizable=yes";
 	  if((w+100>window.screen.width)||(h+100>window.screen.height))
-	  	par+=",scrollbars=yes"
+	  	par+=",scrollbars=yes";
 	  if(w) par+=',width='+w;
  	  if(h) par+=',height='+h;
-	  wind=open("","win",par);
+	  var wind=open("","win",par);
 	  wind.document.writeln('<html>'+
 		'<head><title><'+'/title><style>body,html{width:100%;height:100%;padding:0;margin:0;}\n'+
 		'body{overflow:auto;}\n</'+'style>\n<'+'script>function fitPic(){'+
@@ -29,7 +29,7 @@ function WindowO(e,s,w,h)
 		'onclick="self.close();">close</button><'+'/body><'+'/html>');
 	  wind.document.close();
 	} catch(e) {
-	  alert('Всплывающие окна заблокированы! Разрешите всплывающие окна для нормального функционирования.')
+	  alert('Р’СЃРїР»С‹РІР°СЋС‰РёРµ РѕРєРЅР° Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅС‹! Р Р°Р·СЂРµС€РёС‚Рµ РІСЃРїР»С‹РІР°СЋС‰РёРµ РѕРєРЅР° РґР»СЏ РЅРѕСЂРјР°Р»СЊРЅРѕРіРѕ С„СѓРЅРєС†РёРѕРЅРёСЂРѕРІР°РЅРёСЏ.')
 	}
 	return false;
-};
+}

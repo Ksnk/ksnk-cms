@@ -141,21 +141,22 @@ $.fn.contextMenu = function (action, o,o2) {
         //console.log(e);
         //обрабатываем оставшиеся hotkey
         if(!$(e.target).is('input,textarea')){
-        if(options.hotkey[e.keyCode]){
-            var action=options.hotkey[e.keyCode];
-            if(!options._disabled[action.action]
-                && e.altKey==action.alt
-                && e.ctrlKey==action.ctrl
-                && e.shiftKey==action.shift
-            ){
-                if( options.action )
-                     options.action.call(null, action.action, event);
-                e.preventDefault();
-                e.stopPropagation();
-                e.result=false;
-                return false;
+            if(options.hotkey[e.keyCode]){
+                var action=options.hotkey[e.keyCode];
+                if(!options._disabled[action.action]
+                    && e.altKey==action.alt
+                    && e.ctrlKey==action.ctrl
+                    && e.shiftKey==action.shift
+                ){
+                    if( options.action )
+                         options.action.call(null, action.action, event);
+                    e.preventDefault();
+                    e.stopPropagation();
+                    e.result=false;
+                    return false;
+                }
             }
-        }}
+        }
     }
 
     function showMenu(tgtElement,X,Y){

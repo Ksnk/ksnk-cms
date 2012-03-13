@@ -39,13 +39,18 @@ table.regedit td {
     padding:0;
     overflow:hidden;
     white-space: nowrap;
+
+    font-size: 10pt;
+
 }
 
-.regedit-title, .regedit-property, .regedit-propvalue,.regedit-propaction, .regedit-propname{
-    font-size: 10pt;
+.regedit-title,.regedit-property, .regedit-simpleline, .regedit-propvalue,.regedit-propaction, .regedit-propname{
     text-decoration: none;
 }
 
+.regedit-simpleline{
+    background: #f7f7f7;
+}
 .regedit .regedit-title, .regedit .regedit-property {
     display: inline-block;
     padding-left: 3px;

@@ -23,13 +23,7 @@ $.fn.regedit = function (action,o) {
             if(row.type.match(/^aro/))
                 options._keys[row.key] = options._prefix + row.title;
             var $dig = '';
-            child_cnt=0;
-            if(row.children){
-                for ( i in row.children) {
-                    ii=row.children[i];if(!ii) continue;
-                    child_cnt++;
-                }
-            }
+
             if(row.prop){
                 for ( i in row.prop) {
                     ii=row.prop[i];if(!ii) continue;
@@ -40,13 +34,10 @@ $.fn.regedit = function (action,o) {
                     }
                 }
             }
-            if (child_cnt == 0) {
-                row._empty = true;
-            }
             $result = '';
             // символ +-[] -
             var $xxx = '';
-            if (row._empty) {
+            if (child_cnt== 0) {
                 $xxx = 'empty';
             } else if (row._status == 'show') {
                 $xxx = 'minus';
@@ -111,10 +102,48 @@ $.fn.regedit = function (action,o) {
         return getNode(element).data('row');
     }
 
+    /**
+     * преобразовать узел к другому типу
+     * @param el
+     * @param type
+     */
+    function trnTo(el,type){
+        var row=el.data('row');
+        row.type=type;
+        update();
+    }
+
+    /**
+     * Добавить узел в узел
+     * @param el
+     * @param type
+     * @param title
+     */
+    function insertRow(el,type,title){
+        var row=el.data('row');
+        row._status='show';
+        if(!row.children) row.children=[];
+        var child={key:options._nextKey--,type:type,title:title||'New '+type};
+        row.children.push(child);
+        update();
+        options._append[child.key]=child;
+
+        if(child._element){
+            make_Active(child._element);
+            editcell($('.regedit-title',child._element));
+        }
+//        console.log(child);
+    }
+
+    /**
+     * удалить узел напрочь
+     * @param el
+     * @param row
+     */
     function deleteRow(el,row) {
         var activeNode=false;
         if(!row){
-            var row = options.activeNode.data('row');
+            row = options.activeNode.data('row');
             var x = $('#tree tr.active').prevAll(':visible:first');
             if (x.length)
                 activeNode=x.data('row');
@@ -122,20 +151,26 @@ $.fn.regedit = function (action,o) {
                 activeNode=$('#tree tr:visible:first').data('row');
             options.activeNode.data('row',activeNode);
         }
+        //console.log('x ',row.key);
         if(row.children) {
-            for(var i in row.children){
-                var ii=row.children[i];if(!ii) continue;
-                deleteRow(null,ii);
-                delete(row.children[i]);
-            }
+            var xx=[],i;
+            for( i in row.children)xx.push(row.children[i]);
+            for( i in xx)
+                deleteRow(null,xx[i]);
         }
-        if(row.key) // удаляем старую строку, иначе - вновьвставленную
+        if(row.key<0) {// удаляем старую строку, иначе - вновьвставленную
+            if(options._append[row.key]) delete(options._append[row.key]);
+        } else {
             options._delete[row.key]=row.key;
+            //console.log(row.key);
+        }
+        if(options._update[row.key]) delete(options._update[row.key]);
         // удаляем из парента
         if(el) {
             var idx=$.inArray(row,row._parent.children);
+            //console.log('y ',row.key,row._parent.key);
             if(idx>=0){
-                delete(row._parent.children[idx]);
+                row._parent.children.splice(idx,1);
             }
             update();
         }
@@ -156,11 +191,14 @@ $.fn.regedit = function (action,o) {
         tab.find('tbody').find('tr').remove();
         var $html;
         for (var i in childs) {
-            $html = '<tr><td class="regedit-propname"><span class="regedit-icon-select"></span>' + options._keys[parseInt(childs[i].id) || 0]
+            $html = '<tr><td class="regedit-propname"><span class="regedit-icon-select"></span>'
+                        + options._keys[parseInt(childs[i].id) || 0]
                     + '</td><td></td>'
-                    + '<td class="regedit-propvalue"><span class="regedit-icon-select"></span>' + (childs[i].allow == 0 ? '-' : '+')
+                    + '<td class="regedit-propvalue"><span class="regedit-icon-select"></span>'
+                        + (childs[i].allow == 0 ? '-' : '+')
                     + '</td><td></td>'
-                    + '<td class="regedit-propaction"><span class="regedit-icon-select"></span>' + childs[i].action
+                    + '<td class="regedit-propaction"><span class="regedit-icon-select"></span>'
+                        + childs[i].action
                     + '</td><td></td>'
                     + '<td></td></tr>';
             $($html).appendTo(tab.find('tbody')).data('row', childs[i]);
@@ -195,6 +233,8 @@ $.fn.regedit = function (action,o) {
             _delete:[],
             _update:[],
             _append:[],
+            /** @var int - индекс, устанавливаемый для вставки */
+            _nextKey:-1,
             activeState:'tree',
             activeNode:null,
             /**
@@ -206,6 +246,8 @@ $.fn.regedit = function (action,o) {
                     if($(this).is('.regedit-title')){
                         //делаем rename в дереве
                         row=$(this).parent().parent().data('row');
+                        if(!options._append[row.key])
+                            options._update[row.key]=row;
                         row.title=txt;
                      } else if($(this).is('.regedit-propname,.regedit-propvalue,.regedit-propaction')){
                         var parent=options.activeNode.data('row');
@@ -218,6 +260,7 @@ $.fn.regedit = function (action,o) {
                             (row||str)['allow']=(0+(txt=='+'));
                         } else
                             (row||str)['action']=txt;
+
                         if(!row) { // обновляем данные
                             //добавляем новую строку
                             if(parent=options.activeNode.data('row')){
@@ -226,7 +269,10 @@ $.fn.regedit = function (action,o) {
                                 } else {
                                     parent.prop=[str]
                                 }
+                                options._update[parent.key]=parent;
                             }
+                        } else {
+                            options._update[row.key]=row;
                         }
 
                        // $(this).html('<span class="regedit-icon-select"></span>'+txt);
@@ -341,20 +387,39 @@ $.fn.regedit = function (action,o) {
                 else if(options.activeState=='tree')
                 if ($(this).is('.regedit-title')) {
                     make_Active($(this));
-                    var $result = ['Переименовать#rename'],
+                    var $result =[] ,
                         node = getRow(this);
-                    if (node.type == 'axo_group' || node.type == 'axo_prefix') {
+                    // статистико рулед!
+                    var m=node.type.match(/(a[rx]o)(_prefix|_group)?/)
+                        ,cnt=node.children && node.children.length>0||false;
+
+                    if(cnt){
                         if (node._status == 'hide')
                             $result.push('Развернуть#open');
                         else
                             $result.push('Свернуть#open');
                         $result.push('');
-                        $result.push({title:'Добавить', children:[
-                            'Группу#add_group_down',
-                            'префикс#add_group',
-                            'пользователя#add_user'
-                        ]});
                     }
+
+                    $result.push('Переименовать#rename');
+                    if (!!m[2]) {
+                        var children=['Группу#add_'+m[1]+'group'];
+                        if(m[2]=='_group')
+                            children.push('Префикс#add_'+m[1]+'prefix');
+                        if('aro'==m[1])
+                            children.push('Объект#add_aro');
+                        else
+                            children.push('Пользователя#add_axo');
+                        $result.push({title:'Добавить',children:children});
+                    }
+                    $result.push({title:'Преобразовать в', children:
+                        [
+                            'Группу#trn_'+m[1]+'group',
+                            'Префикс#trn_'+m[1]+'prefix',
+                            'aro'==m[1]?'Объект#trn_aro':'Пользователя#trn_axo'
+                        ]
+                    });
+
                     $result.push('Удалить#del');
                     $result.push('', 'Copy#copy', 'Paste#paste');
                     return $result;
@@ -418,6 +483,32 @@ $.fn.regedit = function (action,o) {
                     case 'del':
                         deleteRow(options.activeNode);
                         break;
+                    // вставка элементов
+                    case 'add_axogroup':
+                        insertRow(options.activeNode,'axo_group','Группа пользователей'); break;
+                    case 'add_axoprefix':
+                        insertRow(options.activeNode,'axo_prefix','Префикс'); break;
+                    case 'add_axo':
+                        insertRow(options.activeNode,'axo','Пользователь'); break;
+                    case 'add_arogroup':
+                        insertRow(options.activeNode,'aro_group','Группа объектов'); break;
+                    case 'add_aroprefix':
+                        insertRow(options.activeNode,'aro_prefix','Префикс'); break;
+                    case 'add_aro':
+                        insertRow(options.activeNode,'aro','Объект'); break;
+                    case 'trn_axogroup':
+                        trnTo(options.activeNode,'axo_group'); break;
+                    case 'trn_axoprefix':
+                        trnTo(options.activeNode,'axo_prefix'); break;
+                    case 'trn_axo':
+                        trnTo(options.activeNode,'axo'); break;
+                    case 'trn_arogroup':
+                        trnTo(options.activeNode,'aro_group'); break;
+                    case 'trn_aroprefix':
+                        trnTo(options.activeNode,'aro_prefix'); break;
+                    case 'trn_aro':
+                        trnTo(options.activeNode,'aro'); break;
+
                     default:
                         alert(act)
 
@@ -499,6 +590,19 @@ $.fn.regedit = function (action,o) {
         }
     }
 
+    function ToString(prefix,obj){
+        var result=[];
+        for(var a in obj){
+            for(var b in obj[a]){
+                if(b!='key' && !b.match(/^_/) && !!obj[a][b])
+                    result.push(prefix+'['+obj[a].key+']['+b+']='+encodeURIComponent(obj[a][b]));
+            }
+            if(obj[a]._parent)
+                result.push(prefix+'['+obj[a].key+'][parent]='+obj[a]._parent.key);
+        }
+        return result.join('&');
+    }
+
     function update(){
         var tree = $('#tree');
         if (options && options.children) {
@@ -530,12 +634,9 @@ $.fn.regedit = function (action,o) {
                     for(var a in options._delete)
                         result.push('delete[]='+a);
                 }
-                if(options._update){
-                    result.push('update='+options._update.join(','));
-                }
-                if(options._append){
-                    result.push('append='+options._append.join(','));
-                }
+                var x;
+                if(x=ToString('update',options._update))result.push(x);
+                if(x=ToString('append',options._append))result.push(x);
                 return result.join('&');
             case 'delNode':
                 deleteRow(options.activeNode);
@@ -608,7 +709,7 @@ $(function () {
         ,on_drag:function (event, options) {
             var xxx=$(this).data('vresizer'),
                 w = options.startheight + (event.pageY - options.start) * xxx[1];
-            console.log(xxx);
+           // console.log(xxx);
             if(w>15 && w<xxx[2])
                 xxx[0].css('height', w);
         }
