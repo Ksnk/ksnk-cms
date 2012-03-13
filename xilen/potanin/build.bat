@@ -8,7 +8,7 @@ if not exist z:\home\potanin.me\wwww md z:\home\potanin.me\www
 
 :nocreate
 
-%php_exe% -q  ../preprocessor/preprocessor.php /Ddst=z:/home/potanin.me/www ../potanin/config.xml
+%PHPBIN% -q  ../preprocessor/preprocessor.php /Ddst=z:/home/potanin.me/www ../potanin/config.xml
 :create
 
 ::@echo press Ctrl-Break to stop it
