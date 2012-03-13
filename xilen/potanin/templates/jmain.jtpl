@@ -59,7 +59,6 @@
     <base href="{{root}}">
 
 <link href="{{root}}style/style.css" rel="stylesheet" type="text/css" />
-<link href="{{root}}style/layout.css" rel="stylesheet" type="text/css" />
 <!--[if IE]><link href="{{root}}style/ie.css" rel="stylesheet" type="text/css" /><![endif]-->
 <style type="text/css">
 <!--
@@ -208,7 +207,6 @@
     <base href="{{root}}">
 
 <link href="{{root}}style/style.css" rel="stylesheet" type="text/css" />
-<link href="{{root}}style/layout.css" rel="stylesheet" type="text/css" />
 <!--[if IE]><link href="{{root}}style/ie.css" rel="stylesheet" type="text/css" /><![endif]-->
 <style type="text/css">
 <!--
