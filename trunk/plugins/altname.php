@@ -7,17 +7,17 @@
 $auto_plugins[]='altname';
 
 // участок шаблона админки статьи с дополнительным полем ввода адреса
-	point_start('plugin_control0');
+	POINT::start('plugin_control0');
 %>
 <input type="text" class="tahoma fills size11" style="width:100px;" title="Название раздела в адресной строке"
 	alt="Название раздела в адресной строке" onchange="need_Save()" placeholder="адрес" name="alt_name_{id}">
-<% point_start('plugin_control1')
+<% POINT::start('plugin_control1')
 // обработка дополнительного поля ввода в форме администрирования статьи
 %>
 if(!!$element->article && $form->var['alt_name_'.$element->article->v['id']]){
    $this->export('altname','update_page',$form->var['alt_name_'.$element->article->v['id']],$res['name'],$item->v['id']);
 }
-<% point_start('plugin_control2')
+<% POINT::start('plugin_control2')
 // обработка дополнительного поля ввода в форме администрирования статьи
 %>
   $x=$this->export('altname','getrealaddr',$item->v['id']);
@@ -25,7 +25,7 @@ if(!!$element->article && $form->var['alt_name_'.$element->article->v['id']]){
   	$x=$item->v['id'];
   }
   $form->var['alt_name_'.$element->article->v['id']]=$x;
-<% point_start('plugin_body') %>
+<% POINT::start('plugin_body') %>
 
 /**
  * плагин для реализации альтернативных имен страниц
