@@ -1867,7 +1867,7 @@ $x=$this->export('altname','getrealaddr',$item->v['id']);
 /**
  * Поехали работать
  */
-$engine=&new engine('sitemap','ajax','Auth','users');
+$engine=new engine('sitemap','ajax','Auth','users');
 $_GLOBALS['engine']=&$engine;
 
 //DO_IT_ALL();

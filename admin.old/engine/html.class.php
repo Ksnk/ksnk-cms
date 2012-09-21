@@ -322,7 +322,7 @@ class form{
 		if (!is_array($arg))$canget=$arg;
 //        else if (is_string($arg))$canget=$arg;
 		else if ($canget) {
-			$this->controls[] =&new control($arg);
+			$this->controls[] =new control($arg);
 			if ($arg[0]!=CNT_LABEL)
 			if ($arg[0]!=CNT_TEXT)
 			if ($arg[0]!=CNT_GROUP)

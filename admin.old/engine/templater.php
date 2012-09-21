@@ -134,10 +134,10 @@ class tpl {
 				$xx='';
 				for($i=0;$i<count($x);$i++)
 					if(isset($x[$i]))
-						$xx.=call_user_func ($idx,$x[$i]);
+						$xx.=call_user_func ($idx,&$x[$i]);
 				return $xx;		
 			} else
-				return call_user_func ($idx,$x);
+				return call_user_func ($idx,&$x);
 		} else if ($x===true) return $true ;
 		elseif (($x!==0)&&(!$x)) return $false ;
 		else return $x;
@@ -152,10 +152,10 @@ class tpl {
 				$xx='';
 				for($i=0;$i<count($x);$i++)
 					if(isset($x[$i]))
-						$xx.=call_user_func ($idx,$x[$i]);
+						$xx.=call_user_func ($idx,&$x[$i]);
 				return $xx;		
 			} else
-				return call_user_func ($idx,$x);
+				return call_user_func ($idx,&$x);
 		} else return $x;
 	}
 
@@ -168,10 +168,10 @@ class tpl {
 				$xx='';
 				for($i=0;$i<count($x);$i++)
 					if(isset($x[$i]))
-						$xx.=call_user_func ($idx,$x[$i]);
+						$xx.=call_user_func ($idx,&$x[$i]);
 				return $xx;		
 			} else
-				return call_user_func ($idx,$x);
+				return call_user_func ($idx,&$x);
 		} else return $x;
 	}
 
@@ -444,7 +444,7 @@ function smart_template($idx=null,$par=null,$contents='') {
 		$idx=array($idx,'_');	
 	$template->resolve($idx,$contents);
 	if (!is_null($par) && is_callable($idx))
-		return call_user_func ($idx,$par);
+		return call_user_func ($idx,&$par);
 	else {
         debug('unknown tamplate '.$idx[0].' '.$idx[1]);
 		return '';
