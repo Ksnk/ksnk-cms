@@ -60,7 +60,7 @@ class runningline extends ml_plugin {
 							$orderind++;
 						}
 						if(!empty($order_new)){
-							$ns=&new DBNestedSet($this->parent->database,TAB_PREF.'_menu');
+							$ns=new DBNestedSet($this->parent->database,TAB_PREF.'_menu');
 							while(!empty($order_old)){
 							//debug($order_new);debug($order_old);
 								reset($order_old);
@@ -88,7 +88,7 @@ class runningline extends ml_plugin {
 				$x->serialize($_POST,true);
 				break;
 			case "ins":
-				$ns=&new DBNestedSet($this->parent->database,TAB_PREF.'_menu');
+				$ns=new DBNestedSet($this->parent->database,TAB_PREF.'_menu');
 				$ns->AddNode($node->v['id'],array_merge(array('name'=>'running_line'),$from));
 				//$node->newmenu($node->v['id'],'running_line');
 		   		break;
@@ -99,7 +99,7 @@ class runningline extends ml_plugin {
 		if(!$this->parent->has_rights(right_WRITE))
 			return $this->parent->ffirst('_loginform');
 
-		$ns=&new DBNestedSet($this->database,TAB_PREF.'_menu');
+		$ns=new DBNestedSet($this->database,TAB_PREF.'_menu');
 		$votes_root=$ns->GetNodeInfo('runningline');
 		if(!empty($votes_root) && $killall){
 			$x=$ns->DeleteNode('runningline');

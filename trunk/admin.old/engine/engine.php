@@ -225,7 +225,7 @@ class prop
     {
         static $me;
         if (!isset($me)) {
-            $me =& new prop();
+            $me = new prop();
             $me->prop();
         }
         return $me;

@@ -699,7 +699,7 @@ class tpl_parser extends parser {
 			
 		if (!is_null($par)){
 			if (method_exists($tpl_compiler,'_'.$idx))
-				return call_user_func (array($tpl_compiler,'_'.$idx),$par);
+				return call_user_func (array($tpl_compiler,'_'.$idx),&$par);
 			else 
 				printf('have no template "%s:%s"','tpl_compiler','_'.$idx);
 		}

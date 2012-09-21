@@ -504,7 +504,7 @@ class csv extends ml_plugin {
 		@set_time_limit(8*60);
 		$starttime=mkt();
 
-		$csv_reader=&new csv_reader($fname,$this->linedelimiter);
+		$csv_reader=new csv_reader($fname,$this->linedelimiter);
 		if(isset($this->headerline))
             $data=$this->headerline;
         else
@@ -1149,7 +1149,7 @@ class katalog extends ml_plugin
 			  )");
 
 
-	//		$ns=&new DBNestedSet($this->database,TAB_PREF.'_category');
+	//		$ns=new DBNestedSet($this->database,TAB_PREF.'_category');
 	/*		$ns->AddNode(0,array('name'=>'category'));
 			$ns->AddNode(0,array('name'=>'charact'));
 			$ns->AddNode(0,array('name'=>'new'));

@@ -11,6 +11,7 @@
 var mousetgt=(window.execScript || window.opera)?document:window;
 
 $.fn.ddr = function (options) {
+    options=options||{};
     function drag_stop() {
         $(mousetgt).unbind('mousemove', mousemove).unbind('mouseup', mouseup);//.unbind('mousedown',mouseup);
         options._drag_target = null;

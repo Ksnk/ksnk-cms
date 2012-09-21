@@ -140,7 +140,7 @@ function & readElement(&$res,&$i){
 	{
 		$x=itemByType(ppi($res[$i]['type']));
 		if($x=='xGallery') $x='yGallery'; // XXX: затычка!
-		$row=&new $x();
+		$row=new $x();
 		$row->readFrom($res,$i);
 	}
 	return $row;
@@ -1194,7 +1194,7 @@ class xArticle extends xElement {
 			if(!empty($_POST['new_item_add']) && !empty($formvar['new_item_type']))
 			{
 				$x=itemByType($formvar['new_item_type']);
-				$x=&new $x();
+				$x=new $x();
 				//debug($this->node());
 				$x->Create(array('type'=>$formvar['new_item_type']),$this->node());
 				unset($_POST['new_item_add'],$formvar['new_item_type']);
@@ -2023,9 +2023,9 @@ class xTable extends xElement {
 	function Create($key,$parent) {
 		global $engine;
 		$id= $engine->nodeAdd($parent,$key);
-		$row= &new xRow();
+		$row= new xRow();
 		$row->Create(array('name'=>'Header','type'=>type_ROW),$id);
-		$row= &new xRow();
+		$row= new xRow();
 		$row->Create(array('name'=>'Header','type'=>type_ROW),$id);
 		return $id;
 	}
@@ -2044,12 +2044,12 @@ class xKatalog1 extends xTable {
 		//$this->img_col = 1;
 		global $engine;
 		$id= $engine->nodeAdd($parent,$key);
-		$row= &new xRow();
+		$row= new xRow();
 		$rid = $row->Create(array('name'=>'Header','type'=>type_ROW),$id);
 		$cid = $engine->nodeAdd($rid,array('type'=>type_CELL,'text'=>''));
 		$cid = $engine->nodeAdd($rid,array('type'=>type_CELL,'text'=>'Доп. описание'));
 		//$engine->nodeAdd($cid,array('type'=>type_PIC, 'name'=>'picture', 'pic_small'=>'', 'pic_big'=>''));
-		$row= &new xRow();
+		$row= new xRow();
 		$rid = $row->Create(array('name'=>'Header','type'=>type_ROW),$id);
 		$cid = $engine->nodeAdd($rid,array('type'=>type_CELL,'text'=>''));
 		$cid = $engine->nodeAdd($rid,array('type'=>type_CELL,'text'=>''));

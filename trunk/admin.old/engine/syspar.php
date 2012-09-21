@@ -1951,7 +1951,7 @@ function convert_href($s){
            'return \'href="\'.$matches[1].preg_replace(\'~(?:&amp;|&)~\',\'&amp;\',$matches[2]).\'"\';'
     	);
 	}}
-	//$prop= &new prop();
+	//$prop= new prop();
 	$ar=prop::prep(SUPER::_l(mess_query));
 	
 	$x=preg_replace_callback('~href="(.*?)/?(\?.*?)"~',$xfunc,	$s	);

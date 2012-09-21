@@ -459,7 +459,7 @@ class search extends ml_plugin{
 		else
 			$x=array();
 		if(isset($x['katalog'])){
-			$Kat=&new xKatalogue();
+			$Kat=new xKatalogue();
 			$Kat->v=array('id'=>$x['katalog']);
 			return $Kat->getText($x);		
 		}	
